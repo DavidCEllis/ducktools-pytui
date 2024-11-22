@@ -1,4 +1,4 @@
-# <one line to give the program's name and a brief idea of what it does.>
+# duckpy - python launcher and finder
 # Copyright (C) 2024 David C Ellis
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,3 +15,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 __version__ = "v0.0.1"
+
+
+

@@ -1,3 +1,7 @@
-# ducktools: PROJECTNAME #
+# duckpy #
 
-This is the template project for ducktools projects.
+Replacement for `py.exe` on windows with additional useful commands.
+
+## Differences ##
+
+* `duckpy` 
