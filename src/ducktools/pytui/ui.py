@@ -15,11 +15,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import os.path
 from pathlib import Path
 import typing
 
-from ducktools.pythonfinder import list_python_installs, PythonInstall
+from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv
 
 from textual.app import App
@@ -28,6 +28,7 @@ from textual.containers import Vertical
 from textual.widgets import DataTable, Footer, Header, Label
 
 from .commands import launch_repl, launch_shell, create_venv
+from .util import list_installs_deduped
 
 
 DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"]
@@ -52,7 +53,7 @@ class VEnvTable(DataTable):
             self.add_columns("Version", "Environment Path", "Runtime Path")
             for venv in get_python_venvs(base_dir=CWD, recursive=False, search_parent_folders=True):
                 folder = str(Path(venv.folder).relative_to(CWD))
-                self.add_row(venv.version_str, folder, venv.parent_path, key=venv)
+                self.add_row(venv.version_str, folder, venv.parent_executable, key=venv)
         finally:
             self.loading = False
 
@@ -72,13 +73,12 @@ class RuntimeTable(DataTable):
         try:
             self.cursor_type = "row"
             self.add_columns("Version", "Managed By", "Implementation", "Path")
-            for install in list_python_installs():
-                path = str(Path(install.executable).parent)
+            for install in list_installs_deduped():
                 self.add_row(
                     install.version_str,
                     install.managed_by,
                     install.implementation,
-                    path,
+                    install.executable,
                     key=install
                 )
         finally:
