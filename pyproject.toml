@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name="ducktools.pytui"
+name="ducktools-pytui"
 description="A TUI for managing Python runtimes and installs"
 authors = [
   { name="David C Ellis" },
@@ -31,7 +31,7 @@ dynamic = ['version']
 
 [project.scripts]
 "pytui" = "ducktools.pytui.__main__:main"
-"ducktools.pytui" = "ducktools.pytui.__main__:main"  # For uvx invocations
+"ducktools-pytui" = "ducktools.pytui.__main__:main"  # For uvx invocations
 
 [project.optional-dependencies]
 testing = ["pytest", "pytest-cov"]

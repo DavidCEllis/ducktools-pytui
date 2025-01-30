@@ -1,4 +1,4 @@
-# ducktools.pytui #
+# ducktools: pytui #
 
 A terminal based user interface for managing Python installs and virtual environments.
 
@@ -6,9 +6,9 @@ A terminal based user interface for managing Python installs and virtual environ
 
 The easiest way to install ducktools.pytui is as a tool from PyPI using `uv` or `pipx`.
 
-`uv tool install ducktools.pytui` or `pipx install ducktools.pytui`
+`uv tool install ducktools-pytui` or `pipx install ducktools-pytui`
 
-Run with `pytui` or `ducktools.pytui`.
+Run with `pytui` or `ducktools-pytui`.
 
 ## Features ##
 
@@ -39,6 +39,6 @@ Run with `pytui` or `ducktools.pytui`.
   * Conda environments are a completely separate ecosystem, 
     while everything this supports uses the standard PyPI ecosystem
   * Supporting Conda would basically require a whole separate parallel set of commands
-* Manage `ducktools.pytui` specific runtimes
+* Manage `ducktools-pytui` specific runtimes
   * I don't want to add *yet another* place Python can be installed
-  * `ducktools.pytui` is intended to help manage tools and installs that already exist
+  * `ducktools-pytui` is intended to help manage tools and installs that already exist
