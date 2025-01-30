@@ -17,6 +17,8 @@ Run with `pytui` or `ducktools-pytui`.
 * List Python Virtual Environments relative to the current folder
 * List Python installs
 * Launch a Terminal with a selected venv activated
+  * Currently only 'tested' with 'bash' on Linux and 'cmd' on Windows
+  * It's possible shell config files may break the environment variable changes. 
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
 

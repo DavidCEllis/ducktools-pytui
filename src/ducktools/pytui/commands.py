@@ -72,10 +72,20 @@ def launch_shell(venv: PythonVEnv) -> None:
     if shell_name == "cmd":
         old_prompt = env.get("PROMPT", "$P$G")
         env["PROMPT"] = f"({Path(venv.folder).name}) {old_prompt}"
+        cmd = [shell]
     elif shell_name == "bash":
-        old_prompt = env.get("PS1", "")
-        env["PS1"] = f"({Path(venv.folder).name}) {old_prompt}"
+        old_prompt = env.get("PS1", r"\u@\h \w\$")
+        env["PS1"] = f"($VIRTUAL_ENV_PROMPT) {old_prompt}"
+        cmd = [shell, "--noprofile", "--norc"]
+    elif shell_name == "zsh":
+        old_prompt = env.get("PS1", "%n@%m %1~:")
+        env["PS1"] = f"($VIRTUAL_ENV_PROMPT) {old_prompt}"
+        cmd = [shell, "--no-rcs"]
+    else:
+        # We'll probably need some extra config here
+        cmd = [shell]
 
+    print(shell_name)
     print(f"Launching Shell with active VENV: {venv.folder}")
     print("Type 'exit' to close")
-    run([shell], env=env)
+    run(cmd, env=env)
