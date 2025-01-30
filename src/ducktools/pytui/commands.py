@@ -1,4 +1,4 @@
-# This file is a part of pytui
+# This file is a part of ducktools.pytui
 # A TUI for managing Python installs and virtual environments
 #
 # Copyright (C) 2025  David C Ellis

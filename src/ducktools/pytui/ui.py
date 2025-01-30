@@ -1,4 +1,4 @@
-# This file is a part of pytui
+# This file is a part of ducktools.pytui
 # A TUI for managing Python installs and virtual environments
 #
 # Copyright (C) 2025  David C Ellis
@@ -155,4 +155,4 @@ class ManagerApp(App):
         self.refresh()
 
     def on_mount(self):
-        self.title = "DuckPy: Python Environment and Runtime Manager"
+        self.title = "Ducktools.PyTui: Python Environment and Runtime Manager"
