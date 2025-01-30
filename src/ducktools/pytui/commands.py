@@ -85,7 +85,6 @@ def launch_shell(venv: PythonVEnv) -> None:
         # We'll probably need some extra config here
         cmd = [shell]
 
-    print(shell_name)
     print(f"Launching Shell with active VENV: {venv.folder}")
     print("Type 'exit' to close")
     run(cmd, env=env)
