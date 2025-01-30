@@ -38,7 +38,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/duckpy
+      url: https://test.pypi.org/p/ducktools-pytui
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
