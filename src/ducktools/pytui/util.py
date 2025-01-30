@@ -16,11 +16,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# This is a generic utility wrapper to launch a subprocess
-# while ignoring specific signals in the parent process
+import os.path
 import functools
 import signal
 import subprocess
+
+from ducktools.pythonfinder import list_python_installs, PythonInstall
+
+
+def list_installs_deduped(query_executables: bool = True) -> list[PythonInstall]:
+    installs = list_python_installs(query_executables=query_executables)
+
+    # First sort so the executables are in priority order
+    deduped_installs = []
+    used_folders = set()
+    for inst in installs:
+        fld = os.path.dirname(inst.executable)
+        if fld in used_folders:
+            continue
+
+        used_folders.add(fld)
+        deduped_installs.append(inst)
+
+    return deduped_installs
 
 
 class IgnoreSignals:
