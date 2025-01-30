@@ -22,7 +22,9 @@ Run with `pytui` or `ducktools.pytui`.
 
 ### Planned ###
 
+* Config file with some saved settings
 * Create a venv from a specific runtime
+  * Allow selecting 'default' packages to install, auto-editable install option with extras
 * Delete a selected venv
 * List installed packages in a venv
 * Add commands to install/uninstall runtimes with specific tools if available (pyenv/uv/pymanage(r)(?))
