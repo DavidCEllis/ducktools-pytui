@@ -14,7 +14,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.9"
+        python-version: "3.12"
     - name: Install pypa/build
       run: >-
         python3 -m
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/ducktools-<PACKAGENAMEHERE>
+      url: https://pypi.org/p/duckpy
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -69,8 +69,9 @@ jobs:
         name: python-package-distributions
         path: dist/
     - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v2.1.1
+      uses: sigstore/gh-action-sigstore-python@v3.0.0
       with:
+        release-signing-artifacts: false
         inputs: >-
           ./dist/*.tar.gz
           ./dist/*.whl

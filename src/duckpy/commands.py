@@ -1,86 +1,81 @@
+# This file is a part of duckpy
+# A TUI for managing Python installs and virtual environments
+#
+# Copyright (C) 2025  David C Ellis
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import os
 import sys
+from pathlib import Path
 
-from ducktools.lazyimporter import LazyImporter
-from ducktools.lazyimporter.capture import capture_imports
+import shellingham
+from ducktools.pythonfinder.venv import PythonVEnv
 
-
-laz = LazyImporter()
-
-with capture_imports(laz, auto_export=False):
-    from ducktools.pythonfinder.win32 import get_registered_pythons
+from .util import run
 
 
-def _get_active_python():
-    split_char = ";" if sys.platform == "win32" else ":"
-    env_paths = os.environ.get("PATH", "").split(split_char)
-    python = None
-
-    for p in env_paths:
-        try:
-            for pth in os.scandir(p):
-                if pth.name in {"python", "python.exe"}:
-                    python = pth.path
-                    break
-        except FileNotFoundError:
-            pass
-
-        if python:
-            break
-
-    return python
+def launch_repl(python_exe: str) -> None:
+    run([python_exe])
 
 
-def py_list(*, paths: bool = False):
-    """
-    Emulate `py --list` and `py --list-paths`
+def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> Path:
+    # Unlike the regular venv command defaults this will create an environment
+    # and download the *newest* pip (assuming the parent venv includes pip)
 
-    This differs in that it will *not* highlight the 'latest' python install if it is
-    not the version of Python that would be run by running `python` in the commandline.
+    if include_pip:
+        run([python_exe, "-m", "venv", "--upgrade-deps", venv_path])
+    else:
+        run([python_exe, "-m", "venv", "--without-pip", venv_path])
 
-    :param paths: List registered python installs
-    :return: a list of windows registered python installs
-    """
-    # Get the details on active python
-    in_venv = "VIRTUAL_ENV_PROMPT" in os.environ
-    active_path = _get_active_python()
-    if in_venv:
-        if paths:
-            print(f"  *               {active_path}")
+    if sys.platform == "win32":
+        python_path = Path(venv_path).resolve() / "Scripts" / "python.exe"
+    else:
+        python_path = Path(venv_path).resolve() / "bin" / "python"
+
+    return python_path
+
+
+def launch_shell(venv: PythonVEnv) -> None:
+    # Launch a shell with a virtual environment activated.
+    env = os.environ.copy()
+    old_path = env.get("PATH", "")
+    env["PATH"] = os.pathsep.join([str(Path(venv.executable).parent), old_path])
+    env["VIRTUAL_ENV"] = venv.folder
+    env["VIRTUAL_ENV_PROMPT"] = Path(venv.folder).name
+
+    for t, v in env.items():
+        if type(v) is not str:
+            assert False, t
+
+    try:
+        shell_name, shell = shellingham.detect_shell()
+    except shellingham.ShellDetectionFailure:
+        if os.name == "posix":
+            shell_name, shell = "UNKNOWN", os.environ["SHELL"]
+        elif os.name == "nt":
+            shell_name, shell = "UNKNOWN", os.environ["COMSPEC"]
         else:
-            print(u"  *               Active venv")
+            raise RuntimeError(f"Shell detection failed")
 
-    pythoncore_installs = []
-    other_installs = []
+    if shell_name == "cmd":
+        old_prompt = env.get("PROMPT", "$P$G")
+        env["PROMPT"] = f"({Path(venv.folder).name}) {old_prompt}"
+    elif shell_name == "bash":
+        old_prompt = env.get("PS1", "")
+        env["PS1"] = f"({Path(venv.folder).name}) {old_prompt}"
 
-    for py in laz.get_registered_pythons():
-        company = py.metadata.get("Company", "PythonCore")
-        version = py.metadata.get("SysVersion")
-        tag = py.metadata.get("Tag")
-
-        is_pythoncore = (company == "PythonCore")
-
-        if is_pythoncore:
-            ver = f"-V:{tag}"
-        else:
-            ver = f"-V:{company}/{tag}"
-
-        if active_path == py.executable:
-            ver += " *"
-
-        if paths:
-            line = f" {ver:<16} {py.executable}"
-        else:
-            line = f" {ver:<16} {py.metadata.get("DisplayName")}"
-
-        if is_pythoncore:
-            pythoncore_installs.append(line)
-        else:
-            other_installs.append(line)
-
-    print("\n".join(pythoncore_installs))
-    print("\n".join(other_installs))
-
-
-if __name__ == "__main__":
-    py_list()
+    print(f"Launching Shell with active VENV: {venv.folder}")
+    print("Type 'exit' to close")
+    run([shell], env=env)

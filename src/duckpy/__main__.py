@@ -1,36 +1,27 @@
-import argparse
+# This file is a part of duckpy
+# A TUI for managing Python installs and virtual environments
+#
+# Copyright (C) 2025  David C Ellis
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from . import __version__
-from .commands import py_list
-
-def get_parser():
-
-    parser = argparse.ArgumentParser(
-        prog="duckpy",
-        description=f"Alternate Python Launcher for Windows Version {__version__[1:]}",
-        allow_abbrev=False,
-    )
-    parser.add_argument(
-        "-0", "--list",
-        dest="list_opt",
-        action="store_true",
-        help="List the available pythons"
-    )
-    parser.add_argument(
-        "-0p", "--list-paths",
-        dest="list_paths",
-        action="store_true",
-        help="List with paths"
-    )
-
-    return parser
+from .ui import ManagerApp
 
 
 def main():
-    parser = get_parser()
-    args, extras = parser.parse_known_args()
-
-    print(args)
+    app = ManagerApp()
+    app.run()
 
 
 if __name__ == "__main__":
