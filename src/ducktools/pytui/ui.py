@@ -52,7 +52,7 @@ class VEnvTable(DataTable):
             self.cursor_type = "row"
             self.add_columns("Version", "Environment Path", "Runtime Path")
             for venv in get_python_venvs(base_dir=CWD, recursive=False, search_parent_folders=True):
-                folder = str(Path(venv.folder).relative_to(CWD))
+                folder = os.path.relpath(venv.folder, start=CWD)
                 self.add_row(venv.version_str, folder, venv.parent_executable, key=venv)
         finally:
             self.loading = False
