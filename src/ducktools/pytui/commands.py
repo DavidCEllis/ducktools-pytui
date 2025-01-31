@@ -50,6 +50,8 @@ def launch_shell(venv: PythonVEnv) -> None:
     # Launch a shell with a virtual environment activated.
     env = os.environ.copy()
     old_path = env.get("PATH", "")
+    old_venv_prompt = os.environ.get("VIRTUAL_ENV_PROMPT", "")
+
     env["PATH"] = os.pathsep.join([os.path.dirname(venv.executable), old_path])
     env["VIRTUAL_ENV"] = venv.folder
     env["VIRTUAL_ENV_PROMPT"] = os.path.basename(venv.folder)
@@ -70,15 +72,18 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     if shell_name == "cmd":
         old_prompt = env.get("PROMPT", "$P$G")
+        old_prompt = old_prompt.removeprefix(old_venv_prompt)
         env["PROMPT"] = f"({os.path.basename(venv.folder)}) {old_prompt}"
         cmd = [shell]
     elif shell_name == "bash":
         old_prompt = env.get("PS1", r"\u@\h \w\$")
-        env["PS1"] = f"($VIRTUAL_ENV_PROMPT) {old_prompt}"
+        old_prompt = old_prompt.removeprefix(old_venv_prompt)
+        env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {old_prompt}"
         cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
         old_prompt = env.get("PS1", "%n@%m %1~:")
-        env["PS1"] = f"($VIRTUAL_ENV_PROMPT) {old_prompt}"
+        old_prompt = old_prompt.removeprefix(old_venv_prompt)
+        env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {old_prompt}"
         cmd = [shell, "--no-rcs"]
     else:
         # We'll probably need some extra config here
