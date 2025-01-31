@@ -18,7 +18,6 @@
 
 import os
 import sys
-from pathlib import Path
 
 import shellingham
 from ducktools.pythonfinder.venv import PythonVEnv
@@ -30,7 +29,7 @@ def launch_repl(python_exe: str) -> None:
     run([python_exe])
 
 
-def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> Path:
+def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> str:
     # Unlike the regular venv command defaults this will create an environment
     # and download the *newest* pip (assuming the parent venv includes pip)
 
@@ -40,9 +39,9 @@ def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = T
         run([python_exe, "-m", "venv", "--without-pip", venv_path])
 
     if sys.platform == "win32":
-        python_path = Path(venv_path).resolve() / "Scripts" / "python.exe"
+        python_path = os.path.join(os.path.realpath(venv_path), "Scripts", "python.exe")
     else:
-        python_path = Path(venv_path).resolve() / "bin" / "python"
+        python_path = os.path.join(os.path.realpath(venv_path), "bin", "python")
 
     return python_path
 
@@ -51,9 +50,9 @@ def launch_shell(venv: PythonVEnv) -> None:
     # Launch a shell with a virtual environment activated.
     env = os.environ.copy()
     old_path = env.get("PATH", "")
-    env["PATH"] = os.pathsep.join([str(Path(venv.executable).parent), old_path])
+    env["PATH"] = os.pathsep.join([os.path.dirname(venv.executable), old_path])
     env["VIRTUAL_ENV"] = venv.folder
-    env["VIRTUAL_ENV_PROMPT"] = Path(venv.folder).name
+    env["VIRTUAL_ENV_PROMPT"] = os.path.basename(venv.folder)
 
     for t, v in env.items():
         if type(v) is not str:
@@ -71,7 +70,7 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     if shell_name == "cmd":
         old_prompt = env.get("PROMPT", "$P$G")
-        env["PROMPT"] = f"({Path(venv.folder).name}) {old_prompt}"
+        env["PROMPT"] = f"({os.path.basename(venv.folder)}) {old_prompt}"
         cmd = [shell]
     elif shell_name == "bash":
         old_prompt = env.get("PS1", r"\u@\h \w\$")

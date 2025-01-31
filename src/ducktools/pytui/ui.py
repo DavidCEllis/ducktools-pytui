@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import os
 import os.path
-from pathlib import Path
 import typing
 
 from ducktools.pythonfinder import PythonInstall
@@ -32,7 +32,7 @@ from .util import list_installs_deduped
 
 
 DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"]
-CWD = Path.cwd()
+CWD = os.getcwd()
 
 
 class VEnvTable(DataTable):
