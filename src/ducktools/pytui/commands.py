@@ -52,9 +52,11 @@ def launch_shell(venv: PythonVEnv) -> None:
     old_path = env.get("PATH", "")
     old_venv_prompt = os.environ.get("VIRTUAL_ENV_PROMPT", "")
 
+    venv_prompt = os.path.basename(venv.folder)
+
     env["PATH"] = os.pathsep.join([os.path.dirname(venv.executable), old_path])
     env["VIRTUAL_ENV"] = venv.folder
-    env["VIRTUAL_ENV_PROMPT"] = os.path.basename(venv.folder)
+    env["VIRTUAL_ENV_PROMPT"] = venv_prompt
 
     for t, v in env.items():
         if type(v) is not str:
@@ -71,19 +73,22 @@ def launch_shell(venv: PythonVEnv) -> None:
             raise RuntimeError(f"Shell detection failed")
 
     if shell_name == "cmd":
+        # Windows cmd prompt keep it simple
         old_prompt = env.get("PROMPT", "$P$G")
         old_prompt = old_prompt.removeprefix(old_venv_prompt)
-        env["PROMPT"] = f"({os.path.basename(venv.folder)}) {old_prompt}"
+        env["PROMPT"] = f"({venv_prompt}) {old_prompt}"
         cmd = [shell]
     elif shell_name == "bash":
+        # Dynamic prompt appears to work in BASH at least on Ubuntu
         old_prompt = env.get("PS1", r"\u@\h \w\$")
         old_prompt = old_prompt.removeprefix(old_venv_prompt)
         env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {old_prompt}"
         cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
+        # Didn't have so much luck on MacOS
         old_prompt = env.get("PS1", "%n@%m %1~:")
         old_prompt = old_prompt.removeprefix(old_venv_prompt)
-        env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {old_prompt}"
+        env["PS1"] = f"(pytui: {venv_prompt}) {old_prompt}"
         cmd = [shell, "--no-rcs"]
     else:
         # We'll probably need some extra config here
