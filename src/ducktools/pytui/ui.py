@@ -26,6 +26,7 @@ from textual.app import App
 from textual.binding import Binding
 from textual.containers import Vertical
 from textual.widgets import DataTable, Footer, Header, Label
+from textual.widgets.data_table import CellDoesNotExist
 
 from .commands import launch_repl, launch_shell, create_venv
 from .util import list_installs_deduped
@@ -39,23 +40,32 @@ class VEnvTable(DataTable):
     BINDINGS = [
         Binding(key="enter", action="app.activated_shell", description="Activate VEnv and Launch Shell", show=True),
         Binding(key="r", action="app.launch_venv_repl", description="Launch VEnv Python REPL", show=True),
-        # Binding(key="p", action="show_packages", description="List Installed Packages", show=True),
+        # Binding(key="p", action="list_packages", description="List Installed Packages", show=True),
         *DATATABLE_BINDINGS_NO_ENTER,
     ]
 
     def on_mount(self):
-        self.load_venvs()
+        self.setup_columns()
+        self.load_venvs(clear_first=False)
 
-    def load_venvs(self):
+    def setup_columns(self):
+        self.cursor_type = "row"
+        self.add_columns("Version", "Environment Path", "Runtime Path")
+
+    def load_venvs(self, clear_first=True):
         self.loading = True
         try:
-            self.cursor_type = "row"
-            self.add_columns("Version", "Environment Path", "Runtime Path")
+            if clear_first:
+                self.clear(columns=False)
+
             for venv in get_python_venvs(base_dir=CWD, recursive=False, search_parent_folders=True):
                 folder = os.path.relpath(venv.folder, start=CWD)
                 self.add_row(venv.version_str, folder, venv.parent_executable, key=venv)
         finally:
             self.loading = False
+
+    def list_packages(self):
+        pass
 
 
 class RuntimeTable(DataTable):
@@ -66,13 +76,19 @@ class RuntimeTable(DataTable):
     ]
 
     def on_mount(self):
-        self.load_runtimes()
+        self.setup_columns()
+        self.load_runtimes(clear_first=False)
 
-    def load_runtimes(self):
+    def setup_columns(self):
+        self.cursor_type = "row"
+        self.add_columns("Version", "Managed By", "Implementation", "Path")
+
+    def load_runtimes(self, clear_first=True):
         self.loading = True
         try:
-            self.cursor_type = "row"
-            self.add_columns("Version", "Managed By", "Implementation", "Path")
+            if clear_first:
+                self.clear()
+
             for install in list_installs_deduped():
                 self.add_row(
                     install.version_str,
@@ -116,7 +132,10 @@ class ManagerApp(App):
     def action_launch_runtime(self):
         table = self._runtime_table
 
-        row = table.coordinate_to_cell_key(table.cursor_coordinate)
+        try:
+            row = table.coordinate_to_cell_key(table.cursor_coordinate)
+        except CellDoesNotExist:
+            return
 
         install = typing.cast(PythonInstall, row.row_key.value)
         python_exe = install.executable
@@ -131,7 +150,11 @@ class ManagerApp(App):
 
     def action_launch_venv_repl(self):
         table = self._venv_table
-        row = table.coordinate_to_cell_key(table.cursor_coordinate)
+
+        try:
+            row = table.coordinate_to_cell_key(table.cursor_coordinate)
+        except CellDoesNotExist:
+            return
 
         install = typing.cast(PythonVEnv, row.row_key.value)
         python_exe = install.executable
@@ -146,7 +169,12 @@ class ManagerApp(App):
 
     def action_activated_shell(self):
         table = self._venv_table
-        row = table.coordinate_to_cell_key(table.cursor_coordinate)
+
+        try:
+            row = table.coordinate_to_cell_key(table.cursor_coordinate)
+        except CellDoesNotExist:
+            return
+
         venv = typing.cast(PythonVEnv, row.row_key.value)
         with self.suspend():
             launch_shell(venv)

@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import sys
+import os.path
 
 import shellingham
 from ducktools.pythonfinder.venv import PythonVEnv
@@ -29,7 +29,7 @@ def launch_repl(python_exe: str) -> None:
     run([python_exe])
 
 
-def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> str:
+def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> PythonVEnv:
     # Unlike the regular venv command defaults this will create an environment
     # and download the *newest* pip (assuming the parent venv includes pip)
 
@@ -38,12 +38,31 @@ def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = T
     else:
         run([python_exe, "-m", "venv", "--without-pip", venv_path])
 
-    if sys.platform == "win32":
-        python_path = os.path.join(os.path.realpath(venv_path), "Scripts", "python.exe")
-    else:
-        python_path = os.path.join(os.path.realpath(venv_path), "bin", "python")
+    config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
 
-    return python_path
+    return PythonVEnv.from_cfg(config_path)
+
+
+def install_requirements(
+    *,
+    venv: PythonVEnv,
+    requirements_path: str,
+    no_deps: bool = False,
+):
+    base_python = venv.parent_executable
+    venv_path = venv.folder
+
+    command = [
+        base_python,
+        "-m", "pip",
+        "--python", venv_path,
+        "install",
+        "-r", requirements_path,
+    ]
+    if no_deps:
+        command.append("--no-deps")
+
+    run(command)
 
 
 def launch_shell(venv: PythonVEnv) -> None:
@@ -75,9 +94,9 @@ def launch_shell(venv: PythonVEnv) -> None:
     if shell_name == "cmd":
         # Windows cmd prompt keep it simple
         old_prompt = env.get("PROMPT", "$P$G")
-        old_prompt = old_prompt.removeprefix(old_venv_prompt)
-        env["PROMPT"] = f"({venv_prompt}) {old_prompt}"
-        cmd = [shell]
+        old_prompt = old_prompt.removeprefix(f"({old_venv_prompt}) ")
+        env["PROMPT"] = f"(pytui: {venv_prompt}) {old_prompt}"
+        cmd = [shell, "/k"]  # This effectively hides the copyright message
     elif shell_name == "bash":
         # Dynamic prompt appears to work in BASH at least on Ubuntu
         old_prompt = env.get("PS1", r"\u@\h \w\$")
@@ -94,6 +113,5 @@ def launch_shell(venv: PythonVEnv) -> None:
         # We'll probably need some extra config here
         cmd = [shell]
 
-    print(f"Launching Shell with active VENV: {venv.folder}")
-    print("Type 'exit' to close")
+    print("\nVEnv shell from ducktools.pytui: type 'exit' to close")
     run(cmd, env=env)
