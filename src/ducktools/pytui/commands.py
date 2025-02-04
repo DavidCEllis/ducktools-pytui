@@ -72,14 +72,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     old_venv_prompt = os.environ.get("VIRTUAL_ENV_PROMPT", "")
 
     venv_prompt = os.path.basename(venv.folder)
-
-    env["PATH"] = os.pathsep.join([os.path.dirname(venv.executable), old_path])
-    env["VIRTUAL_ENV"] = venv.folder
-    env["VIRTUAL_ENV_PROMPT"] = venv_prompt
-
-    for t, v in env.items():
-        if type(v) is not str:
-            assert False, t
+    venv_dir = os.path.dirname(venv.executable)
 
     try:
         shell_name, shell = shellingham.detect_shell()
@@ -91,12 +84,29 @@ def launch_shell(venv: PythonVEnv) -> None:
         else:
             raise RuntimeError(f"Shell detection failed")
 
+    env["PATH"] = os.pathsep.join([venv_dir, old_path])
+    env["VIRTUAL_ENV"] = venv.folder
+    env["VIRTUAL_ENV_PROMPT"] = venv_prompt
+
     if shell_name == "cmd":
-        # Windows cmd prompt keep it simple
+        # Windows cmd prompt - history doesn't work for some reason
         old_prompt = env.get("PROMPT", "$P$G")
         old_prompt = old_prompt.removeprefix(f"({old_venv_prompt}) ")
         env["PROMPT"] = f"(pytui: {venv_prompt}) {old_prompt}"
         cmd = [shell, "/k"]  # This effectively hides the copyright message
+    elif shell_name == "powershell":
+        # Copied from activate.ps1
+        prompt_command = """
+        function global:_old_virtual_prompt {
+        ""
+        }
+        $function:_old_virtual_prompt = $function:prompt
+        function global:prompt {
+            $previous_prompt_value = & $function:_old_virtual_prompt
+            ("(pytui: " + $env:VIRTUAL_ENV_PROMPT + ") " + $previous_prompt_value)
+        }
+        """
+        cmd = [shell, "-NoExit", prompt_command]
     elif shell_name == "bash":
         # Dynamic prompt appears to work in BASH at least on Ubuntu
         old_prompt = env.get("PS1", r"\u@\h \w\$")
