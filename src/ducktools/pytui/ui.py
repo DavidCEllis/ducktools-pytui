@@ -17,7 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import os.path
-import typing
 
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv
@@ -25,6 +24,7 @@ from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv
 from textual.app import App
 from textual.binding import Binding
 from textual.containers import Vertical
+from textual.screen import ModalScreen
 from textual.widgets import DataTable, Footer, Header, Label
 from textual.widgets.data_table import CellDoesNotExist
 
@@ -36,6 +36,22 @@ DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"
 CWD = os.getcwd()
 
 
+class DependencyTable(DataTable):
+    def __init__(self, venv: PythonVEnv):
+        self.venv = venv
+        super().__init__()
+
+    def on_mount(self):
+        self.cursor_type = "row"
+        self.add_columns("Dependency", "Version")
+        self.loading = True
+        try:
+            for dep in self.venv.list_packages():
+                self.add_row(dep.name, dep.version, key=dep.name)
+        finally:
+            self.loading = False
+
+
 class VEnvTable(DataTable):
     BINDINGS = [
         Binding(key="enter", action="app.activated_shell", description="Activate VEnv and Launch Shell", show=True),
@@ -43,6 +59,10 @@ class VEnvTable(DataTable):
         # Binding(key="p", action="list_packages", description="List Installed Packages", show=True),
         *DATATABLE_BINDINGS_NO_ENTER,
     ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._venv_catalogue = {}
 
     def on_mount(self):
         self.setup_columns()
@@ -52,15 +72,20 @@ class VEnvTable(DataTable):
         self.cursor_type = "row"
         self.add_columns("Version", "Environment Path", "Runtime Path")
 
+    def venv_from_key(self, key) -> PythonVEnv:
+        return self._venv_catalogue[key]
+
     def load_venvs(self, clear_first=True):
         self.loading = True
         try:
             if clear_first:
                 self.clear(columns=False)
-
+                self._venv_catalogue = {}
             for venv in get_python_venvs(base_dir=CWD, recursive=False, search_parent_folders=True):
+                self._venv_catalogue[venv.folder] = venv
+
                 folder = os.path.relpath(venv.folder, start=CWD)
-                self.add_row(venv.version_str, folder, venv.parent_executable, key=venv)
+                self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
         finally:
             self.loading = False
 
@@ -75,6 +100,10 @@ class RuntimeTable(DataTable):
         *DATATABLE_BINDINGS_NO_ENTER
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._runtime_catalogue = {}
+
     def on_mount(self):
         self.setup_columns()
         self.load_runtimes(clear_first=False)
@@ -83,19 +112,25 @@ class RuntimeTable(DataTable):
         self.cursor_type = "row"
         self.add_columns("Version", "Managed By", "Implementation", "Path")
 
+    def runtime_from_key(self, key) -> PythonInstall:
+        return self._runtime_catalogue[key]
+
     def load_runtimes(self, clear_first=True):
         self.loading = True
         try:
             if clear_first:
                 self.clear()
+                self._runtime_catalogue = {}
 
             for install in list_installs_deduped():
+                self._runtime_catalogue[install.executable] = install
+
                 self.add_row(
                     install.version_str,
                     install.managed_by,
                     install.implementation,
                     install.executable,
-                    key=install
+                    key=install.executable
                 )
         finally:
             self.loading = False
@@ -137,7 +172,7 @@ class ManagerApp(App):
         except CellDoesNotExist:
             return
 
-        install = typing.cast(PythonInstall, row.row_key.value)
+        install = table.runtime_from_key(row.row_key.value)
         python_exe = install.executable
 
         # Suspend the app and launch python
@@ -156,7 +191,7 @@ class ManagerApp(App):
         except CellDoesNotExist:
             return
 
-        install = typing.cast(PythonVEnv, row.row_key.value)
+        install = table.venv_from_key(row.row_key.value)
         python_exe = install.executable
 
         # Suspend the app and launch python
@@ -175,7 +210,7 @@ class ManagerApp(App):
         except CellDoesNotExist:
             return
 
-        venv = typing.cast(PythonVEnv, row.row_key.value)
+        venv = table.venv_from_key(row.row_key.value)
         with self.suspend():
             launch_shell(venv)
 
