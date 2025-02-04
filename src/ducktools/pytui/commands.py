@@ -91,8 +91,12 @@ def launch_shell(venv: PythonVEnv) -> None:
     if shell_name == "cmd":
         # Windows cmd prompt - history doesn't work for some reason
         old_prompt = env.get("PROMPT", "$P$G")
-        old_prompt = old_prompt.removeprefix(f"({old_venv_prompt}) ")
-        env["PROMPT"] = f"(pytui: {venv_prompt}) {old_prompt}"
+        if old_venv_prompt and old_venv_prompt in old_prompt:
+            # Some prompts have colours etc
+            new_prompt = old_prompt.replace(old_venv_prompt, f"pytui: {venv_prompt}")
+        else:
+            new_prompt = f"(pytui: {venv_prompt}) {old_prompt}"
+        env["PROMPT"] = new_prompt
         cmd = [shell, "/k"]  # This effectively hides the copyright message
     elif shell_name == "powershell":
         # Copied from activate.ps1
