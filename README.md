@@ -21,14 +21,14 @@ Run with `pytui` or `ducktools-pytui`.
   * It's possible shell config files may break the environment variable changes. 
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
+* List installed packages in a venv
+* Create a venv from a specific runtime
+* Delete a selected venv
 
 ### Planned ###
 
 * Config file with some saved settings
-* Create a venv from a specific runtime
-  * Allow selecting 'default' packages to install, auto-editable install option with extras
-* Delete a selected venv
-* List installed packages in a venv
+* Allow selecting 'default' packages to install, auto-editable install option with extras
 * Add commands to install/uninstall runtimes with specific tools if available (pyenv/uv/pymanage(r)(?))
 * Highlight invalid venvs
 
