@@ -18,9 +18,12 @@
 
 import os
 import os.path
+import shutil
 import subprocess
+import sys
 
 import shellingham
+from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import PythonVEnv
 
 from .util import run
@@ -30,22 +33,41 @@ def launch_repl(python_exe: str) -> None:
     run([python_exe])
 
 
-def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> PythonVEnv:
+def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include_pip: bool = True) -> PythonVEnv:
     # Unlike the regular venv command defaults this will create an environment
     # and download the *newest* pip (assuming the parent venv includes pip)
 
     if os.path.exists(venv_path):
         raise FileExistsError(f"VEnv '{venv_path}' already exists.")
 
+    python_exe = python_runtime.executable
     # These tasks run in the background so don't need to block ctrl+c
+    # Capture output to not mess with the textual display
+    subprocess.run([python_exe, "-m", "venv", "--without-pip", venv_path], capture_output=True)
+
     if include_pip:
-        subprocess.run([python_exe, "-m", "venv", "--upgrade-deps", venv_path])
-    else:
-        subprocess.run([python_exe, "-m", "venv", "--without-pip", venv_path])
+        # This actually seems to be faster than `--upgrade-deps`
+        extras = ["pip"]
+        if python_runtime.version < (3, 12):
+            extras.append("setuptools")
+
+        # Run the subprocess using *this* install to guarantee the presence of pip
+        subprocess.run(
+            [
+                sys.executable, "-m", "pip",
+                "--python", venv_path,
+                "install", *extras
+            ],
+            capture_output=True,
+        )
 
     config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
 
     return PythonVEnv.from_cfg(config_path)
+
+
+def delete_venv(venv_path: str):
+    shutil.rmtree(venv_path, ignore_errors=True)
 
 
 def install_requirements(

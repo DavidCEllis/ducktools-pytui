@@ -26,12 +26,12 @@ from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPack
 from textual import work
 from textual.app import App
 from textual.binding import Binding
-from textual.containers import Grid, Horizontal, Vertical
+from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, DataTable, Footer, Header, Input, Label
 from textual.widgets.data_table import CellDoesNotExist
 
-from .commands import launch_repl, launch_shell, create_venv
+from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .util import list_installs_deduped
 
 
@@ -127,15 +127,17 @@ class VEnvCreateScreen(ModalScreen[str | None]):
 
 class VEnvTable(DataTable):
     BINDINGS = [
-        Binding(key="enter", action="app.activated_shell", description="Activate VEnv and Launch Shell", show=True),
-        Binding(key="r", action="app.launch_venv_repl", description="Launch VEnv Python REPL", show=True),
-        Binding(key="p", action="app.list_venv_packages", description="List Installed Packages", show=True),
+        Binding(key="enter", action="app.activated_shell", description="Launch VEnv Shell", show=True),
+        Binding(key="r", action="app.launch_venv_repl", description="Launch VEnv REPL", show=True),
+        Binding(key="p", action="app.list_venv_packages", description="List Packages", show=True),
+        Binding(key="delete", action="app.delete_venv", description="Delete VEnv", show=True),
         *DATATABLE_BINDINGS_NO_ENTER,
     ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._venv_catalogue = {}
+        self._sort_key = None
 
     def on_mount(self):
         self.setup_columns()
@@ -143,10 +145,25 @@ class VEnvTable(DataTable):
 
     def setup_columns(self):
         self.cursor_type = "row"
-        self.add_columns("Version", "Environment Path", "Runtime Path")
+        keys = self.add_columns("Version", "Environment Path", "Runtime Path")
+        self._sort_key = keys[1]
+
+    def sort_by_path(self):
+        self.sort(self._sort_key)
 
     def venv_from_key(self, key) -> PythonVEnv:
         return self._venv_catalogue[key]
+
+    def add_venv(self, venv: PythonVEnv, sort=False):
+        self._venv_catalogue[venv.folder] = venv
+        folder = os.path.relpath(venv.folder, start=CWD)
+        self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
+        if sort:
+            self.sort_by_path()
+
+    def remove_venv(self, venv: PythonVEnv):
+        self.remove_row(row_key=venv.folder)
+        self._venv_catalogue.pop(venv.folder)
 
     def load_venvs(self, clear_first=True):
         self.loading = True
@@ -155,18 +172,16 @@ class VEnvTable(DataTable):
                 self.clear(columns=False)
                 self._venv_catalogue = {}
             for venv in get_python_venvs(base_dir=CWD, recursive=False, search_parent_folders=True):
-                self._venv_catalogue[venv.folder] = venv
-
-                folder = os.path.relpath(venv.folder, start=CWD)
-                self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
+                self.add_venv(venv, sort=False)
         finally:
+            self.sort_by_path()
             self.loading = False
 
 
 class RuntimeTable(DataTable):
     BINDINGS = [
-        Binding(key="r", action="app.launch_runtime", description="Launch Runtime Python REPL", show=True),
-        Binding(key="v", action="app.create_venv", description="Create Virtual Environment", show=True),
+        Binding(key="r", action="app.launch_runtime", description="Launch Runtime REPL", show=True),
+        Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
         *DATATABLE_BINDINGS_NO_ENTER
     ]
 
@@ -332,10 +347,23 @@ class ManagerApp(App):
         self._venv_table.loading = True
         loop = asyncio.get_event_loop()
         try:
-            await loop.run_in_executor(None, create_venv, runtime.executable, venv_name)
+            new_venv = await loop.run_in_executor(
+                None,
+                create_venv,
+                runtime, venv_name
+            )
         except FileExistsError:
             pass
         else:
-            self._venv_table.load_venvs(clear_first=True)
+            self._venv_table.add_venv(new_venv, sort=True)
         finally:
             self._venv_table.loading = False
+
+    def action_delete_venv(self):
+        venv = self.selected_venv
+        if venv is None:
+            return
+
+        delete_venv(venv.folder)
+        self._venv_table.remove_venv(venv)
+        self._venv_dependency_cache.pop(venv.folder, None)
