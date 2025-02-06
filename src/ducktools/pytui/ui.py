@@ -18,9 +18,12 @@
 import os
 import os.path
 
-from ducktools.pythonfinder import PythonInstall
-from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv
+from asyncio import get_running_loop
 
+from ducktools.pythonfinder import PythonInstall
+from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPackage
+
+from textual import work
 from textual.app import App
 from textual.binding import Binding
 from textual.containers import Vertical
@@ -36,14 +39,21 @@ DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"
 CWD = os.getcwd()
 
 
-class DependencyScreen(ModalScreen):
+class DependencyScreen(ModalScreen[list[PythonPackage]]):
     BINDINGS = [
-        Binding(key="c", action="app.pop_screen", description="Close", show=True)
+        Binding(key="c", action="close", description="Close", show=True),
+        Binding(key="r", action="reload_dependencies", description="Reload Dependencies", show=True),
     ]
 
-    def __init__(self, venv: PythonVEnv):
+    def __init__(
+        self,
+        venv: PythonVEnv,
+        dependency_cache: list[PythonPackage] | None
+    ):
         super().__init__()
         self.venv = venv
+        self.dependency_cache = dependency_cache
+
         self.venv_table = DataTable()
 
     def compose(self):
@@ -55,12 +65,33 @@ class DependencyScreen(ModalScreen):
     def on_mount(self):
         self.venv_table.cursor_type = "row"
         self.venv_table.add_columns("Dependency", "Version")
+        self.load_dependencies()
+
+    def action_close(self):
+        self.dismiss(self.dependency_cache)
+
+    async def action_reload_dependencies(self):
+        self.load_dependencies(clear=True)
+
+    @work
+    async def load_dependencies(self, clear=False):
         self.venv_table.loading = True
         try:
-            for dep in self.venv.list_packages():
+            if clear:
+                self.venv_table.clear()
+                self.dependency_cache = None
+
+            dependencies = self.dependency_cache
+            if dependencies is None:
+                loop = get_running_loop()
+                dependencies = await loop.run_in_executor(None, self.venv.list_packages)
+
+            for dep in dependencies:
                 self.venv_table.add_row(dep.name, dep.version, key=dep.name)
         finally:
             self.venv_table.loading = False
+
+        self.dependency_cache = dependencies
 
 
 class VEnvTable(DataTable):
@@ -162,6 +193,8 @@ class ManagerApp(App):
         self._venv_table = VEnvTable()
         self._runtime_table = RuntimeTable()
 
+        self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
+
     def on_mount(self):
         self.title = "Ducktools.PyTui: Python Environment and Runtime Manager"
 
@@ -199,16 +232,13 @@ class ManagerApp(App):
 
     def action_launch_runtime(self):
         runtime = self.selected_runtime
-
         if runtime is None:
             return
-
-        python_exe = runtime.executable
 
         # Suspend the app and launch python
         # Ignore keyboard interrupts otherwise the program will exit when this exits.
         with self.suspend():
-            launch_repl(python_exe)
+            launch_repl(runtime.executable)
 
         # Redraw
         self.refresh()
@@ -218,22 +248,25 @@ class ManagerApp(App):
         if venv is None:
             return
 
-        python_exe = venv.executable
-
         # Suspend the app and launch python
         # Ignore keyboard interrupts otherwise the program will exit when this exits.
         with self.suspend():
-            launch_repl(python_exe)
+            launch_repl(venv.executable)
 
         # Redraw
         self.refresh()
 
-    def action_list_venv_packages(self):
+    @work
+    async def action_list_venv_packages(self):
         venv = self.selected_venv
         if venv is None:
             return
 
-        self.push_screen(DependencyScreen(venv=venv))
+        dependency_cache = self._venv_dependency_cache.get(venv.folder)
+        dependency_screen = DependencyScreen(venv=venv, dependency_cache=dependency_cache)
+
+        dependencies = await self.push_screen_wait(dependency_screen)
+        self._venv_dependency_cache[venv.folder] = dependencies
 
     def action_activated_shell(self):
         venv = self.selected_venv
