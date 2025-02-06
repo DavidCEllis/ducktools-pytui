@@ -18,6 +18,7 @@
 
 import os
 import os.path
+import subprocess
 
 import shellingham
 from ducktools.pythonfinder.venv import PythonVEnv
@@ -33,10 +34,14 @@ def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = T
     # Unlike the regular venv command defaults this will create an environment
     # and download the *newest* pip (assuming the parent venv includes pip)
 
+    if os.path.exists(venv_path):
+        raise FileExistsError(f"VEnv '{venv_path}' already exists.")
+
+    # These tasks run in the background so don't need to block ctrl+c
     if include_pip:
-        run([python_exe, "-m", "venv", "--upgrade-deps", venv_path])
+        subprocess.run([python_exe, "-m", "venv", "--upgrade-deps", venv_path])
     else:
-        run([python_exe, "-m", "venv", "--without-pip", venv_path])
+        subprocess.run([python_exe, "-m", "venv", "--without-pip", venv_path])
 
     config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
 

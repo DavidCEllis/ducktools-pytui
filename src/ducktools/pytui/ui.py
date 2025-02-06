@@ -18,7 +18,7 @@
 import os
 import os.path
 
-from asyncio import get_running_loop
+import asyncio
 
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPackage
@@ -26,9 +26,9 @@ from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPack
 from textual import work
 from textual.app import App
 from textual.binding import Binding
-from textual.containers import Vertical
+from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
-from textual.widgets import DataTable, Footer, Header, Label
+from textual.widgets import Button, DataTable, Footer, Header, Input, Label
 from textual.widgets.data_table import CellDoesNotExist
 
 from .commands import launch_repl, launch_shell, create_venv
@@ -83,7 +83,7 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
 
             dependencies = self.dependency_cache
             if dependencies is None:
-                loop = get_running_loop()
+                loop = asyncio.get_running_loop()
                 dependencies = await loop.run_in_executor(None, self.venv.list_packages)
 
             for dep in dependencies:
@@ -92,6 +92,37 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
             self.venv_table.loading = False
 
         self.dependency_cache = dependencies
+
+
+class VEnvCreateScreen(ModalScreen[str | None]):
+    BINDINGS = [
+        Binding(key="escape", action="cancel", description="Cancel VEnv Creation")
+    ]
+
+    def __init__(self, runtime: PythonInstall, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.runtime = runtime
+        self.venv_input = Input(placeholder="VEnv Path (default='.venv')")
+
+    def compose(self):
+        with Vertical(classes="boxed"):
+            yield Label(f"Create VENV from {self.runtime.implementation} {self.runtime.version_str}")
+            yield self.venv_input
+            with Horizontal(classes="boxed_noborder"):
+                yield Button("Create", variant="success", id="create")
+                yield Button("Cancel", id="cancel")
+
+    def action_cancel(self):
+        self.dismiss(None)
+
+    def on_input_submitted(self, event: Input.Submitted):
+        self.dismiss(event.value)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "create":
+            self.dismiss(self.venv_input.value)
+        else:
+            self.dismiss(None)
 
 
 class VEnvTable(DataTable):
@@ -134,8 +165,8 @@ class VEnvTable(DataTable):
 
 class RuntimeTable(DataTable):
     BINDINGS = [
-        # Binding(key="v", action="app.create_venv", description="Create Virtual Environment", show=True),
         Binding(key="r", action="app.launch_runtime", description="Launch Runtime Python REPL", show=True),
+        Binding(key="v", action="app.create_venv", description="Create Virtual Environment", show=True),
         *DATATABLE_BINDINGS_NO_ENTER
     ]
 
@@ -184,6 +215,11 @@ class ManagerApp(App):
     .boxed {
         height: auto;
         border: solid green;
+    }
+    .boxed_noborder {
+        height: auto;
+        border: hidden;
+        margin: 1;
     }
     """
 
@@ -278,3 +314,28 @@ class ManagerApp(App):
 
         # Redraw
         self.refresh()
+
+    @work
+    async def action_create_venv(self):
+        runtime = self.selected_runtime
+        if runtime is None:
+            return
+
+        venv_screen = VEnvCreateScreen(runtime=runtime)
+        venv_name = await self.push_screen_wait(venv_screen)
+
+        if venv_name is None:
+            return
+        elif venv_name == "":
+            venv_name = ".venv"
+
+        self._venv_table.loading = True
+        loop = asyncio.get_event_loop()
+        try:
+            await loop.run_in_executor(None, create_venv, runtime.executable, venv_name)
+        except FileExistsError:
+            pass
+        else:
+            self._venv_table.load_venvs(clear_first=True)
+        finally:
+            self._venv_table.loading = False
