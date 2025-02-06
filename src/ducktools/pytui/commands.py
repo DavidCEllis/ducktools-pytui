@@ -17,9 +17,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import os.path
+import shutil
+import subprocess
 import sys
 
 import shellingham
+from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import PythonVEnv
 
 from .util import run
@@ -29,21 +33,63 @@ def launch_repl(python_exe: str) -> None:
     run([python_exe])
 
 
-def create_venv(python_exe: str, venv_path: str = ".venv", include_pip: bool = True) -> str:
+def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include_pip: bool = True) -> PythonVEnv:
     # Unlike the regular venv command defaults this will create an environment
     # and download the *newest* pip (assuming the parent venv includes pip)
 
+    if os.path.exists(venv_path):
+        raise FileExistsError(f"VEnv '{venv_path}' already exists.")
+
+    python_exe = python_runtime.executable
+    # These tasks run in the background so don't need to block ctrl+c
+    # Capture output to not mess with the textual display
+    subprocess.run([python_exe, "-m", "venv", "--without-pip", venv_path], capture_output=True)
+
     if include_pip:
-        run([python_exe, "-m", "venv", "--upgrade-deps", venv_path])
-    else:
-        run([python_exe, "-m", "venv", "--without-pip", venv_path])
+        # This actually seems to be faster than `--upgrade-deps`
+        extras = ["pip"]
+        if python_runtime.version < (3, 12):
+            extras.append("setuptools")
 
-    if sys.platform == "win32":
-        python_path = os.path.join(os.path.realpath(venv_path), "Scripts", "python.exe")
-    else:
-        python_path = os.path.join(os.path.realpath(venv_path), "bin", "python")
+        # Run the subprocess using *this* install to guarantee the presence of pip
+        subprocess.run(
+            [
+                sys.executable, "-m", "pip",
+                "--python", venv_path,
+                "install", *extras
+            ],
+            capture_output=True,
+        )
 
-    return python_path
+    config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
+
+    return PythonVEnv.from_cfg(config_path)
+
+
+def delete_venv(venv_path: str):
+    shutil.rmtree(venv_path, ignore_errors=True)
+
+
+def install_requirements(
+    *,
+    venv: PythonVEnv,
+    requirements_path: str,
+    no_deps: bool = False,
+):
+    base_python = venv.parent_executable
+    venv_path = venv.folder
+
+    command = [
+        base_python,
+        "-m", "pip",
+        "--python", venv_path,
+        "install",
+        "-r", requirements_path,
+    ]
+    if no_deps:
+        command.append("--no-deps")
+
+    run(command)
 
 
 def launch_shell(venv: PythonVEnv) -> None:
@@ -53,14 +99,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     old_venv_prompt = os.environ.get("VIRTUAL_ENV_PROMPT", "")
 
     venv_prompt = os.path.basename(venv.folder)
-
-    env["PATH"] = os.pathsep.join([os.path.dirname(venv.executable), old_path])
-    env["VIRTUAL_ENV"] = venv.folder
-    env["VIRTUAL_ENV_PROMPT"] = venv_prompt
-
-    for t, v in env.items():
-        if type(v) is not str:
-            assert False, t
+    venv_dir = os.path.dirname(venv.executable)
 
     try:
         shell_name, shell = shellingham.detect_shell()
@@ -72,12 +111,33 @@ def launch_shell(venv: PythonVEnv) -> None:
         else:
             raise RuntimeError(f"Shell detection failed")
 
+    env["PATH"] = os.pathsep.join([venv_dir, old_path])
+    env["VIRTUAL_ENV"] = venv.folder
+    env["VIRTUAL_ENV_PROMPT"] = venv_prompt
+
     if shell_name == "cmd":
-        # Windows cmd prompt keep it simple
+        # Windows cmd prompt - history doesn't work for some reason
         old_prompt = env.get("PROMPT", "$P$G")
-        old_prompt = old_prompt.removeprefix(old_venv_prompt)
-        env["PROMPT"] = f"({venv_prompt}) {old_prompt}"
-        cmd = [shell]
+        if old_venv_prompt and old_venv_prompt in old_prompt:
+            # Some prompts have colours etc
+            new_prompt = old_prompt.replace(old_venv_prompt, f"pytui: {venv_prompt}")
+        else:
+            new_prompt = f"(pytui: {venv_prompt}) {old_prompt}"
+        env["PROMPT"] = new_prompt
+        cmd = [shell, "/k"]  # This effectively hides the copyright message
+    elif shell_name == "powershell":
+        # Copied from activate.ps1
+        prompt_command = """
+        function global:_old_virtual_prompt {
+        ""
+        }
+        $function:_old_virtual_prompt = $function:prompt
+        function global:prompt {
+            $previous_prompt_value = & $function:_old_virtual_prompt
+            ("(pytui: " + $env:VIRTUAL_ENV_PROMPT + ") " + $previous_prompt_value)
+        }
+        """
+        cmd = [shell, "-NoExit", prompt_command]
     elif shell_name == "bash":
         # Dynamic prompt appears to work in BASH at least on Ubuntu
         old_prompt = env.get("PS1", r"\u@\h \w\$")
@@ -94,6 +154,5 @@ def launch_shell(venv: PythonVEnv) -> None:
         # We'll probably need some extra config here
         cmd = [shell]
 
-    print(f"Launching Shell with active VENV: {venv.folder}")
-    print("Type 'exit' to close")
+    print("\nVEnv shell from ducktools.pytui: type 'exit' to close")
     run(cmd, env=env)
