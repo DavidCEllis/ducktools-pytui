@@ -36,27 +36,38 @@ DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"
 CWD = os.getcwd()
 
 
-class DependencyTable(DataTable):
+class DependencyScreen(ModalScreen):
+    BINDINGS = [
+        Binding(key="c", action="app.pop_screen", description="Close", show=True)
+    ]
+
     def __init__(self, venv: PythonVEnv):
-        self.venv = venv
         super().__init__()
+        self.venv = venv
+        self.venv_table = DataTable()
+
+    def compose(self):
+        with Vertical(classes="boxed"):
+            yield Label(f"Packages installed in {self.venv.folder}")
+            yield self.venv_table
+            yield Footer()
 
     def on_mount(self):
-        self.cursor_type = "row"
-        self.add_columns("Dependency", "Version")
-        self.loading = True
+        self.venv_table.cursor_type = "row"
+        self.venv_table.add_columns("Dependency", "Version")
+        self.venv_table.loading = True
         try:
             for dep in self.venv.list_packages():
-                self.add_row(dep.name, dep.version, key=dep.name)
+                self.venv_table.add_row(dep.name, dep.version, key=dep.name)
         finally:
-            self.loading = False
+            self.venv_table.loading = False
 
 
 class VEnvTable(DataTable):
     BINDINGS = [
         Binding(key="enter", action="app.activated_shell", description="Activate VEnv and Launch Shell", show=True),
         Binding(key="r", action="app.launch_venv_repl", description="Launch VEnv Python REPL", show=True),
-        # Binding(key="p", action="list_packages", description="List Installed Packages", show=True),
+        Binding(key="p", action="app.list_venv_packages", description="List Installed Packages", show=True),
         *DATATABLE_BINDINGS_NO_ENTER,
     ]
 
@@ -88,9 +99,6 @@ class VEnvTable(DataTable):
                 self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
         finally:
             self.loading = False
-
-    def list_packages(self):
-        pass
 
 
 class RuntimeTable(DataTable):
@@ -154,6 +162,9 @@ class ManagerApp(App):
         self._venv_table = VEnvTable()
         self._runtime_table = RuntimeTable()
 
+    def on_mount(self):
+        self.title = "Ducktools.PyTui: Python Environment and Runtime Manager"
+
     def compose(self):
         yield Header()
         with Vertical(classes="boxed"):
@@ -164,16 +175,35 @@ class ManagerApp(App):
             yield self._runtime_table
         yield Footer()
 
-    def action_launch_runtime(self):
+    @property
+    def selected_venv(self) -> PythonVEnv | None:
+        table = self._venv_table
+
+        try:
+            row = table.coordinate_to_cell_key(table.cursor_coordinate)
+        except CellDoesNotExist:
+            return None
+
+        return table.venv_from_key(row.row_key.value)
+
+    @property
+    def selected_runtime(self) -> PythonInstall | None:
         table = self._runtime_table
 
         try:
             row = table.coordinate_to_cell_key(table.cursor_coordinate)
         except CellDoesNotExist:
+            return None
+
+        return table.runtime_from_key(row.row_key.value)
+
+    def action_launch_runtime(self):
+        runtime = self.selected_runtime
+
+        if runtime is None:
             return
 
-        install = table.runtime_from_key(row.row_key.value)
-        python_exe = install.executable
+        python_exe = runtime.executable
 
         # Suspend the app and launch python
         # Ignore keyboard interrupts otherwise the program will exit when this exits.
@@ -184,15 +214,11 @@ class ManagerApp(App):
         self.refresh()
 
     def action_launch_venv_repl(self):
-        table = self._venv_table
-
-        try:
-            row = table.coordinate_to_cell_key(table.cursor_coordinate)
-        except CellDoesNotExist:
+        venv = self.selected_venv
+        if venv is None:
             return
 
-        install = table.venv_from_key(row.row_key.value)
-        python_exe = install.executable
+        python_exe = venv.executable
 
         # Suspend the app and launch python
         # Ignore keyboard interrupts otherwise the program will exit when this exits.
@@ -202,20 +228,20 @@ class ManagerApp(App):
         # Redraw
         self.refresh()
 
-    def action_activated_shell(self):
-        table = self._venv_table
-
-        try:
-            row = table.coordinate_to_cell_key(table.cursor_coordinate)
-        except CellDoesNotExist:
+    def action_list_venv_packages(self):
+        venv = self.selected_venv
+        if venv is None:
             return
 
-        venv = table.venv_from_key(row.row_key.value)
+        self.push_screen(DependencyScreen(venv=venv))
+
+    def action_activated_shell(self):
+        venv = self.selected_venv
+        if venv is None:
+            return
+
         with self.suspend():
             launch_shell(venv)
 
         # Redraw
         self.refresh()
-
-    def on_mount(self):
-        self.title = "Ducktools.PyTui: Python Environment and Runtime Manager"
