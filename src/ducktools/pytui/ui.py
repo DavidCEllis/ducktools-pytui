@@ -229,7 +229,7 @@ class ManagerApp(App):
     CSS = """
     .boxed {
         height: auto;
-        border: solid green;
+        border: $primary-darken-2;
     }
     .boxed_noborder {
         height: auto;
