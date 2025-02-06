@@ -12,12 +12,10 @@ Run with `pytui` or `ducktools-pytui`.
 
 ## Features ##
 
-### Done ###
-
 * List Python Virtual Environments relative to the current folder
-* List Python installs
+* List Python Runtimes
 * Launch a Terminal with a selected venv activated
-  * Currently only 'tested' with 'bash' on Linux and 'cmd' on Windows
+  * Currently only 'tested' with bash, zsh (on macos), powershell and cmd.
   * It's possible shell config files may break the environment variable changes. 
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
@@ -28,8 +26,10 @@ Run with `pytui` or `ducktools-pytui`.
 ### Planned ###
 
 * Config file with some saved settings
+  * Option: Create venv without pip or without the latest pip
+  * Keep the theme the user selected
 * Allow selecting 'default' packages to install, auto-editable install option with extras
-* Add commands to install/uninstall runtimes with specific tools if available (pyenv/uv/pymanage(r)(?))
+* Add commands to install/uninstall runtimes of tools with runtime managers (eg: UV, pyenv)
 * Highlight invalid venvs
 
 ### Not Planned ###
@@ -43,4 +43,5 @@ Run with `pytui` or `ducktools-pytui`.
   * Supporting Conda would basically require a whole separate parallel set of commands
 * Manage `ducktools-pytui` specific runtimes
   * I don't want to add *yet another* place Python can be installed
-  * `ducktools-pytui` is intended to help manage tools and installs that already exist
+  * `ducktools-pytui` is intended to help manage the chaos of Python runtime installs and environments, 
+    not add a new dimension to it.
