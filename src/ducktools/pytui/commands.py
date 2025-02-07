@@ -146,7 +146,7 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
         # Didn't have so much luck on MacOS
-        old_prompt = env.get("PS1", "%n@%m %1~:")
+        old_prompt = env.get("PS1", "%n@%m %1~ %#")
         old_prompt = old_prompt.removeprefix(old_venv_prompt)
         env["PS1"] = f"(pytui: {venv_prompt}) {old_prompt}"
         cmd = [shell, "--no-rcs"]
