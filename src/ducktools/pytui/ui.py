@@ -86,7 +86,7 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
                 loop = asyncio.get_running_loop()
                 dependencies = await loop.run_in_executor(None, self.venv.list_packages)
 
-            for dep in dependencies:
+            for dep in sorted(dependencies, key=lambda x: x.name.lower()):
                 self.venv_table.add_row(dep.name, dep.version, key=dep.name)
         finally:
             self.venv_table.loading = False
