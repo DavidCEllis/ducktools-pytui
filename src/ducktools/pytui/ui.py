@@ -247,7 +247,6 @@ class ManagerApp(App):
 
         self._venv_table = VEnvTable()
         self._runtime_table = RuntimeTable()
-        self._venv_table.styles.height = "1fr"
         self._runtime_table.styles.height = "1fr"
 
         self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
