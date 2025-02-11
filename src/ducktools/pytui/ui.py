@@ -231,6 +231,10 @@ class ManagerApp(App):
         height: auto;
         border: $primary-darken-2;
     }
+    .boxed_fillheight {
+        height: 1fr;
+        border: $primary-darken-2;
+    }
     .boxed_noborder {
         height: auto;
         border: hidden;
@@ -243,6 +247,8 @@ class ManagerApp(App):
 
         self._venv_table = VEnvTable()
         self._runtime_table = RuntimeTable()
+        self._venv_table.styles.height = "1fr"
+        self._runtime_table.styles.height = "1fr"
 
         self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
 
@@ -254,7 +260,7 @@ class ManagerApp(App):
         with Vertical(classes="boxed"):
             yield Label("Virtual Environments")
             yield self._venv_table
-        with Vertical(classes="boxed"):
+        with Vertical(classes="boxed_fillheight"):
             yield Label("Python Runtimes")
             yield self._runtime_table
         yield Footer()
