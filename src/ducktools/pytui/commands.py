@@ -30,7 +30,7 @@ from .util import run
 
 
 def launch_repl(python_exe: str) -> None:
-    run([python_exe])
+    run([python_exe])  # type: ignore
 
 
 def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include_pip: bool = True) -> PythonVEnv:
@@ -89,7 +89,7 @@ def install_requirements(
     if no_deps:
         command.append("--no-deps")
 
-    run(command)
+    run(command)  # type: ignore
 
 
 def launch_shell(venv: PythonVEnv) -> None:
@@ -117,12 +117,12 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     if shell_name == "cmd":
         # Windows cmd prompt - history doesn't work for some reason
-        old_prompt = env.get("PROMPT", "$P$G")
-        if old_venv_prompt and old_venv_prompt in old_prompt:
+        shell_prompt = env.get("PROMPT", "$P$G")
+        if old_venv_prompt and old_venv_prompt in shell_prompt:
             # Some prompts have colours etc
-            new_prompt = old_prompt.replace(old_venv_prompt, f"pytui: {venv_prompt}")
+            new_prompt = shell_prompt.replace(old_venv_prompt, f"pytui: {venv_prompt}")
         else:
-            new_prompt = f"(pytui: {venv_prompt}) {old_prompt}"
+            new_prompt = f"(pytui: {venv_prompt}) {shell_prompt}"
         env["PROMPT"] = new_prompt
         cmd = [shell, "/k"]  # This effectively hides the copyright message
     elif shell_name == "powershell":
@@ -140,19 +140,36 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "-NoExit", prompt_command]
     elif shell_name == "bash":
         # Dynamic prompt appears to work in BASH at least on Ubuntu
-        old_prompt = env.get("PS1", r"\u@\h \w\$ ")
-        old_prompt = old_prompt.removeprefix(old_venv_prompt)
-        env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {old_prompt}"
+        # PS1 value isn't normally exported so we need to try to get it
+        shell_echo = subprocess.run(
+            "echo $PS1",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        shell_prompt = shell_echo.stdout.rstrip()
+        if not shell_prompt:
+            # Get a reasonable default if this is empty
+            shell_prompt = r"\u@\h \w\$"
+
+        env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {shell_prompt} "
         cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
-        # Didn't have so much luck on MacOS
-        old_prompt = env.get("PS1", "%n@%m %1~ %# ")
-        old_prompt = old_prompt.removeprefix(old_venv_prompt)
-        env["PS1"] = f"(pytui: {venv_prompt}) {old_prompt}"
+        shell_echo = subprocess.run(
+            "echo $PS1",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        shell_prompt = shell_echo.stdout.rstrip()
+        if not shell_prompt:
+            shell_prompt = "%n@%m %1~ %#"
+
+        env["PS1"] = f"(pytui: {venv_prompt}) {shell_prompt} "
         cmd = [shell, "--no-rcs"]
     else:
         # We'll probably need some extra config here
         cmd = [shell]
 
     print("\nVEnv shell from ducktools.pytui: type 'exit' to close")
-    run(cmd, env=env)
+    run(cmd, env=env)  # type: ignore
