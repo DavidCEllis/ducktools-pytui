@@ -140,32 +140,46 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "-NoExit", prompt_command]
     elif shell_name == "bash":
         # Dynamic prompt appears to work in BASH at least on Ubuntu
-        # PS1 value isn't normally exported so we need to try to get it
-        shell_echo = subprocess.run(
-            "echo $PS1",
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        shell_prompt = shell_echo.stdout.rstrip()
+        # If this is run in a venv, the prompt may exist in environ
+        shell_prompt = os.environ.get("PS1", None)
+        if shell_prompt is None:
+            shell_echo = subprocess.run(
+                "echo $PS1",
+                shell=True,
+                capture_output=True,
+                text=True,
+            )
+            shell_prompt = shell_echo.stdout.rstrip()
         if not shell_prompt:
             # Get a reasonable default if this is empty
             shell_prompt = r"\u@\h \w\$"
 
-        env["PS1"] = f"(pytui: $VIRTUAL_ENV_PROMPT) {shell_prompt} "
+        if old_venv_prompt and old_venv_prompt in shell_prompt:
+            shell_prompt = shell_prompt.replace(old_venv_prompt, "(pytui: $VIRTUAL_ENV_PROMPT) ")
+        else:
+            shell_prompt = f"(pytui: $VIRTUAL_ENV_PROMPT) {shell_prompt} "
+        env["PS1"] = shell_prompt
         cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
-        shell_echo = subprocess.run(
-            "echo $PS1",
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        shell_prompt = shell_echo.stdout.rstrip()
+        shell_prompt = os.environ.get("PS1", None)
+        if shell_prompt is None:
+            shell_echo = subprocess.run(
+                "echo $PS1",
+                shell=True,
+                capture_output=True,
+                text=True,
+            )
+            shell_prompt = shell_echo.stdout.rstrip()
+
         if not shell_prompt:
             shell_prompt = "%n@%m %1~ %#"
 
-        env["PS1"] = f"(pytui: {venv_prompt}) {shell_prompt} "
+        if old_venv_prompt and old_venv_prompt in shell_prompt:
+            shell_prompt = shell_prompt.replace(old_venv_prompt, f"(pytui: {venv_prompt})")
+        else:
+            shell_prompt = f"(pytui: {venv_prompt}) {shell_prompt} "
+
+        env["PS1"] = shell_prompt
         cmd = [shell, "--no-rcs"]
     else:
         # We'll probably need some extra config here
