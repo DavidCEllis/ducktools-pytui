@@ -35,7 +35,7 @@ from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .util import list_installs_deduped
 
 
-DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"]
+# DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"]
 CWD = os.getcwd()
 
 
@@ -131,7 +131,6 @@ class VEnvTable(DataTable):
         Binding(key="r", action="app.launch_venv_repl", description="Launch VEnv REPL", show=True),
         Binding(key="p", action="app.list_venv_packages", description="List Packages", show=True),
         Binding(key="delete", action="app.delete_venv", description="Delete VEnv", show=True),
-        *DATATABLE_BINDINGS_NO_ENTER,
     ]
 
     def __init__(self, *args, **kwargs):
@@ -182,7 +181,6 @@ class RuntimeTable(DataTable):
     BINDINGS = [
         Binding(key="r", action="app.launch_runtime", description="Launch Runtime REPL", show=True),
         Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
-        *DATATABLE_BINDINGS_NO_ENTER
     ]
 
     def __init__(self, *args, **kwargs):
