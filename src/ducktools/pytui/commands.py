@@ -29,6 +29,9 @@ from ducktools.pythonfinder.venv import PythonVEnv
 from .util import run
 
 
+USE_COLOR = True
+
+
 def launch_repl(python_exe: str) -> None:
     run([python_exe])  # type: ignore
 
@@ -153,7 +156,10 @@ def launch_shell(venv: PythonVEnv) -> None:
 
         if not shell_prompt or shell_prompt.strip() == "$":
             # Get a reasonable default if this is empty or useless
-            shell_prompt = r"\u@\h \w\$ "
+            if USE_COLOR:
+                shell_prompt = r"\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+            else:
+                shell_prompt = r"\u@\h:\w\$ "
 
         if old_venv_prompt and old_venv_prompt in shell_prompt:
             shell_prompt = shell_prompt.replace(old_venv_prompt, "(pytui: $VIRTUAL_ENV_PROMPT) ")
