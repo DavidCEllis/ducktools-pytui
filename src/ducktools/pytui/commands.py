@@ -157,7 +157,7 @@ def launch_shell(venv: PythonVEnv) -> None:
         if old_venv_prompt and old_venv_prompt in shell_prompt:
             shell_prompt = shell_prompt.replace(old_venv_prompt, "(pytui: $VIRTUAL_ENV_PROMPT) ")
         else:
-            shell_prompt = f"(pytui: $VIRTUAL_ENV_PROMPT) {shell_prompt} "
+            shell_prompt = f"(pytui: $VIRTUAL_ENV_PROMPT) {shell_prompt}"
         env["PS1"] = shell_prompt
         cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
