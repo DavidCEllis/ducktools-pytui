@@ -150,9 +150,10 @@ def launch_shell(venv: PythonVEnv) -> None:
                 text=True,
             )
             shell_prompt = shell_echo.stdout.rstrip()
-        if not shell_prompt:
-            # Get a reasonable default if this is empty
-            shell_prompt = r"\u@\h \w\$"
+
+        if not shell_prompt or shell_prompt.strip() == "$":
+            # Get a reasonable default if this is empty or useless
+            shell_prompt = r"\u@\h \w\$ "
 
         if old_venv_prompt and old_venv_prompt in shell_prompt:
             shell_prompt = shell_prompt.replace(old_venv_prompt, "(pytui: $VIRTUAL_ENV_PROMPT) ")
