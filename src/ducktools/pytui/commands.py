@@ -30,7 +30,7 @@ from .util import run
 
 
 USE_COLOR = True
-
+ACTIVATE_FOLDER = os.path.join(os.path.dirname(__file__), "shell_scripts")
 
 def launch_repl(python_exe: str) -> None:
     run([python_exe])  # type: ignore
@@ -102,7 +102,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     old_venv_prompt = os.environ.get("VIRTUAL_ENV_PROMPT", "")
 
     venv_prompt = os.path.basename(venv.folder)
-    venv_dir = os.path.dirname(venv.executable)
+    venv_bindir = os.path.dirname(venv.executable)
 
     try:
         shell_name, shell = shellingham.detect_shell()
@@ -114,7 +114,16 @@ def launch_shell(venv: PythonVEnv) -> None:
         else:
             raise RuntimeError(f"Shell detection failed")
 
-    env["PATH"] = os.pathsep.join([venv_dir, old_path])
+    # dedupe and construct the PATH for the shell here
+    deduped_path = []
+    for p in old_path.split(os.pathsep):
+        if p in deduped_path:
+            continue
+        deduped_path.append(p)
+
+    venv_env_path = os.pathsep.join([venv_bindir, *deduped_path])
+
+    env["PATH"] = venv_env_path
     env["VIRTUAL_ENV"] = venv.folder
     env["VIRTUAL_ENV_PROMPT"] = venv_prompt
 
@@ -128,6 +137,7 @@ def launch_shell(venv: PythonVEnv) -> None:
             new_prompt = f"(pytui: {venv_prompt}) {shell_prompt}"
         env["PROMPT"] = new_prompt
         cmd = [shell, "/k"]  # This effectively hides the copyright message
+
     elif shell_name == "powershell":
         # Copied from activate.ps1
         prompt_command = """
@@ -141,32 +151,17 @@ def launch_shell(venv: PythonVEnv) -> None:
         }
         """
         cmd = [shell, "-NoExit", prompt_command]
+
     elif shell_name == "bash":
-        # Dynamic prompt appears to work in BASH at least on Ubuntu
-        # If this is run in a venv, the prompt may exist in environ
-        shell_prompt = os.environ.get("PS1", None)
-        if shell_prompt is None:
-            shell_echo = subprocess.run(
-                "echo $PS1",
-                shell=True,
-                capture_output=True,
-                text=True,
-            )
-            shell_prompt = shell_echo.stdout.rstrip()
+        # Invoke our custom activation script as the rcfile
+        # This includes ~/.bashrc but handles activation from Python
+        # The initialization scripts may rewrite PATH so store it as PYTUI_PATH
+        # It will be replaced as the last thing in the rcfile
+        env["PYTUI_PATH"] = venv_env_path
+        env["PYTUI_VENV_PROMPT"] = f"(pytui: {venv_prompt})"
+        rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.sh")
+        cmd = [shell, "--rcfile", rcfile]
 
-        if not shell_prompt or shell_prompt.strip() == "$":
-            # Get a reasonable default if this is empty or useless
-            if USE_COLOR:
-                shell_prompt = r"\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
-            else:
-                shell_prompt = r"\u@\h:\w\$ "
-
-        if old_venv_prompt and old_venv_prompt in shell_prompt:
-            shell_prompt = shell_prompt.replace(old_venv_prompt, "(pytui: $VIRTUAL_ENV_PROMPT) ")
-        else:
-            shell_prompt = f"(pytui: $VIRTUAL_ENV_PROMPT) {shell_prompt}"
-        env["PS1"] = shell_prompt
-        cmd = [shell, "--noprofile", "--norc"]
     elif shell_name == "zsh":
         shell_prompt = os.environ.get("PS1", None)
         if shell_prompt is None:
