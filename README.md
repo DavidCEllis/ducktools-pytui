@@ -1,4 +1,4 @@
-# ducktools: pytui #
+# Ducktools: PyTUI #
 
 A terminal based user interface for managing Python installs and virtual environments.
 
@@ -9,6 +9,10 @@ The easiest way to install ducktools.pytui is as a tool from PyPI using `uv` or 
 `uv tool install ducktools-pytui` or `pipx install ducktools-pytui`
 
 Run with `pytui` or `ducktools-pytui`.
+
+## Example ##
+
+![screenshot showing ducktools-pytui displaying a list of venvs and runtimes](images/pytui_menu.png)
 
 ## Features ##
 
