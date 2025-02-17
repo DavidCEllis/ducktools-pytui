@@ -163,24 +163,21 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "--rcfile", rcfile]
 
     elif shell_name == "zsh":
-        shell_prompt = os.environ.get("PS1", None)
-        if shell_prompt is None:
-            shell_echo = subprocess.run(
-                "echo $PS1",
-                shell=True,
-                capture_output=True,
-                text=True,
-            )
-            shell_prompt = shell_echo.stdout.rstrip()
-
+        # Try to get the shell PS1 from subprocess
+        prompt_getter = subprocess.run(
+            ["zsh", "-ic", "--no-rcs", "echo $PS1"], 
+            text=True, 
+            capture_output=True
+        )
+        shell_prompt = prompt_getter.stdout.strip()
+        
+        if old_venv_prompt:
+            shell_prompt = shell_prompt.removeprefix(old_venv_prompt)
+        
         if not shell_prompt:
             shell_prompt = "%n@%m %1~ %#"
-
-        if old_venv_prompt and old_venv_prompt in shell_prompt:
-            shell_prompt = shell_prompt.replace(old_venv_prompt, f"(pytui: {venv_prompt})")
-        else:
-            shell_prompt = f"(pytui: {venv_prompt}) {shell_prompt} "
-
+        
+        shell_prompt = f"(pytui: {venv_prompt}) {shell_prompt} "
         env["PS1"] = shell_prompt
         cmd = [shell, "--no-rcs"]
     else:
