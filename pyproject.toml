@@ -12,7 +12,7 @@ authors = [
   { name="David C Ellis" },
 ]
 readme="README.md"
-requires-python = ">=3.12.0"
+requires-python = ">=3.10.0"
 dependencies = [
     "ducktools-pythonfinder>=0.7.6",
     "textual~=1.0",
@@ -21,6 +21,8 @@ dependencies = [
 ]
 classifiers = [
     "Development Status :: 1 - Planning",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
