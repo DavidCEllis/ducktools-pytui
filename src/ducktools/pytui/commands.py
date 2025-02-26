@@ -32,7 +32,23 @@ from .util import run
 USE_COLOR = True
 ACTIVATE_FOLDER = os.path.join(os.path.dirname(__file__), "shell_scripts")
 
+WIN_HISTORY_FIXED = False
+
+
+def fix_win_history():
+    """
+    Fix the windows history and set a global flag that it has been set
+    :return:
+    """
+    global WIN_HISTORY_FIXED
+    from .util.win32_terminal_hist import set_console_history_info
+    set_console_history_info()
+    WIN_HISTORY_FIXED = True
+
+
 def launch_repl(python_exe: str) -> None:
+    if os.name == "nt" and not WIN_HISTORY_FIXED:
+        fix_win_history()
     run([python_exe])  # type: ignore
 
 
@@ -101,7 +117,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     old_path = env.get("PATH", "")
     old_venv_prompt = os.environ.get("VIRTUAL_ENV_PROMPT", "")
 
-    venv_prompt = os.path.basename(venv.folder)
+    venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
     venv_bindir = os.path.dirname(venv.executable)
 
     try:
@@ -123,9 +139,13 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     venv_env_path = os.pathsep.join([venv_bindir, *deduped_path])
 
-    env["PATH"] = venv_env_path
-    env["VIRTUAL_ENV"] = venv.folder
-    env["VIRTUAL_ENV_PROMPT"] = venv_prompt
+    # Environment variables may get overwritten so also create PYTUI versions
+    env["PATH"] = env["PYTUI_PATH"] = venv_env_path
+    env["VIRTUAL_ENV"] = env["PYTUI_VIRTUAL_ENV"] = venv.folder
+    env["VIRTUAL_ENV_PROMPT"] = env["PYTUI_VIRTUAL_ENV_PROMPT"] = venv_prompt
+
+    if os.name == "nt" and not WIN_HISTORY_FIXED:
+        fix_win_history()
 
     if shell_name == "cmd":
         # Windows cmd prompt - history doesn't work for some reason
@@ -134,31 +154,19 @@ def launch_shell(venv: PythonVEnv) -> None:
             # Some prompts have colours etc
             new_prompt = shell_prompt.replace(old_venv_prompt, f"pytui: {venv_prompt}")
         else:
-            new_prompt = f"(pytui: {venv_prompt}) {shell_prompt}"
+            new_prompt = f"({venv_prompt}) {shell_prompt}"
         env["PROMPT"] = new_prompt
         cmd = [shell, "/k"]  # This effectively hides the copyright message
 
     elif shell_name == "powershell":
-        # Copied from activate.ps1
-        prompt_command = """
-        function global:_old_virtual_prompt {
-        ""
-        }
-        $function:_old_virtual_prompt = $function:prompt
-        function global:prompt {
-            $previous_prompt_value = & $function:_old_virtual_prompt
-            ("(pytui: " + $env:VIRTUAL_ENV_PROMPT + ") " + $previous_prompt_value)
-        }
-        """
+        rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.ps1")
+        with open(rcfile, encoding="utf8") as f:
+            prompt_command = f.read()
         cmd = [shell, "-NoExit", prompt_command]
 
     elif shell_name == "bash":
         # Invoke our custom activation script as the rcfile
         # This includes ~/.bashrc but handles activation from Python
-        # The initialization scripts may rewrite PATH so store it as PYTUI_PATH
-        # It will be replaced as the last thing in the rcfile
-        env["PYTUI_PATH"] = venv_env_path
-        env["PYTUI_VENV_PROMPT"] = f"(pytui: {venv_prompt})"
         rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.sh")
         cmd = [shell, "--rcfile", rcfile]
 
@@ -177,11 +185,16 @@ def launch_shell(venv: PythonVEnv) -> None:
         if not shell_prompt:
             shell_prompt = "%n@%m %1~ %#"
         
-        shell_prompt = f"(pytui: {venv_prompt}) {shell_prompt} "
+        shell_prompt = f"({venv_prompt}) {shell_prompt} "
         env["PS1"] = shell_prompt
         cmd = [shell, "--no-rcs"]
     else:
         # We'll probably need some extra config here
+        print(f"UNSUPPORTED SHELL: {shell_name!r}.")
+        print(
+            "PATH may not have been correctly modified. "
+            "Check if $PATH matches $PYTUI_PATH"
+        )
         cmd = [shell]
 
     print("\nVEnv shell from ducktools.pytui: type 'exit' to close")
