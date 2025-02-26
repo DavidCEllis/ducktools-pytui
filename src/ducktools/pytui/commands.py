@@ -62,22 +62,35 @@ def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include
     python_exe = python_runtime.executable
     # These tasks run in the background so don't need to block ctrl+c
     # Capture output to not mess with the textual display
-    subprocess.run([python_exe, "-m", "venv", "--without-pip", venv_path], capture_output=True)
-
-    if include_pip:
-        # This actually seems to be faster than `--upgrade-deps`
-        extras = ["pip"]
-        if python_runtime.version < (3, 12):
-            extras.append("setuptools")
-
-        # Run the subprocess using *this* install to guarantee the presence of pip
+    # 3.8 support is going in the next pip update
+    if python_runtime.version >= (3, 9) or not include_pip:
         subprocess.run(
-            [
-                sys.executable, "-m", "pip",
-                "--python", venv_path,
-                "install", *extras
-            ],
+            [python_exe, "-m", "venv", "--without-pip", venv_path],
             capture_output=True,
+            check=True
+        )
+        if include_pip:
+            # This actually seems to be faster than `--upgrade-deps`
+            extras = ["pip"]
+            if python_runtime.version < (3, 12):
+                extras.append("setuptools")
+
+            # Run the subprocess using *this* install to guarantee the presence of pip
+            subprocess.run(
+                [
+                    sys.executable, "-m", "pip",
+                    "--python", venv_path,
+                    "install", *extras
+                ],
+                capture_output=True,
+                check=True,
+            )
+    else:
+        # For older Python if include_pip, just keep the old version rather than trying to update
+        subprocess.run(
+            [python_exe, "-m", "venv", venv_path],
+            capture_output=True,
+            check=True
         )
 
     config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
