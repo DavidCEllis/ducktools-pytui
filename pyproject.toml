@@ -17,7 +17,7 @@ dependencies = [
     "ducktools-pythonfinder>=0.7.6",
     "textual>=1.0",
     "shellingham~=1.5",
-    "pip>=24.0",
+    "pip~=25.0",
 ]
 classifiers = [
     "Development Status :: 1 - Planning",

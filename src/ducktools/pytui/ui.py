@@ -19,6 +19,7 @@ import os
 import os.path
 
 import asyncio
+import subprocess
 
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPackage
@@ -35,8 +36,24 @@ from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .util import list_installs_deduped
 
 
-# DATATABLE_BINDINGS_NO_ENTER = [b for b in DataTable.BINDINGS if b.key != "enter"]
 CWD = os.getcwd()
+
+
+# I wrote this error screen modal and then discovered notify.
+# It might still be useful in some cases so I'll leave it commented out
+# class ErrorScreen(ModalScreen):
+#     def __init__(self, message):
+#         super().__init__()
+#         self.message = message
+#
+#     def compose(self):
+#         with Vertical(classes="boxed"):
+#             yield Label(f"Error: {self.message}")
+#             with Horizontal(classes="boxed_noborder"):
+#                 yield Button("Dismiss", variant="error")
+#
+#     def on_button_pressed(self, event: Button.Pressed) -> None:
+#         self.dismiss(None)
 
 
 class DependencyScreen(ModalScreen[list[PythonPackage]]):
@@ -314,6 +331,10 @@ class ManagerApp(App):
     async def action_list_venv_packages(self):
         venv = self.selected_venv
         if venv is None:
+            self.notify("No VEnv Selected", severity="warning")
+            return
+        elif venv.version < (3, 9):
+            self.notify(f"Package listing not supported for Python {venv.version_str}")
             return
 
         dependency_cache = self._venv_dependency_cache.get(venv.folder)
@@ -337,6 +358,21 @@ class ManagerApp(App):
     async def action_create_venv(self):
         runtime = self.selected_runtime
         if runtime is None:
+            self.notify("No runtime selected.", severity="warning")
+
+        if runtime.implementation.lower() == "micropython":
+            self.notify(
+                "MicroPython does not support VEnv creation.",
+                title="Error",
+                severity="error"
+            )
+            return
+        elif runtime.version < (3, 4):
+            self.notify(
+                f"ducktools-pytui does not support VEnv creation for Python {runtime.version_str}",
+                title="Error",
+                severity="error",
+            )
             return
 
         venv_screen = VEnvCreateScreen(runtime=runtime)
@@ -356,8 +392,15 @@ class ManagerApp(App):
                 runtime, venv_name
             )
         except FileExistsError:
-            pass
+            self.notify(
+                f"Failed to create venv {venv_name}, folder already exists",
+                title="Error",
+                severity="error"
+            )
+        except subprocess.CalledProcessError as e:
+            self.notify(f"Failed to create venv {venv_name}. Process Error: {e}")
         else:
+            self.notify(f"VEnv {venv_name!r} created", title="Success")
             self._venv_table.add_venv(new_venv, sort=True)
         finally:
             self._venv_table.loading = False
