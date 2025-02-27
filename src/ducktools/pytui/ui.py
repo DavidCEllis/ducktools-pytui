@@ -284,7 +284,7 @@ class ManagerApp(App):
         self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
 
     def on_mount(self):
-        self.title = "Ducktools.PyTui: Python Environment and Runtime Manager"
+        self.title = "Ducktools.PyTUI: Python Environment and Runtime Manager"
 
     def compose(self):
         yield Header()
