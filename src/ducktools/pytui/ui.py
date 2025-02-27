@@ -33,6 +33,7 @@ from textual.widgets import Button, DataTable, Footer, Header, Input, Label
 from textual.widgets.data_table import CellDoesNotExist
 
 from .commands import launch_repl, launch_shell, create_venv, delete_venv
+from .config import Config
 from .util import list_installs_deduped
 
 
@@ -150,8 +151,11 @@ class VEnvTable(DataTable):
         Binding(key="delete", action="app.delete_venv", description="Delete VEnv", show=True),
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, config, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.config = config
+
         self._venv_catalogue = {}
         self._sort_key = None
 
@@ -187,7 +191,11 @@ class VEnvTable(DataTable):
             if clear_first:
                 self.clear(columns=False)
                 self._venv_catalogue = {}
-            for venv in get_python_venvs(base_dir=CWD, recursive=False, search_parent_folders=True):
+            for venv in get_python_venvs(
+                base_dir=CWD,
+                recursive=False,
+                search_parent_folders=True
+            ):
                 self.add_venv(venv, sort=False)
         finally:
             self.sort_by_path()
@@ -200,8 +208,10 @@ class RuntimeTable(DataTable):
         Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, config, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.config = config
         self._runtime_catalogue = {}
 
     def on_mount(self):
@@ -222,7 +232,8 @@ class RuntimeTable(DataTable):
                 self.clear()
                 self._runtime_catalogue = {}
 
-            for install in list_installs_deduped():
+            query_executables = not self.config.fast_runtime_search
+            for install in list_installs_deduped(query_executables=query_executables):
                 self._runtime_catalogue[install.executable] = install
 
                 self.add_row(
@@ -260,8 +271,10 @@ class ManagerApp(App):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._venv_table = VEnvTable()
-        self._runtime_table = RuntimeTable()
+        self.config: Config = Config.from_file()
+
+        self._venv_table = VEnvTable(config=self.config)
+        self._runtime_table = RuntimeTable(config=self.config)
         self._runtime_table.styles.height = "1fr"
 
         self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
@@ -334,7 +347,10 @@ class ManagerApp(App):
             self.notify("No VEnv Selected", severity="warning")
             return
         elif venv.version < (3, 9):
-            self.notify(f"Package listing not supported for Python {venv.version_str}")
+            self.notify(
+                f"Package listing not supported for Python {venv.version_str}",
+                severity="warning",
+            )
             return
 
         dependency_cache = self._venv_dependency_cache.get(venv.folder)
@@ -364,7 +380,7 @@ class ManagerApp(App):
             self.notify(
                 "MicroPython does not support VEnv creation.",
                 title="Error",
-                severity="error"
+                severity="error",
             )
             return
         elif runtime.version < (3, 4):
@@ -389,13 +405,13 @@ class ManagerApp(App):
             new_venv = await loop.run_in_executor(
                 None,
                 create_venv,
-                runtime, venv_name
+                runtime, venv_name, self.config.include_pip, self.config.latest_pip
             )
         except FileExistsError:
             self.notify(
                 f"Failed to create venv {venv_name}, folder already exists",
                 title="Error",
-                severity="error"
+                severity="error",
             )
         except subprocess.CalledProcessError as e:
             self.notify(f"Failed to create venv {venv_name}. Process Error: {e}")

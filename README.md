@@ -17,21 +17,36 @@ Run with `pytui` or `ducktools-pytui`.
 ## Features ##
 
 * List Python Virtual Environments relative to the current folder
-* List Python Runtimes
+* List Python Runtimes discovered by [ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
 * Launch a Terminal with a selected venv activated
   * Currently only 'tested' with bash, zsh (on macos), powershell and cmd.
-  * It's possible shell config files may break the environment variable changes. 
+  * It's possible shell config files may break the environment variable changes.
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
-* List installed packages in a venv
-* Create a venv from a specific runtime
+* List installed packages in a venv (Python 3.9 or later)
+* Create a venv from a specific runtime (Python 3.4 or later)
 * Delete a selected venv
+
+### Basic Configuration ###
+
+Some configuration is available by editing the config.json file located here:
+
+* Windows: `%LOCALAPPDATA%\ducktools\pytui\config.json`
+* Linux/Mac/Other: `~/.ducktools/pytui/config.json`
+
+### Config Values ###
+* `venv_search_mode` - Where to search for VEnv folders
+  * `"cwd"` - Search in the working directory only
+  * `"parents"` - Search in the working directory and each parent folder (default)
+  * `"recursive"` - Search in the working directory and subfolders recursively
+  * `"recursive_parents"` - Combine the "recursive" and "parents" options (only the CWD is recursively searched)
+* `fast_runtime_search` - Skip any potential Python runtimes that will require querying the interpreter (default: `False`)
+  * This may make the start time faster in some cases, but will miss runtimes on PATH or alternate interpreters
+* `include_pip` - Whether to include `pip` (and `setuptools` where appropriate) in created VEnvs (default: `True`)
+* `latest_pip` - Download the latest `pip` for Python versions where it is available (default: `True`)
 
 ### Planned ###
 
-* Config file with some saved settings
-  * Option: Create venv without pip or without the latest pip
-  * Keep the theme the user selected
 * Allow selecting 'default' packages to install, auto-editable install option with extras
 * Add commands to install/uninstall runtimes of tools with runtime managers (eg: UV, pyenv)
 * Highlight invalid venvs

@@ -52,7 +52,12 @@ def launch_repl(python_exe: str) -> None:
     run([python_exe])  # type: ignore
 
 
-def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include_pip: bool = True) -> PythonVEnv:
+def create_venv(
+    python_runtime: PythonInstall,
+    venv_path: str = ".venv",
+    include_pip: bool = True,
+    latest_pip: bool = True
+) -> PythonVEnv:
     # Unlike the regular venv command defaults this will create an environment
     # and download the *newest* pip (assuming the parent venv includes pip)
 
@@ -63,7 +68,13 @@ def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include
     # These tasks run in the background so don't need to block ctrl+c
     # Capture output to not mess with the textual display
     # 3.8 support is going in the next pip update
-    if python_runtime.version >= (3, 9) or not include_pip:
+    if include_pip and (not latest_pip or python_runtime.version < (3, 9)):
+        subprocess.run(
+            [python_exe, "-m", "venv", venv_path],
+            capture_output=True,
+            check=True
+        )
+    else:
         subprocess.run(
             [python_exe, "-m", "venv", "--without-pip", venv_path],
             capture_output=True,
@@ -74,7 +85,6 @@ def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include
             extras = ["pip"]
             if python_runtime.version < (3, 12):
                 extras.append("setuptools")
-
             # Run the subprocess using *this* install to guarantee the presence of pip
             subprocess.run(
                 [
@@ -85,13 +95,6 @@ def create_venv(python_runtime: PythonInstall, venv_path: str = ".venv", include
                 capture_output=True,
                 check=True,
             )
-    else:
-        # For older Python if include_pip, just keep the old version rather than trying to update
-        subprocess.run(
-            [python_exe, "-m", "venv", venv_path],
-            capture_output=True,
-            check=True
-        )
 
     config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
 
