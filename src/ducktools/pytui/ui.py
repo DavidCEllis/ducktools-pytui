@@ -191,12 +191,16 @@ class VEnvTable(DataTable):
             if clear_first:
                 self.clear(columns=False)
                 self._venv_catalogue = {}
+
+            recursive = "recursive" in self.config.venv_search_mode
+            search_parent_folders = "parents" in self.config.venv_search_mode
             for venv in get_python_venvs(
                 base_dir=CWD,
-                recursive=False,
-                search_parent_folders=True
+                recursive=recursive,
+                search_parent_folders=search_parent_folders,
             ):
                 self.add_venv(venv, sort=False)
+
         finally:
             self.sort_by_path()
             self.loading = False
