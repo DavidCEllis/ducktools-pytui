@@ -68,7 +68,11 @@ def create_venv(
     # These tasks run in the background so don't need to block ctrl+c
     # Capture output to not mess with the textual display
     # 3.8 support is going in the next pip update
-    if include_pip and (not latest_pip or python_runtime.version < (3, 9)):
+    # Also always include the pip bundled with graalpy and don't update
+    if (
+        include_pip and (not latest_pip or python_runtime.version < (3, 9))
+        or python_runtime.implementation == "graalpy"
+    ):
         subprocess.run(
             [python_exe, "-m", "venv", venv_path],
             capture_output=True,
