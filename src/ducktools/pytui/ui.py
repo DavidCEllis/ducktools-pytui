@@ -321,8 +321,13 @@ class RuntimeTable(DataTable):
             for install in list_installs_deduped(query_executables=query_executables):
                 self._runtime_catalogue[install.executable] = install
 
+                if install.version_str == install.implementation_version_str:
+                    version_str = install.version_str
+                else:
+                    version_str = f"{install.version_str} / {install.implementation_version_str}"
+
                 self.add_row(
-                    install.version_str,
+                    version_str,
                     install.managed_by,
                     install.implementation,
                     install.executable,
