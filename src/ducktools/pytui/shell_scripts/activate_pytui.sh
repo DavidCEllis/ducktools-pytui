@@ -6,7 +6,7 @@ alias deactivate="exit"
 
 # Replace the prompt unless it's specifically disabled
 if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT-}" ] ; then
-    export PS1="$PYTUI_VIRTUAL_ENV_PROMPT $PS1"
+    export PS1="($PYTUI_VIRTUAL_ENV_PROMPT) $PS1"
 fi
 
 # bashrc running multiple times may have added dupes to PATH
