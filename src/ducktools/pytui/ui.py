@@ -34,10 +34,12 @@ from textual.widgets.data_table import CellDoesNotExist
 
 from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .config import Config
+from .runtime_installers import uv
 from .util import list_installs_deduped
 
 
 CWD = os.getcwd()
+HAS_UV = uv.check_uv()
 
 
 # I wrote this error screen modal and then discovered notify.
@@ -55,6 +57,78 @@ CWD = os.getcwd()
 #
 #     def on_button_pressed(self, event: Button.Pressed) -> None:
 #         self.dismiss(None)
+
+
+class UVPythonTable(DataTable):
+    def __init__(self, runtimes: list[uv.UVPythonListing], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.runtimes = runtimes
+
+    def on_mount(self):
+        self.setup_columns()
+        self.list_downloads()
+
+    def setup_columns(self):
+        self.cursor_type = "row"
+        self.add_columns("Version", "Implementation", "Variant", "Architecture")
+
+    def list_downloads(self):
+        for dl in self.runtimes:
+            self.add_row(dl.version, dl.implementation, dl.variant, dl.arch, key=dl.key)
+
+
+class UVPythonScreen(ModalScreen[uv.UVPythonListing | None]):
+    BINDINGS = [
+        Binding(key="enter", action="install", description="Install Runtime", priority=True, show=True),
+        Binding(key="escape", action="cancel", description="Cancel", priority=True, show=True),
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.runtimes = uv.fetch_downloads()
+        self.install_table = UVPythonTable(self.runtimes)
+        self.install_button = Button("Install", variant="success", id="install")
+        self.cancel_button = Button("Cancel", id="cancel")
+
+    @property
+    def runtimes_by_key(self):
+        return {
+            v.key: v for v in self.runtimes
+        }
+
+    @property
+    def selected_runtime(self) -> uv.UVPythonListing | None:
+        table = self.install_table
+
+        try:
+            row = table.coordinate_to_cell_key(table.cursor_coordinate)
+        except CellDoesNotExist:
+            return None
+
+        return self.runtimes_by_key.get(row.row_key.value)
+
+    def compose(self):
+        with Vertical(classes="boxed_limitheight"):
+            yield Label("Available UV Python Runtimes")
+            yield self.install_table
+        with Horizontal(classes="boxed_noborder"):
+            yield self.install_button
+            yield self.cancel_button
+
+    def action_install(self):
+        if self.focused == self.install_table or self.focused == self.install_button:
+            self.dismiss(self.selected_runtime)
+        else:
+            self.dismiss(None)
+
+    def action_cancel(self):
+        self.dismiss(None)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "install":
+            self.dismiss(self.selected_runtime)
+        else:
+            self.dismiss(None)
 
 
 class DependencyScreen(ModalScreen[list[PythonPackage]]):
@@ -211,6 +285,13 @@ class RuntimeTable(DataTable):
         Binding(key="r", action="app.launch_runtime", description="Launch Runtime REPL", show=True),
         Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
     ]
+    if HAS_UV:
+        BINDINGS.extend(
+            [
+                Binding(key="i", action="app.install_runtime", description="Install New Runtime", show=True),
+                Binding(key="delete", action="app.uninstall_runtime", description="Uninstall Runtime", show=True),
+            ]
+        )
 
     def __init__(self, *args, config, **kwargs):
         super().__init__(*args, **kwargs)
@@ -263,6 +344,11 @@ class ManagerApp(App):
     }
     .boxed_fillheight {
         height: 1fr;
+        border: $primary-darken-2;
+    }
+    .boxed_limitheight {
+        height: auto;
+        max-height: 90%;
         border: $primary-darken-2;
     }
     .boxed_noborder {
@@ -433,3 +519,70 @@ class ManagerApp(App):
         delete_venv(venv.folder)
         self._venv_table.remove_venv(venv)
         self._venv_dependency_cache.pop(venv.folder, None)
+
+    @work
+    async def action_install_runtime(self):
+        if not HAS_UV:
+            return
+        runtime_screen = UVPythonScreen()
+        runtime = await self.push_screen_wait(runtime_screen)
+
+        if runtime is not None:
+            self._runtime_table.loading = True
+            loop = asyncio.get_event_loop()
+            try:
+                log = await loop.run_in_executor(None, uv.install_python, runtime)
+                # self.notify(log)
+            except (FileNotFoundError, subprocess.CalledProcessError) as e:
+                self.notify(
+                    f"Install Failed: {e}",
+                    title="Error",
+                    severity="error",
+                )
+            else:
+                self.notify(
+                    f"{runtime.key} installed successfully",
+                    title="New Install"
+                )
+                self._runtime_table.load_runtimes(clear_first=True)
+            finally:
+                self._runtime_table.loading = False
+                self.set_focus(self._runtime_table)
+                self.refresh_bindings()
+
+    @work
+    async def action_uninstall_runtime(self):
+        if not HAS_UV:
+            return
+
+        runtime = self.selected_runtime
+        if runtime is None:
+            return
+
+        uv_listing = uv.find_matching_listing(runtime)
+        if uv_listing is None:
+            self.notify(
+                f"{runtime.executable} is not a UV managed runtime",
+                severity="warning"
+            )
+            return
+
+        loop = asyncio.get_event_loop()
+        self._runtime_table.loading = True
+        try:
+            log = await loop.run_in_executor(None, uv.uninstall_python, uv_listing)
+            # self.notify(log)
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            self.notify(
+                f"Uninstall Failed: {e}",
+                severity="error",
+            )
+        else:
+            self.notify(
+                f"Runtime {uv_listing.key!r} uninstalled."
+            )
+            self._runtime_table.load_runtimes(clear_first=True)
+        finally:
+            self._runtime_table.loading = False
+            self.set_focus(self._runtime_table)
+            self.refresh_bindings()
