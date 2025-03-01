@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import os.path
+import sys
 
 import asyncio
 import subprocess
@@ -562,6 +563,13 @@ class ManagerApp(App):
 
         runtime = self.selected_runtime
         if runtime is None:
+            return
+
+        if runtime.executable.startswith(sys.base_prefix):
+            self.notify(
+                "Can not uninstall the runtime being used to run ducktools-pytui",
+                severity="warning",
+            )
             return
 
         uv_listing = uv.find_matching_listing(runtime)
