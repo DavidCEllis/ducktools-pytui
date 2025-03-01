@@ -120,7 +120,8 @@ def find_matching_listing(install: PythonInstall) -> UVPythonListing | None:
         check=True,
     )
     installed_dict = {
-        os.path.dirname(v["path"]): UVPythonListing(**v) for v in json.loads(installed_list_cmd.stdout)
+        os.path.dirname(os.path.realpath(v["path"])): UVPythonListing(**v)
+        for v in json.loads(installed_list_cmd.stdout)
     }
     return installed_dict.get(os.path.dirname(install.executable), None)
 
