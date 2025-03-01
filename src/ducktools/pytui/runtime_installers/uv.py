@@ -103,7 +103,7 @@ def fetch_downloads(all_versions=False) -> list[UVPythonListing]:
     return download_listings
 
 def find_matching_listing(install: PythonInstall) -> UVPythonListing | None:
-    if not install.managed_by.startswith("Astral"):
+    if install.managed_by is None or not install.managed_by.startswith("Astral"):
         return None
 
     # Get astral listings based on search
