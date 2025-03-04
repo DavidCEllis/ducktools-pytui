@@ -335,7 +335,7 @@ def test_find_matching_listing_nonwin():
         assert non_uv is None
 
 
-def test_install():
+def test_install(uv_python_dir):
     listing = UVPythonListing(
         key="cpython-3.14.0a5+freethreaded-windows-x86_64-none",
         version="3.14.0a5",
@@ -372,7 +372,7 @@ def test_install():
         )
 
 
-def test_uninstall():
+def test_uninstall(uv_python_dir):
     if sys.platform == "win32":
         py_path = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.13.2-windows-x86_64-none\\python.exe"
     else:
