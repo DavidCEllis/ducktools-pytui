@@ -45,8 +45,8 @@ def uv_install_json() -> str:
     return (example_folder / "uv_install_list.json").read_text()
 
 
-@functools.cache
-def uv_installed_pythons() -> list[uv.UVPythonListing]:
+@pytest.fixture()
+def uv_installed_pythons(uv_python_dir) -> list[uv.UVPythonListing]:
     pys = [uv.UVPythonListing.from_dict(v) for v in json.loads(uv_install_json())]
     return pys
 
@@ -173,12 +173,12 @@ def test_fetch_installed(uv_python_dir):
     assert [p.key for p in installed_pys] == expected
 
 
-def test_fetch_downloads(uv_python_dir):
+def test_fetch_downloads(uv_python_dir, uv_installed_pythons):
     with (
         patch("subprocess.run") as fake_process,
         patch.object(uv, "fetch_installed") as fake_installed,
     ):
-        fake_installed.return_value = uv_installed_pythons()
+        fake_installed.return_value = uv_installed_pythons
 
         cmd_output = MagicMock()
         cmd_output.stdout = uv_download_json()
@@ -225,7 +225,7 @@ def test_fetch_downloads(uv_python_dir):
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows version of test")
-def test_find_matching_listing_win():
+def test_find_matching_listing_win(uv_installed_pythons):
     inst_313 = PythonInstall(
         version=(3, 13, 2, "final", 0),
         executable="C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.13.2-windows-x86_64-none\\python.exe",
@@ -270,7 +270,7 @@ def test_find_matching_listing_win():
     )
 
     with patch.object(uv, "fetch_installed") as fake_installed:
-        fake_installed.return_value = uv_installed_pythons()
+        fake_installed.return_value = uv_installed_pythons
 
         uv_313 = uv.find_matching_listing(inst_313)
 
@@ -286,7 +286,7 @@ def test_find_matching_listing_win():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Non-windows version of test")
-def test_find_matching_listing_nonwin():
+def test_find_matching_listing_nonwin(uv_installed_pythons):
     inst_313 = PythonInstall(
         version=(3, 13, 2, "final", 0),
         executable="/home/david/.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/bin/python",
@@ -320,7 +320,7 @@ def test_find_matching_listing_nonwin():
     )
 
     with patch.object(uv, "fetch_installed") as fake_installed:
-        fake_installed.return_value = uv_installed_pythons()
+        fake_installed.return_value = uv_installed_pythons
 
         uv_313 = uv.find_matching_listing(inst_313)
 
