@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -24,5 +25,8 @@ from ducktools.pytui.runtime_installers import uv
 @pytest.fixture(scope="function")
 def uv_python_dir():
     with patch.object(uv, "uv_python_dir") as fake_py_dir:
-        fake_py_dir.return_value = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python"
+        if sys.platform == "win32":
+            fake_py_dir.return_value = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python"
+        else:
+            fake_py_dir.return_value = "/home/david/.local/share/uv/python"
         yield

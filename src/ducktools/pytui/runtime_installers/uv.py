@@ -19,6 +19,8 @@ import functools
 import json
 import os.path
 import subprocess
+from pathlib import Path
+
 
 from ducktools.classbuilder.prefab import Prefab, attribute, get_attributes
 from ducktools.pythonfinder.shared import version_str_to_tuple, PythonInstall
@@ -75,7 +77,7 @@ class UVPythonListing(Prefab):
             self.key = key
         else:
             base_path = uv_python_dir()
-            key_path = os.path.dirname(os.path.relpath(self.path, base_path))
+            key_path = str(Path(self.path).relative_to(base_path).parts[0])
             self.key = key if key == key_path else key_path
 
     @property
@@ -161,7 +163,10 @@ def find_matching_listing(install: PythonInstall) -> UVPythonListing | None:
 
     # Executable names may not match, one may find python.exe, the other pypy.exe
     # Use the parent folder.
-    installed_dict = {os.path.dirname(os.path.realpath(py.path)): py for py in fetch_installed()}
+    installed_dict = {
+        os.path.dirname(os.path.realpath(py.path)): py
+        for py in fetch_installed()
+    }
 
     return installed_dict.get(os.path.dirname(install.executable), None)
 
