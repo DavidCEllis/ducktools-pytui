@@ -30,7 +30,7 @@ from ducktools.pytui.runtime_installers import uv
 from ducktools.pytui.runtime_installers.uv import UVPythonListing
 
 if sys.platform == "win32":
-    example_folder = Path(__file__).parent / "win32" / "example_data"
+    example_folder = Path(__file__).parent / "example_data" / "win32"
 else:
     example_folder = Path(__file__).parent / "example_data"
 
