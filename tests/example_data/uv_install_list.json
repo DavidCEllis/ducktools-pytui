@@ -1,0 +1,172 @@
+[
+    {
+        "key": "cpython-3.14.0a5-linux-x86_64-gnu",
+        "version": "3.14.0a5",
+        "version_parts": {
+            "major": 3,
+            "minor": 14,
+            "patch": 0
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/bin/python3.14",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.14.0a4-linux-x86_64-gnu",
+        "version": "3.14.0a4",
+        "version_parts": {
+            "major": 3,
+            "minor": 14,
+            "patch": 0
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.14.0a4-linux-x86_64-gnu/bin/python3.14",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.13.2-linux-x86_64-gnu",
+        "version": "3.13.2",
+        "version_parts": {
+            "major": 3,
+            "minor": 13,
+            "patch": 2
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/bin/python3.13",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.12.9-linux-x86_64-gnu",
+        "version": "3.12.9",
+        "version_parts": {
+            "major": 3,
+            "minor": 12,
+            "patch": 9
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/bin/python3.12",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.11.11-linux-x86_64-gnu",
+        "version": "3.11.11",
+        "version_parts": {
+            "major": 3,
+            "minor": 11,
+            "patch": 11
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/bin/python3.11",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.10.16-linux-x86_64-gnu",
+        "version": "3.10.16",
+        "version_parts": {
+            "major": 3,
+            "minor": 10,
+            "patch": 16
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/bin/python3.10",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.9.21-linux-x86_64-gnu",
+        "version": "3.9.21",
+        "version_parts": {
+            "major": 3,
+            "minor": 9,
+            "patch": 21
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/bin/python3.9",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "cpython-3.8.20-linux-x86_64-gnu",
+        "version": "3.8.20",
+        "version_parts": {
+            "major": 3,
+            "minor": 8,
+            "patch": 20
+        },
+        "path": "/home/david/.local/share/uv/python/cpython-3.8.20-linux-x86_64-gnu/bin/python3.8",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "pypy-3.11.11-linux-x86_64-gnu",
+        "version": "3.11.11",
+        "version_parts": {
+            "major": 3,
+            "minor": 11,
+            "patch": 11
+        },
+        "path": "/home/david/.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/bin/pypy3.11",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "gnu"
+    },
+    {
+        "key": "pypy-3.10.16-linux-x86_64-gnu",
+        "version": "3.10.16",
+        "version_parts": {
+            "major": 3,
+            "minor": 10,
+            "patch": 16
+        },
+        "path": "/home/david/.local/share/uv/python/pypy-3.10.19-linux-x86_64-gnu/bin/pypy3.10",
+        "symlink": null,
+        "url": null,
+        "os": "linux",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "gnu"
+    }
+]

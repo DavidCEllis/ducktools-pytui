@@ -1,0 +1,257 @@
+[
+    {
+        "key": "cpython-3.14.0a5+freethreaded-windows-x86_64-none",
+        "version": "3.14.0a5",
+        "version_parts": {
+            "major": 3,
+            "minor": 14,
+            "patch": 0
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.14.0a5%2B20250212-x86_64-pc-windows-msvc-freethreaded%2Bpgo-full.tar.zst",
+        "os": "windows",
+        "variant": "freethreaded",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.14.0a5-windows-x86_64-none",
+        "version": "3.14.0a5",
+        "version_parts": {
+            "major": 3,
+            "minor": 14,
+            "patch": 0
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.14.0a5%2B20250212-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.13.2+freethreaded-windows-x86_64-none",
+        "version": "3.13.2",
+        "version_parts": {
+            "major": 3,
+            "minor": 13,
+            "patch": 2
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.13.2%2B20250212-x86_64-pc-windows-msvc-freethreaded%2Bpgo-full.tar.zst",
+        "os": "windows",
+        "variant": "freethreaded",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.13.2-windows-x86_64-none",
+        "version": "3.13.2",
+        "version_parts": {
+            "major": 3,
+            "minor": 13,
+            "patch": 2
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.13.2%2B20250212-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.12.9-windows-x86_64-none",
+        "version": "3.12.9",
+        "version_parts": {
+            "major": 3,
+            "minor": 12,
+            "patch": 9
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.12.9%2B20250212-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.11.11-windows-x86_64-none",
+        "version": "3.11.11",
+        "version_parts": {
+            "major": 3,
+            "minor": 11,
+            "patch": 11
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.11.11%2B20250212-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.10.16-windows-x86_64-none",
+        "version": "3.10.16",
+        "version_parts": {
+            "major": 3,
+            "minor": 10,
+            "patch": 16
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.10.16%2B20250212-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.9.21-windows-x86_64-none",
+        "version": "3.9.21",
+        "version_parts": {
+            "major": 3,
+            "minor": 9,
+            "patch": 21
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20250212/cpython-3.9.21%2B20250212-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.8.20-windows-x86_64-none",
+        "version": "3.8.20",
+        "version_parts": {
+            "major": 3,
+            "minor": 8,
+            "patch": 20
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20241002/cpython-3.8.20%2B20241002-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.7.9-windows-x86_64-none",
+        "version": "3.7.9",
+        "version_parts": {
+            "major": 3,
+            "minor": 7,
+            "patch": 9
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20200822/cpython-3.7.9-x86_64-pc-windows-msvc-shared-pgo-20200823T0118.tar.zst",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.11.11-windows-x86_64-none",
+        "version": "3.11.11",
+        "version_parts": {
+            "major": 3,
+            "minor": 11,
+            "patch": 11
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://downloads.python.org/pypy/pypy3.11-v7.3.19-win64.zip",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.10.19-windows-x86_64-none",
+        "version": "3.10.19",
+        "version_parts": {
+            "major": 3,
+            "minor": 10,
+            "patch": 19
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://downloads.python.org/pypy/pypy3.10-v7.3.19-win64.zip",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.9.19-windows-x86_64-none",
+        "version": "3.9.19",
+        "version_parts": {
+            "major": 3,
+            "minor": 9,
+            "patch": 19
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://downloads.python.org/pypy/pypy3.9-v7.3.16-win64.zip",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.8.16-windows-x86_64-none",
+        "version": "3.8.16",
+        "version_parts": {
+            "major": 3,
+            "minor": 8,
+            "patch": 16
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://downloads.python.org/pypy/pypy3.8-v7.3.11-win64.zip",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.7.13-windows-x86_64-none",
+        "version": "3.7.13",
+        "version_parts": {
+            "major": 3,
+            "minor": 7,
+            "patch": 13
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://downloads.python.org/pypy/pypy3.7-v7.3.9-win64.zip",
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    }
+]
