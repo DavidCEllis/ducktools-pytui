@@ -1,0 +1,172 @@
+[
+    {
+        "key": "cpython-3.14.0a5-windows-x86_64-none",
+        "version": "3.14.0a5",
+        "version_parts": {
+            "major": 3,
+            "minor": 14,
+            "patch": 0
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.14.0a5-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.14.0a4-windows-x86_64-none",
+        "version": "3.14.0a4",
+        "version_parts": {
+            "major": 3,
+            "minor": 14,
+            "patch": 0
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.14.0a4-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.13.2-windows-x86_64-none",
+        "version": "3.13.2",
+        "version_parts": {
+            "major": 3,
+            "minor": 13,
+            "patch": 2
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.13.2-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.12.9-windows-x86_64-none",
+        "version": "3.12.9",
+        "version_parts": {
+            "major": 3,
+            "minor": 12,
+            "patch": 9
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.12.9-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.11.11-windows-x86_64-none",
+        "version": "3.11.11",
+        "version_parts": {
+            "major": 3,
+            "minor": 11,
+            "patch": 11
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.11.11-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.10.16-windows-x86_64-none",
+        "version": "3.10.16",
+        "version_parts": {
+            "major": 3,
+            "minor": 10,
+            "patch": 16
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.10.16-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.9.21-windows-x86_64-none",
+        "version": "3.9.21",
+        "version_parts": {
+            "major": 3,
+            "minor": 9,
+            "patch": 21
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.9.21-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "cpython-3.8.20-windows-x86_64-none",
+        "version": "3.8.20",
+        "version_parts": {
+            "major": 3,
+            "minor": 8,
+            "patch": 20
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.8.20-windows-x86_64-none\\python.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.11.11-windows-x86_64-none",
+        "version": "3.11.11",
+        "version_parts": {
+            "major": 3,
+            "minor": 11,
+            "patch": 11
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\pypy-3.11.11-windows-x86_64-none\\pypy3.11.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    },
+    {
+        "key": "pypy-3.10.16-windows-x86_64-none",
+        "version": "3.10.16",
+        "version_parts": {
+            "major": 3,
+            "minor": 10,
+            "patch": 16
+        },
+        "path": "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\pypy-3.10.19-windows-x86_64-none\\pypy3.10.exe",
+        "symlink": null,
+        "url": null,
+        "os": "windows",
+        "variant": "default",
+        "implementation": "pypy",
+        "arch": "x86_64",
+        "libc": "none"
+    }
+]
