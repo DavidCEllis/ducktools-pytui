@@ -40,7 +40,6 @@ from .util import list_installs_deduped
 
 
 CWD = os.getcwd()
-HAS_UV = uv.check_uv()
 
 
 # I wrote this error screen modal and then discovered notify.
@@ -286,7 +285,7 @@ class RuntimeTable(DataTable):
         Binding(key="r", action="app.launch_runtime", description="Launch Runtime REPL", show=True),
         Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
     ]
-    if HAS_UV:
+    if uv.check_uv():
         BINDINGS.extend(
             [
                 Binding(key="i", action="app.install_runtime", description="Install New Runtime", show=True),
@@ -528,7 +527,7 @@ class ManagerApp(App):
 
     @work
     async def action_install_runtime(self):
-        if not HAS_UV:
+        if not uv.check_uv():
             return
         runtime_screen = UVPythonScreen()
         runtime = await self.push_screen_wait(runtime_screen)
@@ -558,7 +557,7 @@ class ManagerApp(App):
 
     @work
     async def action_uninstall_runtime(self):
-        if not HAS_UV:
+        if not uv.check_uv():
             return
 
         runtime = self.selected_runtime
