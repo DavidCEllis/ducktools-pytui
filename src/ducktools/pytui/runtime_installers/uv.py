@@ -145,8 +145,10 @@ def fetch_downloads(all_versions=False) -> list[UVPythonListing]:
     )
     full_download_list = json.loads(download_list_cmd.stdout)
 
+    installed_keys = {v.key for v in fetch_installed()}
+
     download_listings = [
-        UVPythonListing(**v) for v in full_download_list
+        UVPythonListing.from_dict(v) for v in full_download_list
         if v["key"] not in installed_keys
     ]
 
