@@ -80,7 +80,7 @@ class UVPythonTable(DataTable):
 class UVPythonScreen(ModalScreen[uv.UVPythonListing | None]):
     BINDINGS = [
         Binding(key="enter", action="install", description="Install Runtime", priority=True, show=True),
-        Binding(key="escape", action="cancel", description="Cancel", priority=True, show=True),
+        Binding(key="escape", action="cancel", description="Cancel", show=True),
     ]
 
     def __init__(self, *args, **kwargs):
@@ -108,12 +108,10 @@ class UVPythonScreen(ModalScreen[uv.UVPythonListing | None]):
         return self.runtimes_by_key.get(row.row_key.value)
 
     def compose(self):
-        with Vertical(classes="boxed_limitheight"):
+        with Vertical(classes="boxed"):
             yield Label("Available UV Python Runtimes")
             yield self.install_table
-        with Horizontal(classes="boxed_noborder"):
-            yield self.install_button
-            yield self.cancel_button
+            yield Footer()
 
     def action_install(self):
         if self.focused == self.install_table or self.focused == self.install_button:
@@ -133,8 +131,8 @@ class UVPythonScreen(ModalScreen[uv.UVPythonListing | None]):
 
 class DependencyScreen(ModalScreen[list[PythonPackage]]):
     BINDINGS = [
-        Binding(key="c", action="close", description="Close", show=True),
         Binding(key="r", action="reload_dependencies", description="Reload Dependencies", show=True),
+        Binding(key="escape", action="close", description="Close", show=True),
     ]
 
     def __init__(
@@ -188,7 +186,8 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
 
 class VEnvCreateScreen(ModalScreen[str | None]):
     BINDINGS = [
-        Binding(key="escape", action="cancel", description="Cancel VEnv Creation")
+        Binding(key="enter", action="create", description="Create VEnv", show=True, priority=True),
+        Binding(key="escape", action="cancel", description="Cancel", show=True),
     ]
 
     def __init__(self, runtime: PythonInstall, *args, **kwargs):
@@ -199,22 +198,18 @@ class VEnvCreateScreen(ModalScreen[str | None]):
     def compose(self):
         with Vertical(classes="boxed"):
             yield Label(f"Create VENV from {self.runtime.implementation} {self.runtime.version_str}")
-            yield self.venv_input
-            with Horizontal(classes="boxed_noborder"):
-                yield Button("Create", variant="success", id="create")
-                yield Button("Cancel", id="cancel")
+            with Vertical(classes="boxed_noborder"):
+                yield self.venv_input
+            yield Footer()
 
     def action_cancel(self):
         self.dismiss(None)
 
+    def action_create(self):
+        self.dismiss(self.venv_input.value)
+
     def on_input_submitted(self, event: Input.Submitted):
         self.dismiss(event.value)
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "create":
-            self.dismiss(self.venv_input.value)
-        else:
-            self.dismiss(None)
 
 
 class VEnvTable(DataTable):
