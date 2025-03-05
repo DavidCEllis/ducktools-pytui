@@ -193,7 +193,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     elif shell_name == "zsh":
         # Try to get the shell PS1 from subprocess
         prompt_getter = subprocess.run(
-            ["zsh", "-ic", "--no-rcs", "echo $PS1"], 
+            ["zsh", "-ic", "echo $PS1"], 
             text=True, 
             capture_output=True
         )
