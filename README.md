@@ -32,7 +32,7 @@ Run with `pytui` or `ducktools-pytui`.
 Some configuration is available by editing the config.json file located here:
 
 * Windows: `%LOCALAPPDATA%\ducktools\pytui\config.json`
-* Linux/Mac/Other: `~/.ducktools/pytui/config.json`
+* Linux/Mac/Other: `~/.config/ducktools/pytui/config.json`
 
 ### Config Values ###
 * `venv_search_mode` - Where to search for VEnv folders
