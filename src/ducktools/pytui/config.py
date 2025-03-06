@@ -44,7 +44,22 @@ if sys.platform == "win32":
     PYTUI_FOLDER = os.path.join(USER_FOLDER, "ducktools", "pytui")
 else:
     USER_FOLDER = os.path.expanduser("~")
-    PYTUI_FOLDER = os.path.join(USER_FOLDER, ".ducktools", "pytui")
+
+    # Versions prior to 0.2.0 used this old folder
+    OLD_FOLDER = os.path.join(USER_FOLDER, ".ducktools", "pytui")
+    PYTUI_FOLDER = os.path.join(USER_FOLDER, ".config", "ducktools", "pytui")
+
+    # If you used a version prior to v0.2.0
+    if os.path.exists(OLD_FOLDER):
+        import shutil
+
+        # Delete the old folder if the new one already exists, move otherwise
+        if os.path.exists(PYTUI_FOLDER):
+            shutil.rmtree(OLD_FOLDER)
+        else:
+            os.makedirs(os.path.dirname(PYTUI_FOLDER), exist_ok=True)
+            shutil.move(OLD_FOLDER, PYTUI_FOLDER)
+
 
 CONFIG_FILE = os.path.join(PYTUI_FOLDER, "config.json")
 
