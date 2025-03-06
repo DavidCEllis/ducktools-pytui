@@ -34,7 +34,6 @@ from ducktools.pythonfinder.venv import PythonVEnv
 from .util import run
 
 
-USE_COLOR = True
 ACTIVATE_FOLDER = os.path.join(os.path.dirname(__file__), "shell_scripts")
 
 WIN_HISTORY_FIXED = False
@@ -239,6 +238,7 @@ def launch_shell(venv: PythonVEnv) -> None:
         shell_prompt = f"({venv_prompt}) {shell_prompt} "
         env["PS1"] = shell_prompt
         cmd = [shell, "--no-rcs"]
+
     else:
         # We'll probably need some extra config here
         print(f"UNSUPPORTED SHELL: {shell_name!r}.")
