@@ -190,6 +190,29 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "-NoExit", prompt_command]
 
     elif shell_name == "bash":
+        if sys.platform == "win32":
+            # Git bash needs special env handling as it follows linux conventions
+            drive, venv_dir = os.path.splitdrive(venv_bindir)
+            if ":" in drive:
+                drive = drive.replace(":", "").lower()
+                drive = f"/{drive}"
+            venv_dir = venv_dir.replace("\\", "/")
+            new_venv_bindir = "".join([drive, venv_dir])
+
+            # Get the current bash PATH
+            prompt_getter = subprocess.run(
+                [shell, "-ic", "echo $PATH"],
+                text=True,
+                capture_output=True
+            )
+            git_bash_path = prompt_getter.stdout.strip()
+            deduped_path = []
+            for p in git_bash_path.split(":"):
+                if p in deduped_path:
+                    continue
+                deduped_path.append(p)
+            env["PATH"] = env["PYTUI_PATH"] = ":".join([new_venv_bindir, *deduped_path])
+
         # Invoke our custom activation script as the rcfile
         # This includes ~/.bashrc but handles activation from Python
         rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.sh")
@@ -198,7 +221,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     elif shell_name == "zsh":
         # Try to get the shell PS1 from subprocess
         prompt_getter = subprocess.run(
-            ["zsh", "-ic", "echo $PS1"], 
+            [shell, "-ic", "echo $PS1"],
             text=True, 
             capture_output=True
         )
