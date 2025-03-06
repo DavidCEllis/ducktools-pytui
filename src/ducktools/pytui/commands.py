@@ -156,13 +156,39 @@ def launch_shell(venv: PythonVEnv) -> None:
             raise RuntimeError(f"Shell detection failed")
 
     # dedupe and construct the PATH for the shell here
-    deduped_path = []
-    for p in old_path.split(os.pathsep):
-        if p in deduped_path:
-            continue
-        deduped_path.append(p)
+    if sys.platform == "win32" and shell_name == "bash":
+        # Git bash needs special env handling as it follows linux conventions
+        # And does not provide the PATH variable to child processes
+        drive, venv_dir = os.path.splitdrive(venv_bindir)
+        if ":" in drive:
+            drive = drive.replace(":", "").lower()
+            drive = f"/{drive}"
+        venv_dir = venv_dir.replace("\\", "/")
+        new_venv_bindir = "".join([drive, venv_dir])
 
-    venv_env_path = os.pathsep.join([venv_bindir, *deduped_path])
+        # Get the current git bash PATH
+        prompt_getter = subprocess.run(
+            [shell, "-ic", "echo $PATH"],
+            text=True,
+            capture_output=True
+        )
+        git_bash_path = prompt_getter.stdout.strip()
+        deduped_path = []
+        for p in git_bash_path.split(":"):
+            if p in deduped_path:
+                continue
+            deduped_path.append(p)
+        venv_env_path = ":".join([new_venv_bindir, *deduped_path])
+
+    else:
+        # In other cases follow the OS conventions
+        deduped_path = []
+        for p in old_path.split(os.pathsep):
+            if p in deduped_path:
+                continue
+            deduped_path.append(p)
+
+        venv_env_path = os.pathsep.join([venv_bindir, *deduped_path])
 
     # Environment variables may get overwritten so also create PYTUI versions
     env["PATH"] = env["PYTUI_PATH"] = venv_env_path
@@ -190,29 +216,6 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "-NoExit", prompt_command]
 
     elif shell_name == "bash":
-        if sys.platform == "win32":
-            # Git bash needs special env handling as it follows linux conventions
-            drive, venv_dir = os.path.splitdrive(venv_bindir)
-            if ":" in drive:
-                drive = drive.replace(":", "").lower()
-                drive = f"/{drive}"
-            venv_dir = venv_dir.replace("\\", "/")
-            new_venv_bindir = "".join([drive, venv_dir])
-
-            # Get the current bash PATH
-            prompt_getter = subprocess.run(
-                [shell, "-ic", "echo $PATH"],
-                text=True,
-                capture_output=True
-            )
-            git_bash_path = prompt_getter.stdout.strip()
-            deduped_path = []
-            for p in git_bash_path.split(":"):
-                if p in deduped_path:
-                    continue
-                deduped_path.append(p)
-            env["PATH"] = env["PYTUI_PATH"] = ":".join([new_venv_bindir, *deduped_path])
-
         # Invoke our custom activation script as the rcfile
         # This includes ~/.bashrc but handles activation from Python
         rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.sh")
