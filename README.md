@@ -19,13 +19,17 @@ Run with `pytui` or `ducktools-pytui`.
 * List Python Virtual Environments relative to the current folder
 * List Python Runtimes discovered by [ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
 * Launch a Terminal with a selected venv activated
-  * Currently only 'tested' with bash, zsh (on macos), powershell and cmd.
-  * It's possible shell config files may break the environment variable changes.
+  * Currently only 'tested' with bash (and limited git bash on Windows), zsh (on macos), powershell and cmd
+  * Other shells will almost certainly break the environment variable changes
+  * This isn't the standard `activate` script, as it puts PyTUI in the background and launches a new shell
+  * Use `exit` to close the shell and return to PyTUI
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
 * List installed packages in a venv (Python 3.9 or later)
 * Create a venv from a specific runtime (Python 3.4 or later)
 * Delete a selected venv
+* Install a runtime (Requires UV installed and on PATH)
+* Uninstall a runtime (UV runtimes only)
 
 ### Basic Configuration ###
 
@@ -45,11 +49,11 @@ Some configuration is available by editing the config.json file located here:
 * `include_pip` - Whether to include `pip` (and `setuptools` where appropriate) in created VEnvs (default: `True`)
 * `latest_pip` - Download the latest `pip` for Python versions where it is available (default: `True`)
 
-### Planned ###
+### Possible Extras ###
 
-* Allow selecting 'default' packages to install, auto-editable install option with extras
-* Add commands to install/uninstall runtimes of tools with runtime managers (eg: UV, pyenv)
-* Highlight invalid venvs
+* Support other common shells
+* Support a global venv folder accessible from any path
+* Highlight broken venvs where the base install no longer exists
 
 ### Not Planned ###
 

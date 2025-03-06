@@ -34,7 +34,6 @@ from ducktools.pythonfinder.venv import PythonVEnv
 from .util import run
 
 
-USE_COLOR = True
 ACTIVATE_FOLDER = os.path.join(os.path.dirname(__file__), "shell_scripts")
 
 WIN_HISTORY_FIXED = False
@@ -156,13 +155,39 @@ def launch_shell(venv: PythonVEnv) -> None:
             raise RuntimeError(f"Shell detection failed")
 
     # dedupe and construct the PATH for the shell here
-    deduped_path = []
-    for p in old_path.split(os.pathsep):
-        if p in deduped_path:
-            continue
-        deduped_path.append(p)
+    if sys.platform == "win32" and shell_name == "bash":
+        # Git bash needs special env handling as it follows linux conventions
+        # And does not provide the PATH variable to child processes
+        drive, venv_dir = os.path.splitdrive(venv_bindir)
+        if ":" in drive:
+            drive = drive.replace(":", "").lower()
+            drive = f"/{drive}"
+        venv_dir = venv_dir.replace("\\", "/")
+        new_venv_bindir = "".join([drive, venv_dir])
 
-    venv_env_path = os.pathsep.join([venv_bindir, *deduped_path])
+        # Get the current git bash PATH
+        prompt_getter = subprocess.run(
+            [shell, "-ic", "echo $PATH"],
+            text=True,
+            capture_output=True
+        )
+        git_bash_path = prompt_getter.stdout.strip()
+        deduped_path = []
+        for p in git_bash_path.split(":"):
+            if p in deduped_path:
+                continue
+            deduped_path.append(p)
+        venv_env_path = ":".join([new_venv_bindir, *deduped_path])
+
+    else:
+        # In other cases follow the OS conventions
+        deduped_path = []
+        for p in old_path.split(os.pathsep):
+            if p in deduped_path:
+                continue
+            deduped_path.append(p)
+
+        venv_env_path = os.pathsep.join([venv_bindir, *deduped_path])
 
     # Environment variables may get overwritten so also create PYTUI versions
     env["PATH"] = env["PYTUI_PATH"] = venv_env_path
@@ -198,7 +223,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     elif shell_name == "zsh":
         # Try to get the shell PS1 from subprocess
         prompt_getter = subprocess.run(
-            ["zsh", "-ic", "echo $PS1"], 
+            [shell, "-ic", "echo $PS1"],
             text=True, 
             capture_output=True
         )
@@ -213,6 +238,7 @@ def launch_shell(venv: PythonVEnv) -> None:
         shell_prompt = f"({venv_prompt}) {shell_prompt} "
         env["PS1"] = shell_prompt
         cmd = [shell, "--no-rcs"]
+
     else:
         # We'll probably need some extra config here
         print(f"UNSUPPORTED SHELL: {shell_name!r}.")
