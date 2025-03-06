@@ -1,5 +1,6 @@
 # This mostly exists in order to get the correct $PS1 value
-source $HOME/.bashrc
+bashrcfile="$HOME/.bashrc"
+[ -f "$bashrcfile" ] && source "$bashrcfile"
 
 # 'deactivate' in a pytui venv should just exit back to pytui
 alias deactivate="exit"
