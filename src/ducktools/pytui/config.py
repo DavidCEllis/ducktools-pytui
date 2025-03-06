@@ -45,11 +45,11 @@ if sys.platform == "win32":
 else:
     USER_FOLDER = os.path.expanduser("~")
 
-    # Versions prior to 0.2.0 used this old folder
+    # Versions prior to 0.1.3 used this old folder
     OLD_FOLDER = os.path.join(USER_FOLDER, ".ducktools", "pytui")
     PYTUI_FOLDER = os.path.join(USER_FOLDER, ".config", "ducktools", "pytui")
 
-    # If you used a version prior to v0.2.0
+    # If you used a version prior to v0.1.3
     if os.path.exists(OLD_FOLDER):
         import shutil
 
