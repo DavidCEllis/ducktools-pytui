@@ -1,0 +1,61 @@
+name: Build zipapp
+
+# run on push for setup/testing
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build zipapp
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"  # build with oldest supported python
+    - name: Build the Zipapp
+      run: >-
+        python3 scripts/build_zipapp.py
+    - name: Store the built zipapp
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytui-zipapp
+        path: dist/
+
+  add-to-github-release:
+    name: >-
+      Sign the zipapp with Sigstore
+      and upload it to GitHub Release
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+      id-token: write  # IMPORTANT: mandatory for sigstore
+
+    steps:
+    - name: Download the zipapp
+      uses: actions/download-artifact@v4
+      with:
+        name: pytui-zipapp
+        path: dist/
+    - name: Sign the zipapp with Sigstore
+      uses: sigstore/gh-action-sigstore-python@v3.0.0
+      with:
+        release-signing-artifacts: false
+        inputs: >-
+          ./dist/*.pyz
+    - name: Upload artifact signature to GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      # Upload to GitHub Release using the `gh` CLI.
+      # `dist/` contains the built packages, and the
+      # sigstore-produced signatures and certificates.
+      run: >-
+        gh release upload
+        '${{ github.ref_name }}' dist/**
+        --repo '${{ github.repository }}'
