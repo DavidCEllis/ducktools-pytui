@@ -21,10 +21,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .ui import ManagerApp
+import argparse
+import sys
+
+from ._version import __version__
+
+class UnsupportedPythonError(Exception):
+    pass
+
+
+def get_parser():
+    parser = argparse.ArgumentParser(
+        prog="ducktools-pytui",
+        description="Prototype Python venv and runtime manager",
+    )
+    parser.add_argument("-V", "--version", action="version", version=__version__)
+    return parser
 
 
 def main():
+    if sys.version_info < (3, 10):
+        v = sys.version_info
+        raise UnsupportedPythonError(
+            f"Python {v.major}.{v.minor}.{v.micro} is not supported. "
+            f"ducktools.pytui requires Python 3.10 or later."
+        )
+
+    if sys.argv[1:]:
+        parser = get_parser()
+        parser.parse_args()
+
+    from .ui import ManagerApp
     app = ManagerApp()
     app.run()
 
