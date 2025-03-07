@@ -49,6 +49,7 @@ from pathlib import Path
 
 
 project_path = Path(__file__).parents[1]
+project_build_path = project_path / "build" / "project_build"
 build_path = project_path / "build" / "application"
 build_bin = build_path / "bin"
 dist_path = project_path / "dist" / "pytui.pyz"
@@ -57,23 +58,45 @@ main_func = "ducktools.pytui.__main__:main"
 def main():
     # Prepare install and build paths
     shutil.rmtree(build_path, ignore_errors=True)
+    shutil.rmtree(project_build_path, ignore_errors=True)
     dist_path.unlink(missing_ok=True)
 
     build_path.mkdir(parents=True)
     dist_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Download
+    # Download locked dependencies
+    subprocess.run(
+        [
+            sys.executable, "-m",
+            "pip", "install",
+            "--no-compile",
+            "-r", str(project_path / "requirements.txt"),
+            "--target", str(build_path),
+        ]
+    )
+
+    # Install just the current package in another folder
     subprocess.run(
         [
             sys.executable, "-m",
             "pip", "install",
             "--no-compile", str(project_path),
-            "--target", str(build_path)
+            "--no-deps",
+            "--target", str(project_build_path)
         ]
     )
 
+    shutil.move(
+        project_build_path / "ducktools" / "pytui",
+        build_path / "ducktools" / "pytui",
+    )
+
+    for fld in project_build_path.glob("ducktools_pytui*/"):
+        shutil.move(fld, build_path)
+
     # Remove script files
     shutil.rmtree(build_bin)
+    shutil.rmtree(project_build_path)
 
     zipapp.create_archive(
         build_path,
