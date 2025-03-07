@@ -25,7 +25,6 @@ import argparse
 import sys
 
 from ._version import __version__
-from .ui import ManagerApp
 
 class UnsupportedPythonError(Exception):
     pass
@@ -52,6 +51,7 @@ def main():
         parser = get_parser()
         parser.parse_args()
 
+    from .ui import ManagerApp
     app = ManagerApp()
     app.run()
 
