@@ -10,6 +10,10 @@ The easiest way to install ducktools.pytui is as a tool from PyPI using `uv` or 
 
 Run with `pytui` or `ducktools-pytui`.
 
+There is also now a zipapp available on 
+[the releases page](https://github.com/DavidCEllis/ducktools-pytui/releases/latest)
+and should be usable as long as you have Python 3.10 or newer.
+
 ## Example ##
 
 ![screenshot showing ducktools-pytui displaying a list of venvs and runtimes](images/pytui_menu.png)
