@@ -77,11 +77,15 @@ class UVPythonListing(Prefab):
     libc: str | None  # Apparently this is the string "none" instead of an actual None.
     _version_tuple: tuple[int, int, int, str, int] | None = attribute(default=None, private=True)
 
-    def __prefab_post_init__(self, key: str) -> None:
-        # UV bug - key and path can mismatch if someone typoed the metadata
-        if self.path is None:
+    def __prefab_post_init__(self, key: str, path: str | None) -> None:
+        if path is None:
             self.key = key
+            self.path = path
         else:
+            # Resolve path always, sometimes UV gives a relative path to cwd.
+            self.path = os.path.abspath(path)
+
+            # UV bug - key and path can mismatch if someone typoed the metadata
             base_path = uv_python_dir()
             key_path = str(Path(self.path).relative_to(base_path).parts[0])
             self.key = key if key == key_path else key_path
