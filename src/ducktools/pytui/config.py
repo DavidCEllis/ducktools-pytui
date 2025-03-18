@@ -76,7 +76,6 @@ class Config(Prefab):
     }
     config_file: str = attribute(default=CONFIG_FILE, serialize=False)
     venv_search_mode: str = "parents"
-    fast_runtime_search: bool = False
     include_pip: bool = True
     latest_pip: bool = True
 
@@ -95,14 +94,11 @@ class Config(Prefab):
                     raw_input = {}
 
             venv_search_mode = raw_input.get("venv_search_mode", "parents")
-            fast_runtime_search = raw_input.get("fast_runtime_search", False)
             include_pip = raw_input.get("include_pip", True)
             latest_pip = raw_input.get("latest_pip", True)
 
             if venv_search_mode not in cls.VENV_SEARCH_MODES:
                 venv_search_mode = "parents"
-            if not isinstance(fast_runtime_search, bool):
-                fast_runtime_search = False
             if not isinstance(include_pip, bool):
                 include_pip = True
             if not isinstance(latest_pip, bool):
@@ -111,7 +107,6 @@ class Config(Prefab):
             config = cls(
                 config_file=config_file,
                 venv_search_mode=venv_search_mode,
-                fast_runtime_search=fast_runtime_search,
                 include_pip=include_pip,
                 latest_pip=latest_pip,
             )
