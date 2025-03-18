@@ -29,14 +29,13 @@ import subprocess
 from ducktools.pythonfinder import list_python_installs, PythonInstall
 
 
-def list_installs_deduped(*, query_executables: bool = True) -> list[PythonInstall]:
+def list_installs_deduped() -> list[PythonInstall]:
     """
     Get a list of Python executables, but try to avoid multiple aliases to the same Python runtime.
 
-    :param query_executables: Query executables discovered
     :return: List of PythonInstall instances
     """
-    installs = list_python_installs(query_executables=query_executables)
+    installs = list_python_installs()
 
     # First sort so the executables are in priority order
     deduped_installs = []

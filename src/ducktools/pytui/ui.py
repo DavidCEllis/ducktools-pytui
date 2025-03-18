@@ -318,8 +318,7 @@ class RuntimeTable(DataTable):
                 self.clear()
                 self._runtime_catalogue = {}
 
-            query_executables = not self.config.fast_runtime_search
-            for install in list_installs_deduped(query_executables=query_executables):
+            for install in list_installs_deduped():
                 self._runtime_catalogue[install.executable] = install
 
                 if install.version_str == install.implementation_version_str:
