@@ -10,9 +10,9 @@ ducktools-lazyimporter==0.7.2 \
     --hash=sha256:6d6fe2690200e0f03c7898410ba459e64de3a554ba7a0e7396a333da98e8e5fa \
     --hash=sha256:6f5ae8c965efe2011331449b94e5dace778c08783f643c2db30bc316826529da
     # via ducktools-pythonfinder
-ducktools-pythonfinder==0.8.1 \
-    --hash=sha256:3d8969e814258e12542e3f53d9e5491d21223b4a153f38dccceecddedc007621 \
-    --hash=sha256:aa3a60887b6e5b30204e6c3938a815e2357d3e4dc31e0717fb58f8a04a8a3e02
+ducktools-pythonfinder==0.8.2 \
+    --hash=sha256:27b88bd87c8a839cc42c61254a709afd5b1f537855bb0a9486dfee4fcb4037e6 \
+    --hash=sha256:7fb386e21aaf832b15098e6e7f52c4312b2a759d6fc609587e1a6a9bd7013bee
     # via ducktools-pytui (pyproject.toml)
 linkify-it-py==2.0.3 \
     --hash=sha256:68cda27e162e9215c17d786649d1da0021a451bdc436ef9e0fa0ba5234b9b048 \
