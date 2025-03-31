@@ -246,7 +246,6 @@ class VEnvTable(DataTable):
         self.config = config
 
         self._venv_catalogue = {}
-        self._sort_key = None
 
     def on_mount(self):
         self.setup_columns()
@@ -254,12 +253,11 @@ class VEnvTable(DataTable):
 
     def setup_columns(self):
         self.cursor_type = "row"
-        keys = self.add_columns("Version", "Environment Path", "Runtime Path")
-        self._sort_key = keys[1]
+        keys = self.add_columns("Version", "Global", "Environment Path", "Runtime Path")
 
     @staticmethod
     def _keysort(rowtuple):
-        return rowtuple[0].startswith("g"), rowtuple[1]
+        return rowtuple[1], rowtuple[2]
 
     def sort_by_path(self):
         self.sort(key=self._keysort)
@@ -272,14 +270,15 @@ class VEnvTable(DataTable):
 
         if global_venv:
             self.add_row(
-                f"g {venv.version_str}",
+                venv.version_str,
+                True,
                 venv.folder,
                 venv.parent_executable,
                 key=venv.folder
             )
         else:
             folder = os.path.relpath(venv.folder, start=CWD)
-            self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
+            self.add_row(venv.version_str, False, folder, venv.parent_executable, key=venv.folder)
         if sort:
             self.sort_by_path()
 
