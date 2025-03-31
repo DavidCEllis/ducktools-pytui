@@ -34,8 +34,9 @@ from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPack
 from textual import work
 from textual.app import App
 from textual.binding import Binding
-from textual.containers import Horizontal, Vertical
+from textual.containers import Vertical
 from textual.screen import ModalScreen
+from textual.validation import Length
 from textual.widgets import Button, DataTable, Footer, Header, Input, Label
 from textual.widgets.data_table import CellDoesNotExist
 
@@ -196,10 +197,20 @@ class VEnvCreateScreen(ModalScreen[str | None]):
         Binding(key="escape", action="cancel", description="Cancel", show=True),
     ]
 
-    def __init__(self, runtime: PythonInstall, *args, **kwargs):
+    def __init__(self, runtime: PythonInstall, global_venv=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.runtime = runtime
-        self.venv_input = Input(placeholder="VEnv Path (default='.venv')")
+        self.global_venv = global_venv
+
+        if global_venv:
+            self.venv_input = Input(
+                placeholder="VEnv Path",
+                validators=[Length(minimum=1)],
+                validate_on=["submitted"],
+            )
+        else:
+            self.venv_input = Input(placeholder="VEnv Path (default='.venv')")
+
 
     def compose(self):
         with Vertical(classes="boxed"):
@@ -212,7 +223,10 @@ class VEnvCreateScreen(ModalScreen[str | None]):
         self.dismiss(None)
 
     def action_create(self):
-        self.dismiss(self.venv_input.value)
+        if self.global_venv and len(self.venv_input.value) == 0:
+            self.notify("Must provide a name in order to create a global venv", severity="warning")
+        else:
+            self.dismiss(self.venv_input.value)
 
     def on_input_submitted(self, event: Input.Submitted):
         self.dismiss(event.value)
@@ -243,16 +257,29 @@ class VEnvTable(DataTable):
         keys = self.add_columns("Version", "Environment Path", "Runtime Path")
         self._sort_key = keys[1]
 
+    @staticmethod
+    def _keysort(rowtuple):
+        return rowtuple[0].startswith("g"), rowtuple[1]
+
     def sort_by_path(self):
-        self.sort(self._sort_key)
+        self.sort(key=self._keysort)
 
     def venv_from_key(self, key) -> PythonVEnv:
         return self._venv_catalogue[key]
 
-    def add_venv(self, venv: PythonVEnv, sort=False):
+    def add_venv(self, venv: PythonVEnv, sort=False, global_venv=False):
         self._venv_catalogue[venv.folder] = venv
-        folder = os.path.relpath(venv.folder, start=CWD)
-        self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
+
+        if global_venv:
+            self.add_row(
+                f"g {venv.version_str}",
+                venv.folder,
+                venv.parent_executable,
+                key=venv.folder
+            )
+        else:
+            folder = os.path.relpath(venv.folder, start=CWD)
+            self.add_row(venv.version_str, folder, venv.parent_executable, key=venv.folder)
         if sort:
             self.sort_by_path()
 
@@ -276,6 +303,14 @@ class VEnvTable(DataTable):
             ):
                 self.add_venv(venv, sort=False)
 
+            for venv in get_python_venvs(
+                base_dir=self.config.global_venv_folder,
+                recursive=True,
+                search_parent_folders=False,
+            ):
+                if venv.folder not in self._venv_catalogue:
+                    self.add_venv(venv, global_venv=True)
+
         finally:
             self.sort_by_path()
             self.loading = False
@@ -285,6 +320,7 @@ class RuntimeTable(DataTable):
     BINDINGS = [
         Binding(key="r", action="app.launch_runtime", description="Launch Runtime REPL", show=True),
         Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
+        Binding(key="g", action="app.create_global_venv", description="Create Global VEnv", show=True),
     ]
     if uv.check_uv():
         BINDINGS.extend(
@@ -465,11 +501,16 @@ class ManagerApp(App):
         # Redraw
         self.refresh()
 
-    @work
-    async def action_create_venv(self):
-        runtime = self.selected_runtime
+    def _check_runtime_for_venv(self, runtime: PythonInstall | None) -> bool:
+        """
+        Check if a runtime is selected and if it can be used to create a venv
+
+        :param runtime: PythonInstall object
+        :return:
+        """
         if runtime is None:
             self.notify("No runtime selected.", severity="warning")
+            return False
 
         if runtime.implementation.lower() == "micropython":
             self.notify(
@@ -477,13 +518,56 @@ class ManagerApp(App):
                 title="Error",
                 severity="error",
             )
-            return
+            return False
         elif runtime.version < (3, 4):
             self.notify(
                 f"ducktools-pytui does not support VEnv creation for Python {runtime.version_str}",
                 title="Error",
                 severity="error",
             )
+            return False
+
+        return True
+
+    async def _build_venv(
+        self,
+        runtime: PythonInstall,
+        venv_path: str,
+        global_venv: bool
+    ) -> None:
+        """
+        Call python and create the actual venv
+
+        :param runtime:
+        :param venv_path:
+        :return:
+        """
+        self._venv_table.loading = True
+        loop = asyncio.get_event_loop()
+        try:
+            new_venv = await loop.run_in_executor(
+                None,
+                create_venv,
+                runtime, venv_path, self.config.include_pip, self.config.latest_pip,
+            )
+        except FileExistsError:
+            self.notify(
+                f"Failed to create venv {venv_path!r}, folder already exists",
+                title="Error",
+                severity="error",
+            )
+        except subprocess.CalledProcessError as e:
+            self.notify(f"Failed to create venv {venv_path!r}. Process Error: {e}")
+        else:
+            self.notify(f"VEnv {venv_path!r} created", title="Success")
+            self._venv_table.add_venv(new_venv, sort=True, global_venv=global_venv)
+        finally:
+            self._venv_table.loading = False
+
+    @work
+    async def action_create_venv(self):
+        runtime = self.selected_runtime
+        if self._check_runtime_for_venv(runtime) is False:
             return
 
         venv_screen = VEnvCreateScreen(runtime=runtime)
@@ -494,27 +578,22 @@ class ManagerApp(App):
         elif venv_name == "":
             venv_name = ".venv"
 
+        await self._build_venv(runtime, venv_name, global_venv=False)
+
+    @work
+    async def action_create_global_venv(self):
+        runtime = self.selected_runtime
+        if self._check_runtime_for_venv(runtime) is False:
+            return
+
+        venv_screen = VEnvCreateScreen(runtime=runtime, global_venv=True)
+        venv_name = await self.push_screen_wait(venv_screen)
+
+        venv_path = os.path.join(self.config.global_venv_folder, venv_name)
+
         self._venv_table.loading = True
-        loop = asyncio.get_event_loop()
-        try:
-            new_venv = await loop.run_in_executor(
-                None,
-                create_venv,
-                runtime, venv_name, self.config.include_pip, self.config.latest_pip
-            )
-        except FileExistsError:
-            self.notify(
-                f"Failed to create venv {venv_name}, folder already exists",
-                title="Error",
-                severity="error",
-            )
-        except subprocess.CalledProcessError as e:
-            self.notify(f"Failed to create venv {venv_name}. Process Error: {e}")
-        else:
-            self.notify(f"VEnv {venv_name!r} created", title="Success")
-            self._venv_table.add_venv(new_venv, sort=True)
-        finally:
-            self._venv_table.loading = False
+
+        await self._build_venv(runtime, venv_path, global_venv=True)
 
     def action_delete_venv(self):
         venv = self.selected_venv

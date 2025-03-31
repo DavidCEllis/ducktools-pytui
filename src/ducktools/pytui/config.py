@@ -68,6 +68,7 @@ else:
 
 
 CONFIG_FILE = os.path.join(PYTUI_FOLDER, "config.json")
+GLOBAL_VENV_FOLDER = os.path.join(PYTUI_FOLDER, "venvs")
 
 
 class Config(Prefab):
@@ -78,6 +79,7 @@ class Config(Prefab):
     venv_search_mode: str = "parents"
     include_pip: bool = True
     latest_pip: bool = True
+    global_venv_folder: str = GLOBAL_VENV_FOLDER
 
     def write_config(self):
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
