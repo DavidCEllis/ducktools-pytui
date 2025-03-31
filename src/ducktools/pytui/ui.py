@@ -303,13 +303,14 @@ class VEnvTable(DataTable):
             ):
                 self.add_venv(venv, sort=False)
 
-            for venv in get_python_venvs(
-                base_dir=self.config.global_venv_folder,
-                recursive=True,
-                search_parent_folders=False,
-            ):
-                if venv.folder not in self._venv_catalogue:
-                    self.add_venv(venv, global_venv=True)
+            if os.path.exists(self.config.global_venv_folder):
+                for venv in get_python_venvs(
+                    base_dir=self.config.global_venv_folder,
+                    recursive=True,
+                    search_parent_folders=False,
+                ):
+                    if venv.folder not in self._venv_catalogue:
+                        self.add_venv(venv, global_venv=True)
 
         finally:
             self.sort_by_path()
