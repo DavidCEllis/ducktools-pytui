@@ -48,10 +48,9 @@ Some configuration is available by editing the config.json file located here:
   * `"parents"` - Search in the working directory and each parent folder (default)
   * `"recursive"` - Search in the working directory and subfolders recursively
   * `"recursive_parents"` - Combine the "recursive" and "parents" options (only the CWD is recursively searched)
-* `fast_runtime_search` - Skip any potential Python runtimes that will require querying the interpreter (default: `False`)
-  * This has mostly been resolved by caching the results and will eventually be removed
 * `include_pip` - Whether to include `pip` (and `setuptools` where appropriate) in created VEnvs (default: `True`)
 * `latest_pip` - Download the latest `pip` for Python versions where it is available (default: `True`)
+* `global_venv_folder` - The folder to use for global pytui venvs, `~/.local/share/ducktools/pytui/venvs` by default
 
 ### Possible Extras ###
 
