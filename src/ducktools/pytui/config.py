@@ -48,27 +48,25 @@ if sys.platform == "win32":
         )
     USER_FOLDER = _local_app_folder
     PYTUI_FOLDER = os.path.join(USER_FOLDER, "ducktools", "pytui")
+    GLOBAL_VENV_FOLDER = os.path.join(PYTUI_FOLDER, "venvs")
 else:
     USER_FOLDER = os.path.expanduser("~")
 
     # Versions prior to 0.1.3 used this old folder
     OLD_FOLDER = os.path.join(USER_FOLDER, ".ducktools", "pytui")
     PYTUI_FOLDER = os.path.join(USER_FOLDER, ".config", "ducktools", "pytui")
+    GLOBAL_VENV_FOLDER = os.path.join(USER_FOLDER, ".local", "share", "ducktools", "pytui", "venvs")
 
     # If you used a version prior to v0.1.3
     if os.path.exists(OLD_FOLDER):
         import shutil
 
-        # Delete the old folder if the new one already exists, move otherwise
-        if os.path.exists(PYTUI_FOLDER):
-            shutil.rmtree(OLD_FOLDER)
-        else:
+        # Move the folder if the new one doesn't already exist, otherwise leave it
+        if not os.path.exists(PYTUI_FOLDER):
             os.makedirs(os.path.dirname(PYTUI_FOLDER), exist_ok=True)
             shutil.move(OLD_FOLDER, PYTUI_FOLDER)
 
-
 CONFIG_FILE = os.path.join(PYTUI_FOLDER, "config.json")
-GLOBAL_VENV_FOLDER = os.path.join(PYTUI_FOLDER, "venvs")
 
 
 class Config(Prefab):
