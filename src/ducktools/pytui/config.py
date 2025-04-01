@@ -48,24 +48,23 @@ if sys.platform == "win32":
         )
     USER_FOLDER = _local_app_folder
     PYTUI_FOLDER = os.path.join(USER_FOLDER, "ducktools", "pytui")
+    GLOBAL_VENV_FOLDER = os.path.join(PYTUI_FOLDER, "venvs")
 else:
     USER_FOLDER = os.path.expanduser("~")
 
     # Versions prior to 0.1.3 used this old folder
     OLD_FOLDER = os.path.join(USER_FOLDER, ".ducktools", "pytui")
     PYTUI_FOLDER = os.path.join(USER_FOLDER, ".config", "ducktools", "pytui")
+    GLOBAL_VENV_FOLDER = os.path.join(USER_FOLDER, ".local", "share", "ducktools", "pytui", "venvs")
 
     # If you used a version prior to v0.1.3
     if os.path.exists(OLD_FOLDER):
         import shutil
 
-        # Delete the old folder if the new one already exists, move otherwise
-        if os.path.exists(PYTUI_FOLDER):
-            shutil.rmtree(OLD_FOLDER)
-        else:
+        # Move the folder if the new one doesn't already exist, otherwise leave it
+        if not os.path.exists(PYTUI_FOLDER):
             os.makedirs(os.path.dirname(PYTUI_FOLDER), exist_ok=True)
             shutil.move(OLD_FOLDER, PYTUI_FOLDER)
-
 
 CONFIG_FILE = os.path.join(PYTUI_FOLDER, "config.json")
 
@@ -78,6 +77,7 @@ class Config(Prefab):
     venv_search_mode: str = "parents"
     include_pip: bool = True
     latest_pip: bool = True
+    global_venv_folder: str = GLOBAL_VENV_FOLDER
 
     def write_config(self):
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
@@ -96,6 +96,7 @@ class Config(Prefab):
             venv_search_mode = raw_input.get("venv_search_mode", "parents")
             include_pip = raw_input.get("include_pip", True)
             latest_pip = raw_input.get("latest_pip", True)
+            global_venv_folder = raw_input.get("global_venv_folder", GLOBAL_VENV_FOLDER)
 
             if venv_search_mode not in cls.VENV_SEARCH_MODES:
                 venv_search_mode = "parents"
@@ -109,6 +110,7 @@ class Config(Prefab):
                 venv_search_mode=venv_search_mode,
                 include_pip=include_pip,
                 latest_pip=latest_pip,
+                global_venv_folder=global_venv_folder,
             )
 
             if raw_input != as_dict(config):
