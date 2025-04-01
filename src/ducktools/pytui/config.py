@@ -98,6 +98,7 @@ class Config(Prefab):
             venv_search_mode = raw_input.get("venv_search_mode", "parents")
             include_pip = raw_input.get("include_pip", True)
             latest_pip = raw_input.get("latest_pip", True)
+            global_venv_folder = raw_input.get("global_venv_folder", GLOBAL_VENV_FOLDER)
 
             if venv_search_mode not in cls.VENV_SEARCH_MODES:
                 venv_search_mode = "parents"
@@ -111,6 +112,7 @@ class Config(Prefab):
                 venv_search_mode=venv_search_mode,
                 include_pip=include_pip,
                 latest_pip=latest_pip,
+                global_venv_folder=global_venv_folder,
             )
 
             if raw_input != as_dict(config):
