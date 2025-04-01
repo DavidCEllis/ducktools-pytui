@@ -1,24 +1,7 @@
-# This file is a part of ducktools.pytui
-# A TUI for managing Python installs and virtual environments
-#
-# Copyright (C) 2025  David C Ellis
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# ducktools-pythonfinder
+# ducktools-pytui
 # MIT License
 #
-# Copyright (c) 2013-2014 David C Ellis
+# Copyright (c) 2025 David C Ellis
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +37,7 @@ build_path = project_path / "build" / "application"
 build_bin = build_path / "bin"
 dist_path = project_path / "dist" / "pytui.pyz"
 main_func = "ducktools.pytui.__main__:main"
+
 
 def main():
     # Prepare install and build paths
@@ -104,6 +88,7 @@ def main():
         interpreter="/usr/bin/env python3",
         main=main_func,
     )
+
 
 if __name__ == "__main__":
     main()
