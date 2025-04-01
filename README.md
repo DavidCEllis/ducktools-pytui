@@ -30,7 +30,7 @@ and should be usable as long as you have Python 3.10 or newer.
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
 * List installed packages in a venv (Python 3.9 or later)
-* Create a venv from a specific runtime (Python 3.4 or later)
+* Create a venv from a specific runtime in the working directory or a global folder (Python 3.4 or later)
 * Delete a selected venv
 * Install a runtime (Requires UV installed and on PATH)
 * Uninstall a runtime (UV runtimes only)
