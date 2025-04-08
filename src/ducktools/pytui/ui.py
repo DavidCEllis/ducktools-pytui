@@ -40,6 +40,8 @@ from textual.validation import Length
 from textual.widgets import Button, DataTable, Footer, Header, Input, Label
 from textual.widgets.data_table import CellDoesNotExist
 
+
+from ._version import __version__ as version_str
 from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .config import Config
 from .runtime_installers import uv
@@ -411,7 +413,7 @@ class ManagerApp(App):
         self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
 
     def on_mount(self):
-        self.title = "Ducktools.PyTUI: Python Environment and Runtime Manager"
+        self.title = f"Ducktools.PyTUI v{version_str}: Python Environment and Runtime Manager"
 
     def compose(self):
         yield Header()
