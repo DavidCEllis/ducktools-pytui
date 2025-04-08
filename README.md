@@ -55,7 +55,6 @@ Some configuration is available by editing the config.json file located here:
 ### Possible Extras ###
 
 * Support other common shells
-* Support a global venv folder accessible from any path
 * Highlight broken venvs where the base install no longer exists
 
 ### Not Planned ###
