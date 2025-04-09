@@ -199,14 +199,16 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
     venv_bindir = os.path.dirname(venv.executable)
-
     try:
         shell_name, shell = shellingham.detect_shell()
     except shellingham.ShellDetectionFailure:
         if os.name == "posix":
-            shell_name, shell = "UNKNOWN", os.environ["SHELL"]
+            shell = os.environ["SHELL"]
+            shell_name = os.path.basename(shell)
         elif os.name == "nt":
-            shell_name, shell = "UNKNOWN", os.environ["COMSPEC"]
+            # Almost certainly "cmd.exe"
+            shell = os.environ["COMSPEC"]
+            shell_name = os.path.splitext(os.path.basename(shell))[0]
         else:
             raise RuntimeError(f"Shell detection failed")
 
