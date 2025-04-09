@@ -30,11 +30,18 @@ import sys
 import shellingham
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import PythonVEnv
+from ducktools.lazyimporter import LazyImporter, ModuleImport
 
+from ._version import __version__
+from .platform_paths import SHELL_SCRIPT_FOLDER
 from .util import run
 
+_laz = LazyImporter([ModuleImport("zipfile")])
 
-ACTIVATE_FOLDER = os.path.join(os.path.dirname(__file__), "shell_scripts")
+_shell_scriptfiles = [
+    "activate_pytui.ps1",
+    "activate_pytui.sh",
+]
 
 WIN_HISTORY_FIXED = False
 
@@ -48,6 +55,55 @@ def fix_win_history():
     from .util.win32_terminal_hist import set_console_history_info
     set_console_history_info()
     WIN_HISTORY_FIXED = True
+
+
+def get_shell_script(filename: str):
+    if os.path.exists(__file__):
+        # Use them from the source folder if available
+        shell_script_folder = os.path.join(os.path.dirname(__file__), "shell_scripts")
+    elif os.path.isfile(sys.argv[0]):  # zipapp potentially
+        # In a zipapp they may not be, so extract them
+        shell_script_folder = SHELL_SCRIPT_FOLDER
+
+        shell_script_verfile = os.path.join(SHELL_SCRIPT_FOLDER, ".version")
+        valid_verfile = False
+        try:
+            with open(shell_script_verfile) as f:
+                script_ver = f.read()
+            if script_ver == __version__:
+                valid_verfile = True
+        except FileNotFoundError:
+            pass
+
+        if not valid_verfile:
+            # Clear out anything that might be there and remake the folder
+            shutil.rmtree(SHELL_SCRIPT_FOLDER, ignore_errors=True)
+            os.makedirs(SHELL_SCRIPT_FOLDER, exist_ok=True)
+
+            # Get the zipfile path to open and the internal shell script folder
+            zipfile_path = os.path.abspath(sys.argv[0])
+            scripts_path = os.path.join(
+                os.path.dirname(__file__), "shell_scripts"
+            ).removeprefix(zipfile_path + os.sep)
+
+            if sys.platform == "win32":
+                # Zipfile needs '/' for internal paths
+                scripts_path = scripts_path.replace("\\", "/")
+
+            zipapp_contents = _laz.zipfile.ZipFile(zipfile_path)
+            for name in _shell_scriptfiles:
+                script_path = f"{scripts_path}/{name}"
+                output_path = os.path.join(shell_script_folder, name)
+                with zipapp_contents.open(script_path) as read_f, \
+                        open(output_path, 'wb') as write_f:
+                    write_f.write(read_f.read())
+
+            with open(shell_script_verfile, 'w') as f:
+                f.write(__version__)
+    else:
+        raise FileNotFoundError("Could not find shell script folder.")
+
+    return os.path.join(shell_script_folder, filename)
 
 
 def launch_repl(python_exe: str) -> None:
@@ -143,14 +199,16 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
     venv_bindir = os.path.dirname(venv.executable)
-
     try:
         shell_name, shell = shellingham.detect_shell()
     except shellingham.ShellDetectionFailure:
         if os.name == "posix":
-            shell_name, shell = "UNKNOWN", os.environ["SHELL"]
+            shell = os.environ["SHELL"]
+            shell_name = os.path.basename(shell)
         elif os.name == "nt":
-            shell_name, shell = "UNKNOWN", os.environ["COMSPEC"]
+            # Almost certainly "cmd.exe"
+            shell = os.environ["COMSPEC"]
+            shell_name = os.path.splitext(os.path.basename(shell))[0]
         else:
             raise RuntimeError(f"Shell detection failed")
 
@@ -209,7 +267,7 @@ def launch_shell(venv: PythonVEnv) -> None:
         cmd = [shell, "/k"]  # This effectively hides the copyright message
 
     elif shell_name == "powershell":
-        rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.ps1")
+        rcfile = get_shell_script("activate_pytui.ps1")
         with open(rcfile, encoding="utf8") as f:
             prompt_command = f.read()
         cmd = [shell, "-NoExit", prompt_command]
@@ -217,7 +275,7 @@ def launch_shell(venv: PythonVEnv) -> None:
     elif shell_name == "bash":
         # Invoke our custom activation script as the rcfile
         # This includes ~/.bashrc but handles activation from Python
-        rcfile = os.path.join(ACTIVATE_FOLDER, "activate_pytui.sh")
+        rcfile = get_shell_script("activate_pytui.sh")
         cmd = [shell, "--rcfile", rcfile]
 
     elif shell_name == "zsh":
