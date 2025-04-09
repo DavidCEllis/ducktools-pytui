@@ -30,43 +30,9 @@ from typing import ClassVar
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
 
 
-# Code to work out where to store data
-# Store in LOCALAPPDATA for windows, User folder for other operating systems
-if sys.platform == "win32":
-    # os.path.expandvars will actually import a whole bunch of other modules
-    # Try just using the environment.
-    if _local_app_folder := os.environ.get("LOCALAPPDATA"):
-        if not os.path.isdir(_local_app_folder):
-            raise FileNotFoundError(
-                f"Could not find local app data folder {_local_app_folder}"
-            )
-    else:
-        raise EnvironmentError(
-            "Environment variable %LOCALAPPDATA% "
-            "for local application data folder location "
-            "not found"
-        )
-    USER_FOLDER = _local_app_folder
-    PYTUI_FOLDER = os.path.join(USER_FOLDER, "ducktools", "pytui")
-    GLOBAL_VENV_FOLDER = os.path.join(PYTUI_FOLDER, "venvs")
-else:
-    USER_FOLDER = os.path.expanduser("~")
-
-    # Versions prior to 0.1.3 used this old folder
-    OLD_FOLDER = os.path.join(USER_FOLDER, ".ducktools", "pytui")
-    PYTUI_FOLDER = os.path.join(USER_FOLDER, ".config", "ducktools", "pytui")
-    GLOBAL_VENV_FOLDER = os.path.join(USER_FOLDER, ".local", "share", "ducktools", "pytui", "venvs")
-
-    # If you used a version prior to v0.1.3
-    if os.path.exists(OLD_FOLDER):
-        import shutil
-
-        # Move the folder if the new one doesn't already exist, otherwise leave it
-        if not os.path.exists(PYTUI_FOLDER):
-            os.makedirs(os.path.dirname(PYTUI_FOLDER), exist_ok=True)
-            shutil.move(OLD_FOLDER, PYTUI_FOLDER)
-
-CONFIG_FILE = os.path.join(PYTUI_FOLDER, "config.json")
+from .platform_paths import (
+    CONFIG_FILE, GLOBAL_VENV_FOLDER,
+)
 
 
 class Config(Prefab):
