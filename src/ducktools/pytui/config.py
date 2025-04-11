@@ -20,11 +20,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
 import os
 import os.path
 import json
-import sys
 from typing import ClassVar
 
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
@@ -36,7 +36,9 @@ from .platform_paths import (
 
 
 class Config(Prefab):
-    VENV_SEARCH_MODES: ClassVar[set[str]] = {
+    # type is ClassVar[set[str]] but classbuilder doesn't work with it
+    # as it doesn't evaluate on 3.8
+    VENV_SEARCH_MODES = {
         "cwd", "parents", "recursive", "recursive_parents"
     }
     config_file: str = attribute(default=CONFIG_FILE, serialize=False)

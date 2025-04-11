@@ -20,6 +20,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
 import os
 import os.path
@@ -41,7 +42,7 @@ from textual.widgets import Button, DataTable, Footer, Header, Input, Label
 from textual.widgets.data_table import CellDoesNotExist
 
 
-from ._version import __version__ as version_str
+from ._version import __version__ as app_version
 from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .config import Config
 from .runtime_installers import uv
@@ -86,7 +87,7 @@ class UVPythonTable(DataTable):
             self.add_row(dl.version, dl.implementation, dl.variant, dl.arch, key=dl.key)
 
 
-class UVPythonScreen(ModalScreen[uv.UVPythonListing | None]):
+class UVPythonScreen(ModalScreen["uv.UVPythonListing | None"]):
     BINDINGS = [
         Binding(key="enter", action="install", description="Install Runtime", priority=True, show=True),
         Binding(key="escape", action="cancel", description="Cancel", show=True),
@@ -138,7 +139,7 @@ class UVPythonScreen(ModalScreen[uv.UVPythonListing | None]):
             self.dismiss(None)
 
 
-class DependencyScreen(ModalScreen[list[PythonPackage]]):
+class DependencyScreen(ModalScreen["list[PythonPackage]"]):
     BINDINGS = [
         Binding(key="r", action="reload_dependencies", description="Reload Dependencies", show=True),
         Binding(key="escape", action="close", description="Close", show=True),
@@ -193,7 +194,7 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
         self.dependency_cache = dependencies
 
 
-class VEnvCreateScreen(ModalScreen[str | None]):
+class VEnvCreateScreen(ModalScreen["str | None"]):
     BINDINGS = [
         Binding(key="enter", action="create", description="Create VEnv", show=True, priority=True),
         Binding(key="escape", action="cancel", description="Cancel", show=True),
@@ -413,7 +414,7 @@ class ManagerApp(App):
         self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
 
     def on_mount(self):
-        self.title = f"Ducktools.PyTUI v{version_str}: Python Environment and Runtime Manager"
+        self.title = f"Ducktools.PyTUI v{app_version}: Python Environment and Runtime Manager"
 
     def compose(self):
         yield Header()
@@ -600,6 +601,13 @@ class ManagerApp(App):
     def action_delete_venv(self):
         venv = self.selected_venv
         if venv is None:
+            return
+
+        if venv.folder == sys.prefix:
+            self.notify(
+                "Can not delete the VEnv being used to run ducktools-pytui",
+                severity="warning",
+            )
             return
 
         delete_venv(venv.folder)

@@ -40,12 +40,12 @@ def get_parser():
 
 
 def main():
-    if sys.version_info < (3, 10):
-        v = sys.version_info
-        raise UnsupportedPythonError(
-            f"Python {v.major}.{v.minor}.{v.micro} is not supported. "
-            f"ducktools.pytui requires Python 3.10 or later."
-        )
+    # if sys.version_info < (3, 10):
+    #     v = sys.version_info
+    #     raise UnsupportedPythonError(
+    #         f"Python {v.major}.{v.minor}.{v.micro} is not supported. "
+    #         f"ducktools.pytui requires Python 3.10 or later."
+    #     )
 
     if sys.argv[1:]:
         parser = get_parser()

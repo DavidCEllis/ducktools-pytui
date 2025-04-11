@@ -12,7 +12,7 @@ authors = [
   { name="David C Ellis" },
 ]
 readme="README.md"
-requires-python = ">=3.10.0"
+requires-python = ">=3.8.0"
 dependencies = [
     "ducktools-classbuilder>=0.7.5",
     "ducktools-pythonfinder>=0.8.3",

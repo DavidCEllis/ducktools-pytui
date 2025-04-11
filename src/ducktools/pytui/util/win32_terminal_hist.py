@@ -5,6 +5,7 @@ in Python that doesn't use PyREPL.
 Copied from:
 https://discuss.python.org/t/interactive-command-history-in-session-started-with-subprocess-on-windows/3701/5
 """
+from __future__ import annotations
 
 import ctypes
 import collections
