@@ -20,6 +20,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
 import functools
 import json
@@ -41,12 +42,12 @@ else:
     example_folder = Path(__file__).parent / "example_data"
 
 
-@functools.cache
+@functools.lru_cache(maxsize=1)
 def uv_download_json() -> str:
     return (example_folder / "uv_download_list.json").read_text()
 
 
-@functools.cache
+@functools.lru_cache(maxsize=1)
 def uv_install_json() -> str:
     return (example_folder / "uv_install_list.json").read_text()
 
@@ -180,10 +181,9 @@ def test_fetch_installed(uv_python_dir):
 
 
 def test_fetch_downloads(uv_python_dir, uv_installed_pythons):
-    with (
-        patch("subprocess.run") as fake_process,
-        patch.object(uv, "fetch_installed") as fake_installed,
-    ):
+    with patch("subprocess.run") as fake_process, \
+        patch.object(uv, "fetch_installed") as fake_installed:
+
         fake_installed.return_value = uv_installed_pythons
 
         cmd_output = MagicMock()

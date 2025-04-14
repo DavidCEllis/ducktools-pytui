@@ -20,6 +20,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
 import functools
 import json
@@ -32,7 +33,7 @@ from ducktools.classbuilder.prefab import Prefab, attribute, get_attributes
 from ducktools.pythonfinder.shared import version_str_to_tuple, PythonInstall
 
 
-@functools.cache
+@functools.lru_cache(maxsize=1)
 def uv_python_dir() -> str | None:
     try:
         cmd = subprocess.run(
@@ -49,7 +50,7 @@ def uv_python_dir() -> str | None:
     return py_dir
 
 
-@functools.cache
+@functools.lru_cache(maxsize=1)
 def check_uv() -> bool:
     """
     Checks if UV is available on Path.
