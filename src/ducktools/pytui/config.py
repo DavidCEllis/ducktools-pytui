@@ -36,9 +36,7 @@ from .platform_paths import (
 
 
 class Config(Prefab):
-    # type is ClassVar[set[str]] but classbuilder doesn't work with it
-    # as it doesn't evaluate on 3.8
-    VENV_SEARCH_MODES = {
+    VENV_SEARCH_MODES: ClassVar[set[str]] = {
         "cwd", "parents", "recursive", "recursive_parents"
     }
     config_file: str = attribute(default=CONFIG_FILE, serialize=False)
