@@ -76,7 +76,7 @@ def main():
     )
 
     for fld in project_build_path.glob("ducktools_pytui*/"):
-        shutil.move(fld, build_path)
+        shutil.move(str(fld), str(build_path))  # convert to str for 3.8
 
     # Remove script files
     shutil.rmtree(build_bin)
