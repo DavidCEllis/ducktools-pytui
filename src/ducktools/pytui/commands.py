@@ -126,40 +126,20 @@ def create_venv(
         raise FileExistsError(f"VEnv '{venv_path}' already exists.")
 
     python_exe = python_runtime.executable
+
+    # Also always include the pip bundled with graalpy and don't update
+    is_graalpy = python_runtime.implementation == "graalpy"
+
+    venv_cmd = [python_exe, "-m", "venv", venv_path]
+    if not is_graalpy:
+        if not include_pip:
+            venv_cmd.append("--without-pip")
+        elif latest_pip and python_runtime.version >= (3, 9):
+            venv_cmd.append("--upgrade-deps")
+
     # These tasks run in the background so don't need to block ctrl+c
     # Capture output to not mess with the textual display
-    # 3.8 support is going in the next pip update
-    # Also always include the pip bundled with graalpy and don't update
-    if (
-        include_pip and (not latest_pip or python_runtime.version < (3, 9))
-        or python_runtime.implementation == "graalpy"
-    ):
-        subprocess.run(
-            [python_exe, "-m", "venv", venv_path],
-            capture_output=True,
-            check=True
-        )
-    else:
-        subprocess.run(
-            [python_exe, "-m", "venv", "--without-pip", venv_path],
-            capture_output=True,
-            check=True
-        )
-        if include_pip:
-            # This actually seems to be faster than `--upgrade-deps`
-            extras = ["pip"]
-            if python_runtime.version < (3, 12):
-                extras.append("setuptools")
-            # Run the subprocess using *this* install to guarantee the presence of pip
-            subprocess.run(
-                [
-                    sys.executable, "-m", "pip",
-                    "--python", venv_path,
-                    "install", *extras
-                ],
-                capture_output=True,
-                check=True,
-            )
+    subprocess.run(venv_cmd, capture_output=True, check=True)
 
     config_path = os.path.join(os.path.realpath(venv_path), "pyvenv.cfg")
 
@@ -176,13 +156,9 @@ def install_requirements(
     requirements_path: str,
     no_deps: bool = False,
 ):
-    base_python = venv.parent_executable
-    venv_path = venv.folder
-
     command = [
-        base_python,
+        venv.executable,
         "-m", "pip",
-        "--python", venv_path,
         "install",
         "-r", requirements_path,
     ]

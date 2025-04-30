@@ -17,12 +17,13 @@ dependencies = [
     "ducktools-classbuilder>=0.8.0",
     "ducktools-pythonfinder>=0.8.3",
     "ducktools-lazyimporter>=0.7.2",
-    "textual>=1.0",
+    "textual>=3.0",
     "shellingham~=1.5",
-    "pip~=25.0",
 ]
 classifiers = [
-    "Development Status :: 1 - Planning",
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
