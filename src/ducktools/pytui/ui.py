@@ -45,32 +45,20 @@ from textual.widgets.data_table import CellDoesNotExist
 from ._version import __version__ as app_version
 from .commands import launch_repl, launch_shell, create_venv, delete_venv
 from .config import Config
-from .runtime_installers import uv
 from .util import list_installs_deduped
+from .runtime_installers import (
+    PythonListing,
+    fetch_downloads,
+    find_matching_listing,
+    get_managers,
+)
 
 
 CWD = os.getcwd()
 
 
-# I wrote this error screen modal and then discovered notify.
-# It might still be useful in some cases so I'll leave it commented out
-# class ErrorScreen(ModalScreen):
-#     def __init__(self, message):
-#         super().__init__()
-#         self.message = message
-#
-#     def compose(self):
-#         with Vertical(classes="boxed"):
-#             yield Label(f"Error: {self.message}")
-#             with Horizontal(classes="boxed_noborder"):
-#                 yield Button("Dismiss", variant="error")
-#
-#     def on_button_pressed(self, event: Button.Pressed) -> None:
-#         self.dismiss(None)
-
-
-class UVPythonTable(DataTable):
-    def __init__(self, runtimes: list[uv.UVPythonListing], *args, **kwargs):
+class InstallableRuntimeTable(DataTable):
+    def __init__(self, runtimes: list[PythonListing], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.runtimes = runtimes
 
@@ -80,14 +68,21 @@ class UVPythonTable(DataTable):
 
     def setup_columns(self):
         self.cursor_type = "row"
-        self.add_columns("Version", "Implementation", "Variant", "Architecture")
+        self.add_columns("Version", "Manager", "Implementation", "Variant", "Architecture")
 
     def list_downloads(self):
         for dl in self.runtimes:
-            self.add_row(dl.version, dl.implementation, dl.variant, dl.arch, key=dl.key)
+            self.add_row(
+                dl.version,
+                dl.manager.organisation,
+                dl.implementation,
+                dl.variant,
+                dl.arch,
+                key=dl.full_key,
+            )
 
 
-class UVPythonScreen(ModalScreen["uv.UVPythonListing | None"]):
+class RuntimeInstallScreen(ModalScreen["PythonListing | None"]):
     BINDINGS = [
         Binding(key="enter", action="install", description="Install Runtime", priority=True, show=True),
         Binding(key="escape", action="cancel", description="Cancel", show=True),
@@ -95,19 +90,20 @@ class UVPythonScreen(ModalScreen["uv.UVPythonListing | None"]):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.runtimes = uv.fetch_downloads()
-        self.install_table = UVPythonTable(self.runtimes)
+        self.runtimes = fetch_downloads()
+        self.install_table = InstallableRuntimeTable(self.runtimes)
+
         self.install_button = Button("Install", variant="success", id="install")
         self.cancel_button = Button("Cancel", id="cancel")
 
     @property
     def runtimes_by_key(self):
         return {
-            v.key: v for v in self.runtimes
+            v.full_key: v for v in self.runtimes
         }
 
     @property
-    def selected_runtime(self) -> uv.UVPythonListing | None:
+    def selected_runtime(self) -> PythonListing | None:
         table = self.install_table
 
         try:
@@ -325,7 +321,8 @@ class RuntimeTable(DataTable):
         Binding(key="v", action="app.create_venv", description="Create VEnv", show=True),
         Binding(key="g", action="app.create_global_venv", description="Create Global VEnv", show=True),
     ]
-    if uv.check_uv():
+
+    if get_managers():
         BINDINGS.extend(
             [
                 Binding(key="i", action="app.install_runtime", description="Install New Runtime", show=True),
@@ -616,16 +613,18 @@ class ManagerApp(App):
 
     @work
     async def action_install_runtime(self):
-        if not uv.check_uv():
+        if not get_managers():
             return
-        runtime_screen = UVPythonScreen()
+
+        runtime_screen = RuntimeInstallScreen()
         runtime = await self.push_screen_wait(runtime_screen)
 
         if runtime is not None:
             self._runtime_table.loading = True
             loop = asyncio.get_event_loop()
+
             try:
-                log = await loop.run_in_executor(None, uv.install_python, runtime)
+                log = await loop.run_in_executor(None, runtime.install)
                 # self.notify(log)
             except (FileNotFoundError, subprocess.CalledProcessError) as e:
                 self.notify(
@@ -646,7 +645,7 @@ class ManagerApp(App):
 
     @work
     async def action_uninstall_runtime(self):
-        if not uv.check_uv():
+        if not get_managers():
             return
 
         runtime = self.selected_runtime
@@ -660,10 +659,10 @@ class ManagerApp(App):
             )
             return
 
-        uv_listing = uv.find_matching_listing(runtime)
-        if uv_listing is None:
+        listing = find_matching_listing(runtime)
+        if listing is None:
             self.notify(
-                f"{runtime.executable} is not a UV managed runtime",
+                f"{runtime.executable} is not a managed runtime",
                 severity="warning"
             )
             return
@@ -671,7 +670,7 @@ class ManagerApp(App):
         loop = asyncio.get_event_loop()
         self._runtime_table.loading = True
         try:
-            log = await loop.run_in_executor(None, uv.uninstall_python, uv_listing)
+            log = await loop.run_in_executor(None, listing.uninstall)
             # self.notify(log)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             self.notify(
@@ -680,7 +679,7 @@ class ManagerApp(App):
             )
         else:
             self.notify(
-                f"Runtime {uv_listing.key!r} uninstalled."
+                f"Runtime {listing.key!r} uninstalled."
             )
             self._runtime_table.load_runtimes(clear_first=True)
         finally:

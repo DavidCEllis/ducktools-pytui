@@ -22,15 +22,22 @@
 # SOFTWARE.
 
 import sys
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 import pytest
 
 from ducktools.pytui.runtime_installers import uv
 
 @pytest.fixture(scope="function")
+def uv_executable():
+    with patch.object(uv.UVManager, "executable", new_callable=PropertyMock) as fake_uv:
+        fake_uv.return_value = "uv"
+        yield
+
+
+@pytest.fixture(scope="function")
 def uv_python_dir():
-    with patch.object(uv, "uv_python_dir") as fake_py_dir:
+    with patch.object(uv.UVManager, "runtime_folder", new_callable=PropertyMock) as fake_py_dir:
         if sys.platform == "win32":
             fake_py_dir.return_value = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python"
         else:

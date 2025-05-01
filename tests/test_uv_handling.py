@@ -34,7 +34,7 @@ import pytest
 
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pytui.runtime_installers import uv
-from ducktools.pytui.runtime_installers.uv import UVPythonListing
+from ducktools.pytui.runtime_installers.uv import UVPythonListing, UVManager
 
 if sys.platform == "win32":
     example_folder = Path(__file__).parent / "example_data" / "win32"
@@ -54,82 +54,82 @@ def uv_install_json() -> str:
 
 @pytest.fixture()
 def uv_installed_pythons(uv_python_dir) -> list[uv.UVPythonListing]:
-    pys = [uv.UVPythonListing.from_dict(v) for v in json.loads(uv_install_json())]
+    manager = UVManager()
+    pys = [uv.UVPythonListing.from_dict(manager=manager, entry=v) for v in json.loads(uv_install_json())]
     return pys
 
 
+# noinspection PyPropertyAccess
 def test_check_uv():
-    with patch("subprocess.run") as fake_process:
-        cmd_output = MagicMock()
-        cmd_output.stdout = "uv 0.6.4 (04db70662 2025-03-03)\n"
-        fake_process.return_value = cmd_output
+    manager = UVManager()
+    with patch("shutil.which") as fake_which:
+        fake_which.return_value = "~/.local/bin/uv"
 
-        out = uv.check_uv()
-        fake_process.assert_called()
-        assert out is True
+        out = manager.executable
 
-    uv.check_uv.cache_clear()
+        fake_which.assert_called()
+        assert out == "~/.local/bin/uv"
 
-    with patch("subprocess.run", side_effect=FileNotFoundError) as fake_process:
-        out = uv.check_uv()
-        fake_process.assert_called()
-        assert out is False
+    del manager.executable
 
-    uv.check_uv.cache_clear()
+    with patch("shutil.which") as fake_which:
+        fake_which.return_value = None
 
-    with patch(
-        "subprocess.run",
-        side_effect=subprocess.CalledProcessError(1, ""),
-    ) as fake_process:
-        out = uv.check_uv()
-        fake_process.assert_called()
-        assert out is False
-
-    uv.check_uv.cache_clear()
+        out = manager.executable
+        fake_which.assert_called()
+        assert out is None
 
 
+def test_fake_uv(uv_executable):
+    manager = UVManager()
+    assert manager.executable == "uv"
+
+
+# noinspection PyPropertyAccess
 def test_uv_python_dir():
     if sys.platform == "win32":
         base = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python"
     else:
         base = "/home/david/.local/share/uv/python"
 
+    manager = UVManager()
+
     with patch("subprocess.run") as fake_process:
         cmd_output = MagicMock()
         cmd_output.stdout = f"{base}\n"
         fake_process.return_value = cmd_output
 
-        out = uv.uv_python_dir()
+        out = manager.runtime_folder
         fake_process.assert_called()
         assert out == base
 
-    uv.uv_python_dir.cache_clear()
+    del manager.runtime_folder
 
     with patch("subprocess.run", side_effect=FileNotFoundError) as fake_process:
-        out = uv.uv_python_dir()
+        out = manager.runtime_folder
         fake_process.assert_called()
         assert out is None
 
-    uv.uv_python_dir.cache_clear()
+    del manager.runtime_folder
 
     with patch(
         "subprocess.run",
         side_effect=subprocess.CalledProcessError(1, ""),
     ) as fake_process:
-        out = uv.uv_python_dir()
+        out = manager.runtime_folder
         fake_process.assert_called()
         assert out is None
 
-    uv.uv_python_dir.cache_clear()
 
-
-def test_fetch_installed(uv_python_dir):
+def test_fetch_installed(uv_executable, uv_python_dir):
     with patch("subprocess.run") as fake_process:
         cmd_output = MagicMock()
         cmd_output.stdout = uv_install_json()
         fake_process.return_value = cmd_output
 
-        installed_pys = uv.fetch_installed()
+        manager = UVManager()
+
+        installed_pys = manager.fetch_installed()
 
         fake_process.assert_called_once_with(
             [
@@ -180,17 +180,19 @@ def test_fetch_installed(uv_python_dir):
     assert [p.key for p in installed_pys] == expected
 
 
-def test_fetch_downloads(uv_python_dir, uv_installed_pythons):
+def test_fetch_downloads(uv_executable, uv_python_dir, uv_installed_pythons):
     with patch("subprocess.run") as fake_process, \
-        patch.object(uv, "fetch_installed") as fake_installed:
+        patch.object(UVManager, "fetch_installed") as fake_installed:
 
         fake_installed.return_value = uv_installed_pythons
+
+        manager = UVManager()
 
         cmd_output = MagicMock()
         cmd_output.stdout = uv_download_json()
         fake_process.return_value = cmd_output
 
-        download_pys = uv.fetch_downloads()
+        download_pys = manager.fetch_downloads()
 
         fake_installed.assert_called()
         fake_process.assert_called_once_with(
@@ -275,18 +277,20 @@ def test_find_matching_listing_win(uv_installed_pythons):
         shadowed=False,
     )
 
-    with patch.object(uv, "fetch_installed") as fake_installed:
+    with patch.object(UVManager, "fetch_installed") as fake_installed:
         fake_installed.return_value = uv_installed_pythons
 
-        uv_313 = uv.find_matching_listing(inst_313)
+        manager = UVManager()
+
+        uv_313 = manager.find_matching_listing(inst_313)
 
         assert uv_313.key == "cpython-3.13.2-windows-x86_64-none"
 
-        uv_pypy_310 = uv.find_matching_listing(pypy_310)
+        uv_pypy_310 = manager.find_matching_listing(pypy_310)
 
         assert uv_pypy_310.key == "pypy-3.10.19-windows-x86_64-none"
 
-        non_uv = uv.find_matching_listing(windows_install)
+        non_uv = manager.find_matching_listing(windows_install)
 
         assert non_uv is None
 
@@ -325,24 +329,28 @@ def test_find_matching_listing_nonwin(uv_installed_pythons):
         shadowed=False,
     )
 
-    with patch.object(uv, "fetch_installed") as fake_installed:
+    with patch.object(UVManager, "fetch_installed") as fake_installed:
         fake_installed.return_value = uv_installed_pythons
 
-        uv_313 = uv.find_matching_listing(inst_313)
+        manager = UVManager()
+
+        uv_313 = manager.find_matching_listing(inst_313)
 
         assert uv_313.key == "cpython-3.13.2-linux-x86_64-gnu"
 
-        uv_pypy_310 = uv.find_matching_listing(pypy_310)
+        uv_pypy_310 = manager.find_matching_listing(pypy_310)
 
         assert uv_pypy_310.key == "pypy-3.10.19-linux-x86_64-gnu"
 
-        non_uv = uv.find_matching_listing(pyenv_install)
+        non_uv = manager.find_matching_listing(pyenv_install)
 
         assert non_uv is None
 
 
-def test_install(uv_python_dir):
+def test_install(uv_executable, uv_python_dir):
+    manager = UVManager()
     listing = UVPythonListing(
+        manager=manager,
         key="cpython-3.14.0a5+freethreaded-windows-x86_64-none",
         version="3.14.0a5",
         version_parts={"major": 3, "minor": 14, "patch": 0},
@@ -356,7 +364,7 @@ def test_install(uv_python_dir):
         libc="none",
     )
     with patch("subprocess.run") as fake_process:
-        output = uv.install_python(listing)
+        output = listing.install()
 
         fake_process.assert_called_once_with(
             [
@@ -378,7 +386,7 @@ def test_install(uv_python_dir):
         )
 
 
-def test_uninstall(uv_python_dir):
+def test_uninstall(uv_executable, uv_python_dir):
     if sys.platform == "win32":
         py_path = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.13.2-windows-x86_64-none\\python.exe"
     else:
@@ -386,7 +394,10 @@ def test_uninstall(uv_python_dir):
         # But it simplifies the amount of platform specific work needed
         py_path = "/home/david/.local/share/uv/python/cpython-3.13.2-windows-x86_64-none/bin/python3.13"
 
+    manager = UVManager()
+
     listing = UVPythonListing(
+        manager=manager,
         key="cpython-3.13.2-windows-x86_64-none",
         version="3.13.2",
         version_parts={"major": 3, "minor": 13, "patch": 2},
@@ -401,7 +412,7 @@ def test_uninstall(uv_python_dir):
     )
 
     with patch("subprocess.run") as fake_process:
-        output = uv.uninstall_python(listing)
+        output = listing.uninstall()
 
         fake_process.assert_called_once_with(
             [

@@ -20,34 +20,5 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from functools import lru_cache
+from __future__ import annotations
 
-from ducktools.pythonfinder import PythonInstall
-
-from . import base, uv
-from .base import PythonListing, RuntimeManager
-
-@lru_cache(maxsize=1)
-def get_managers() -> list[RuntimeManager]:
-    return [
-        m() for m in RuntimeManager.available_managers if m.executable
-    ]
-
-
-def fetch_downloads() -> list[PythonListing]:
-    downloads = []
-    for m in get_managers():
-        downloads.extend(m.fetch_downloads())
-
-    return downloads
-
-
-def find_matching_listing(install: PythonInstall) -> PythonListing | None:
-    for manager in get_managers():
-        listing = manager.find_matching_listing(install)
-        if listing:
-            break
-    else:
-        listing = None
-
-    return listing
