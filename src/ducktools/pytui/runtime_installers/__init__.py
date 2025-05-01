@@ -20,12 +20,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import sys
 from functools import lru_cache
 
 from ducktools.pythonfinder import PythonInstall
 
 from . import base, uv
 from .base import PythonListing, RuntimeManager
+
+if sys.platform == "win32":
+    from . import pythoncore
+
 
 @lru_cache(maxsize=1)
 def get_managers() -> list[RuntimeManager]:

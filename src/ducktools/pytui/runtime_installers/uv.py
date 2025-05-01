@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import ClassVar
 
 
-from ducktools.pythonfinder.shared import PythonInstall
+from ducktools.classbuilder.prefab import get_attributes, prefab
 
 from .base import RuntimeManager, PythonListing
 
@@ -113,30 +113,14 @@ class UVManager(RuntimeManager):
 
         return download_listings
 
-    def find_matching_listing(self, install: PythonInstall) -> UVPythonListing | None:
-        if install.managed_by is None or not install.managed_by.startswith("Astral"):
-            return None
 
-        # Executable names may not match, one may find python.exe, the other pypy.exe
-        # Use the parent folder.
-        installed_dict = {
-            os.path.dirname(os.path.abspath(py.path)): py
-            for py in self.fetch_installed()
-        }
-
-        install_path = os.path.dirname(install.executable)
-
-        return installed_dict.get(install_path, None)
-
-
-class UVPythonListing(PythonListing, kw_only=True):
+@prefab(kw_only=True)
+class UVPythonListing(PythonListing):
     manager: UVManager
 
     # These extra parts are UV Specific
     version_parts: dict
-    path: str | None
     symlink: str | None
-    url: str | None
     os: str
     libc: str | None  # Apparently this is the string "none" instead of an actual None.
 
@@ -152,6 +136,18 @@ class UVPythonListing(PythonListing, kw_only=True):
             base_path = self.manager.runtime_folder
             key_path = str(Path(self.path).relative_to(base_path).parts[0])
             self.key = key if key == key_path else key_path
+
+    @classmethod
+    def from_dict(cls, manager: UVManager, entry: dict):
+        # designed to not fail if extra keys are added
+        attrib_names = set(get_attributes(cls))
+
+        kwargs = entry.copy()
+        for key in entry.keys():
+            if key not in attrib_names:
+                del kwargs[key]
+
+        return cls(manager=manager, **kwargs)
 
     def install(self):
         if self.path:
@@ -172,9 +168,8 @@ class UVPythonListing(PythonListing, kw_only=True):
         )
         return " ".join(cmd)
 
-
     def uninstall(self):
-        if not self.path:
+        if not self.path and os.path.exists(self.path):
             # Can't uninstall non-installed Python
             return None
 

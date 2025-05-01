@@ -18,11 +18,12 @@
 from __future__ import annotations
 
 import functools
+import os.path
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
-from ducktools.classbuilder.prefab import Prefab, attribute, get_attributes
+from ducktools.classbuilder.prefab import prefab, attribute
 
 
 class RuntimeManager(ABC):
@@ -40,15 +41,6 @@ class RuntimeManager(ABC):
         """
         ...
 
-    @functools.cached_property
-    @abstractmethod
-    def runtime_folder(self) -> str | None:
-        """
-        Get the folder containing all python runtimes managed by this tool
-        None if not installed
-        """
-        ...
-
     @abstractmethod
     def fetch_installed(self) -> list[PythonListing]:
         """
@@ -62,18 +54,25 @@ class RuntimeManager(ABC):
         List available downloads, exclude already downloaded
         """
 
-    @abstractmethod
     def find_matching_listing(self, install: PythonInstall) -> PythonListing | None:
-        """
-        Find the listing matching a python install
+        if install.managed_by is None or not install.managed_by.startswith(self.organisation):
+            return None
 
-        :param install:
-        :return:
-        """
-        ...
+        # Executable names may not match, one may find python.exe, the other pypy.exe
+        # Use the parent folder.
+        installed_dict = {
+            os.path.dirname(os.path.abspath(py.path)): py
+            for py in self.fetch_installed()
+            if py.path is not None
+        }
+
+        install_path = os.path.dirname(install.executable)
+
+        return installed_dict.get(install_path, None)
 
 
-class PythonListing(Prefab, kw_only=True):
+@prefab(kw_only=True)
+class PythonListing(ABC):
     manager: RuntimeManager
 
     key: str
@@ -81,6 +80,8 @@ class PythonListing(Prefab, kw_only=True):
     implementation: str
     variant: str
     arch: str
+    path: str | None
+    url: str | None
 
     _version_tuple: tuple[int, int, int, str, int] | None = attribute(default=None, private=True)
 
@@ -90,25 +91,19 @@ class PythonListing(Prefab, kw_only=True):
             self._version_tuple = version_str_to_tuple(self.version)
         return self._version_tuple
 
-
-    @classmethod
-    def from_dict(cls, manager: RuntimeManager, entry: dict):
-        # designed to not fail if extra keys are added
-        attrib_names = set(get_attributes(cls))
-
-        kwargs = entry.copy()
-        for key in entry.keys():
-            if key not in attrib_names:
-                del kwargs[key]
-
-        return cls(manager=manager, **kwargs)
-
     @property
     def full_key(self):
         return f"{type(self).__name__} / {self.key}"
 
-    def install(self):
-        raise NotImplementedError("Base Listing Class does not implement install/uninstall")
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, manager: RuntimeManager, entry: dict):
+        ...
 
+    @abstractmethod
+    def install(self):
+        ...
+
+    @abstractmethod
     def uninstall(self):
-        raise NotImplementedError("Base Listing Class does not implement install/uninstall")
+        ...
