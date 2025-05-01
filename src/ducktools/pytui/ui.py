@@ -115,7 +115,7 @@ class RuntimeInstallScreen(ModalScreen["PythonListing | None"]):
 
     def compose(self):
         with Vertical(classes="boxed"):
-            yield Label("Available UV Python Runtimes")
+            yield Label("Available Python Runtimes")
             yield self.install_table
             yield Footer()
 
