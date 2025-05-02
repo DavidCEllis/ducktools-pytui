@@ -76,21 +76,20 @@ class PythonCoreManager(RuntimeManager):
         # PythonEmbed used for embedded distributions
         # PythonTest used for distributions with tests
         # PythonCore are the ones we want
-        download_listings = [
-            PythonCoreListing.from_dict(manager=self, entry=v)
-            for v in json_data.get("versions", [])
-            if v["id"] not in installed_keys and v["company"] == "PythonCore"
-        ]
-
-        # Filter out alternate architecture
         arch = platform.machine()
         if arch == "AMD64":
             arch = "x86_64"
 
-        download_listings = [
-            listing for listing in download_listings
-            if listing.arch == arch
-        ]
+        download_listings = []
+        for v in json_data.get("versions", []):
+            # Already installed or test/docs releases - skip
+            if v["id"] in installed_keys or v["company"] != "PythonCore":
+                continue
+            listing = PythonCoreListing.from_dict(manager=self, entry=v)
+
+            # Don't list alternate architecture installs
+            if listing.arch == arch:
+                download_listings.append(listing)
 
         return download_listings
 
