@@ -29,12 +29,16 @@ import functools
 import json
 import os.path
 import platform
+import re
 import shutil
 import subprocess
 
 from ducktools.classbuilder.prefab import prefab
 
 from .base import RuntimeManager, PythonListing
+
+
+freethreaded_re = re.compile(r"^\d+.\d+t.*$")
 
 
 class PythonCoreManager(RuntimeManager):
@@ -103,8 +107,8 @@ class PythonCoreListing(PythonListing):
         name = entry["display-name"]
 
         implementation = "cpython"
-        variant = "freethreaded" if "freethreaded" in name else "default"
         tag = entry["tag"]  # Used to install version
+        variant = "freethreaded" if freethreaded_re.match(tag) else "default"
         path = entry.get("executable")
         url = entry.get("url")
 
