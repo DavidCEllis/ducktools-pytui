@@ -15,7 +15,7 @@ readme="README.md"
 requires-python = ">=3.8.0"
 dependencies = [
     "ducktools-classbuilder>=0.8.0",
-    "ducktools-pythonfinder>=0.8.3",
+    "ducktools-pythonfinder>=0.8.5",
     "ducktools-lazyimporter>=0.7.2",
     "textual>=3.0",
     "shellingham~=1.5",
