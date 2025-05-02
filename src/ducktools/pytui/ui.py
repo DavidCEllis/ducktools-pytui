@@ -652,7 +652,8 @@ class ManagerApp(App):
         if runtime is None:
             return
 
-        if runtime.executable.startswith(sys.base_prefix):
+        # Check if the executable is within the base prefix folder
+        if os.path.commonpath([runtime.executable, sys.base_prefix]) == sys.base_prefix:
             self.notify(
                 "Can not uninstall the runtime being used to run ducktools-pytui",
                 severity="warning",
