@@ -1,0 +1,1107 @@
+{
+    "versions": [
+        {
+            "schema": 1,
+            "id": "pythoncore-3.13t-64",
+            "sort-version": "3.13.2",
+            "company": "PythonCore",
+            "tag": "3.13t-64",
+            "install-for": [
+                "3.13.2t-64",
+                "3.13t-64",
+                "3t-64"
+            ],
+            "alias": [
+                {
+                    "target": "python3.13t.exe",
+                    "name": "python3.13t.exe"
+                },
+                {
+                    "target": "python3.13t.exe",
+                    "name": "python3.13t-64.exe"
+                },
+                {
+                    "target": "python3.13t.exe",
+                    "name": "python3t.exe"
+                },
+                {
+                    "target": "python3.13t.exe",
+                    "name": "python3t-64.exe"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.13t.exe"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.13t-64.exe"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "name": "pythonw3t.exe"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "name": "pythonw3t-64.exe"
+                }
+            ],
+            "display-name": "Python 3.13.2 (free-threaded)",
+            "executable": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.13t-64\\python3.13t.exe",
+            "url": "https://www.python.org/ftp/python/3.13.2/python-3.13.2t-amd64.zip",
+            "hash": {
+                "sha256": "4eb15a6264842292abcc86c7b26dfda3ae7e05ce2f54ea4fe7a8e110ae021f89"
+            },
+            "run-for": [
+                {
+                    "target": "python3.13t.exe",
+                    "tag": "3.13.2t-64"
+                },
+                {
+                    "target": "python3.13t.exe",
+                    "tag": "3.13t-64"
+                },
+                {
+                    "target": "python3.13t.exe",
+                    "tag": "3t-64"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "tag": "3.13.2t-64"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "tag": "3.13t-64"
+                },
+                {
+                    "target": "pythonw3.13t.exe",
+                    "windowed": 1,
+                    "tag": "3t-64"
+                }
+            ],
+            "shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.13t",
+                    "DisplayName": "Python 3.13.2 (free-threaded)",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.13",
+                    "Version": "3.13.2",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python3.13t.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw3.13t.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.13/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.13 (free-threaded)",
+                    "Items": [
+                        {
+                            "Name": "Python 3.13 (free-threaded)",
+                            "Target": "%PREFIX%python3.13t.exe",
+                            "Icon": "%PREFIX%python3.13t.exe"
+                        },
+                        {
+                            "Name": "Python 3.13 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.13/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.13 (free-threaded))",
+                            "Target": "%PREFIX%pythonw3.13t.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.13 (free-threaded))",
+                            "Target": "%PREFIX%python3.13t.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.13 Manuals (free-threaded)",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.13/"
+                }
+            ],
+            "__original-shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.13t",
+                    "DisplayName": "Python 3.13.2 (free-threaded)",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.13",
+                    "Version": "3.13.2",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python3.13t.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw3.13t.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.13/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.13 (free-threaded)",
+                    "Items": [
+                        {
+                            "Name": "Python 3.13 (free-threaded)",
+                            "Target": "%PREFIX%python3.13t.exe",
+                            "Icon": "%PREFIX%python3.13t.exe"
+                        },
+                        {
+                            "Name": "Python 3.13 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.13/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.13 (free-threaded))",
+                            "Target": "%PREFIX%pythonw3.13t.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.13 (free-threaded))",
+                            "Target": "%PREFIX%python3.13t.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.13 Manuals (free-threaded)",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.13/"
+                }
+            ],
+            "source": "https://www.python.org/ftp/python/index-windows.json",
+            "prefix": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.13t-64"
+        },
+        {
+            "schema": 1,
+            "id": "pythoncore-3.12-64",
+            "sort-version": "3.12.10",
+            "company": "PythonCore",
+            "tag": "3.12-64",
+            "install-for": [
+                "3.12.10-64",
+                "3.12-64",
+                "3-64"
+            ],
+            "alias": [
+                {
+                    "target": "python.exe",
+                    "name": "python3.12.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.12-64.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3-64.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.12.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.12-64.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3-64.exe"
+                }
+            ],
+            "display-name": "Python 3.12.10",
+            "executable": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+            "url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.zip",
+            "hash": {
+                "sha256": "9dc4d0b051bfd5b881f10846ee023fd7cea8251871e78b6e8920e5630b15e3bb"
+            },
+            "run-for": [
+                {
+                    "target": "python.exe",
+                    "tag": "3.12.10-64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3.12-64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.12.10-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.12-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3-64"
+                }
+            ],
+            "shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.12",
+                    "DisplayName": "Python 3.12.10",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.12",
+                    "Version": "3.12.10",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.12/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.12",
+                    "Items": [
+                        {
+                            "Name": "Python 3.12",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.12 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.12/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.12)",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.12)",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.12 Manuals",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.12/"
+                }
+            ],
+            "__original-shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.12",
+                    "DisplayName": "Python 3.12.10",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.12",
+                    "Version": "3.12.10",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.12/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.12",
+                    "Items": [
+                        {
+                            "Name": "Python 3.12",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.12 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.12/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.12)",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.12)",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.12 Manuals",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.12/"
+                }
+            ],
+            "source": "https://www.python.org/ftp/python/index-windows.json",
+            "prefix": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.12-64"
+        },
+        {
+            "schema": 1,
+            "id": "pythoncore-3.12-32",
+            "sort-version": "3.12.10",
+            "company": "PythonCore",
+            "tag": "3.12-32",
+            "install-for": [
+                "3.12.10-32",
+                "3.12-32",
+                "3-32"
+            ],
+            "alias": [
+                {
+                    "target": "python.exe",
+                    "name": "python3.12.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.12-32.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3-32.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.12.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.12-32.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3-32.exe"
+                }
+            ],
+            "display-name": "Python 3.12.10 (32-bit)",
+            "executable": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.12-32\\python.exe",
+            "url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-win32.zip",
+            "hash": {
+                "sha256": "f586197958b300bfe2cdd538968a869a68c6c54a0a4658cc48d2fbc04ee87630"
+            },
+            "run-for": [
+                {
+                    "target": "python.exe",
+                    "tag": "3.12.10-32"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3.12-32"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3-32"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.12.10-32"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.12-32"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3-32"
+                }
+            ],
+            "shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.12-32",
+                    "DisplayName": "Python 3.12.10 (32-bit)",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "32bit",
+                    "SysVersion": "3.12",
+                    "Version": "3.12.10",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.12/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.12 (32-bit)",
+                    "Items": [
+                        {
+                            "Name": "Python 3.12 (32-bit)",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.12 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.12/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.12 (32-bit))",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.12 (32-bit))",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.12 Manuals (32-bit)",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.12/"
+                }
+            ],
+            "__original-shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.12-32",
+                    "DisplayName": "Python 3.12.10 (32-bit)",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "32bit",
+                    "SysVersion": "3.12",
+                    "Version": "3.12.10",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.12/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.12 (32-bit)",
+                    "Items": [
+                        {
+                            "Name": "Python 3.12 (32-bit)",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.12 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.12/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.12 (32-bit))",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.12 (32-bit))",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.12 Manuals (32-bit)",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.12/"
+                }
+            ],
+            "source": "https://www.python.org/ftp/python/index-windows.json",
+            "prefix": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.12-32"
+        },
+        {
+            "schema": 1,
+            "id": "pythoncore-3.12-arm64",
+            "sort-version": "3.12.10",
+            "company": "PythonCore",
+            "tag": "3.12-arm64",
+            "install-for": [
+                "3.12.10-arm64",
+                "3.12-arm64",
+                "3-arm64"
+            ],
+            "alias": [
+                {
+                    "target": "python.exe",
+                    "name": "python3.12.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.12-arm64.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3-arm64.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.12.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.12-arm64.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3-arm64.exe"
+                }
+            ],
+            "display-name": "Python 3.12.10 (ARM64)",
+            "executable": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.12-arm64\\python.exe",
+            "url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-arm64.zip",
+            "hash": {
+                "sha256": "b94c0f7c1ba1aebe8524d84a472844bce9e0f08e8d7ef9f220e5208da13c37f5"
+            },
+            "run-for": [
+                {
+                    "target": "python.exe",
+                    "tag": "3.12.10-arm64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3.12-arm64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3-arm64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.12.10-arm64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.12-arm64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3-arm64"
+                }
+            ],
+            "shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.12-arm64",
+                    "DisplayName": "Python 3.12.10 (ARM64)",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.12",
+                    "Version": "3.12.10",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.12/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.12 (ARM64)",
+                    "Items": [
+                        {
+                            "Name": "Python 3.12 (ARM64)",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.12 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.12/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.12 (ARM64))",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.12 (ARM64))",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.12 Manuals (ARM64)",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.12/"
+                }
+            ],
+            "__original-shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.12-arm64",
+                    "DisplayName": "Python 3.12.10 (ARM64)",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.12",
+                    "Version": "3.12.10",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe",
+                        "IdlePath": "%PREFIX%Lib\\idlelib\\idle.pyw"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.12/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.12 (ARM64)",
+                    "Items": [
+                        {
+                            "Name": "Python 3.12 (ARM64)",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.12 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.12/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.12 (ARM64))",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.12 (ARM64))",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.12 Manuals (ARM64)",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.12/"
+                }
+            ],
+            "source": "https://www.python.org/ftp/python/index-windows.json",
+            "prefix": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.12-arm64"
+        },
+        {
+            "schema": 1,
+            "id": "pythoncore-3.14-64",
+            "sort-version": "3.14.0a7",
+            "company": "PythonCore",
+            "tag": "3.14-dev-64",
+            "install-for": [
+                "3.14.0a7-64",
+                "3.14-64",
+                "3-64",
+                "3.14-dev-64",
+                "3-dev-64"
+            ],
+            "alias": [
+                {
+                    "target": "python.exe",
+                    "name": "python3.14.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.14-64.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3.exe"
+                },
+                {
+                    "target": "python.exe",
+                    "name": "python3-64.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.14.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.14-64.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3.exe"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "name": "pythonw3-64.exe"
+                }
+            ],
+            "display-name": "Python 3.14.0a7",
+            "executable": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+            "url": "https://www.python.org/ftp/python/3.14.0/python-3.14.0a7-amd64.zip",
+            "hash": {
+                "sha256": "84545c852b87ad0b0e4b1f98ffcb41866a72ce973322ed4f4f6272e849841267"
+            },
+            "run-for": [
+                {
+                    "target": "python.exe",
+                    "tag": "3.14.0a7-64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3.14-64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3-64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3.14-dev-64"
+                },
+                {
+                    "target": "python.exe",
+                    "tag": "3-dev-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.14.0a7-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.14-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3.14-dev-64"
+                },
+                {
+                    "target": "pythonw.exe",
+                    "windowed": 1,
+                    "tag": "3-dev-64"
+                }
+            ],
+            "shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.14-64",
+                    "DisplayName": "Python 3.14.0a7",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.14",
+                    "Version": "3.14.0a7",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.14/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.14",
+                    "Items": [
+                        {
+                            "Name": "Python 3.14",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.14 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.14/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.14)",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.14)",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.14 Manuals",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.14/"
+                }
+            ],
+            "__original-shortcuts": [
+                {
+                    "kind": "pep514",
+                    "Key": "PythonCore\\3.14-64",
+                    "DisplayName": "Python 3.14.0a7",
+                    "SupportUrl": "https://www.python.org/",
+                    "SysArchitecture": "64bit",
+                    "SysVersion": "3.14",
+                    "Version": "3.14.0a7",
+                    "InstallPath": {
+                        "_": "%PREFIX%",
+                        "ExecutablePath": "%PREFIX%python.exe",
+                        "WindowedExecutablePath": "%PREFIX%pythonw.exe"
+                    },
+                    "Help": {
+                        "Online Python Documentation": {
+                            "_": "https://docs.python.org/3.14/"
+                        },
+                        "Main Python Documentation": {
+                            "_": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    }
+                },
+                {
+                    "kind": "start",
+                    "Name": "Python 3.14",
+                    "Items": [
+                        {
+                            "Name": "Python 3.14",
+                            "Target": "%PREFIX%python.exe",
+                            "Icon": "%PREFIX%python.exe"
+                        },
+                        {
+                            "Name": "Python 3.14 Online Documentation",
+                            "Icon": "%SystemRoot%\\System32\\SHELL32.dll",
+                            "IconIndex": 13,
+                            "Target": "https://docs.python.org/3.14/"
+                        },
+                        {
+                            "Name": "IDLE (Python 3.14)",
+                            "Target": "%PREFIX%pythonw.exe",
+                            "Arguments": "\"%PREFIX%Lib\\idlelib\\idle.pyw\"",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "PyDoc (Python 3.14)",
+                            "Target": "%PREFIX%python.exe",
+                            "Arguments": "-m pydoc -b",
+                            "Icon": "%PREFIX%Lib\\idlelib\\Icons\\idle.ico",
+                            "IconIndex": 0
+                        },
+                        {
+                            "Name": "Python 3.14 Manuals",
+                            "Target": "%PREFIX%Doc\\html\\index.html"
+                        }
+                    ]
+                },
+                {
+                    "kind": "uninstall",
+                    "Publisher": "Python Software Foundation",
+                    "HelpLink": "https://docs.python.org/3.14/"
+                }
+            ],
+            "source": "https://www.python.org/ftp/python/index-windows.json",
+            "prefix": "C:\\Users\\ducks\\AppData\\Local\\Python\\pythoncore-3.14-64"
+        }
+    ]
+}

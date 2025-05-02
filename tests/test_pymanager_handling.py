@@ -21,3 +21,80 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import annotations
+
+import functools
+from pathlib import Path
+from unittest.mock import patch, MagicMock
+
+from ducktools.pytui.runtime_installers.pythoncore import PythonCoreManager, PythonCoreListing
+
+example_folder = Path(__file__).parent / "example_data" / "win32"
+
+@functools.lru_cache(maxsize=1)
+def pymanager_download_json() -> str:
+    return (example_folder / "pymanager_download_list.json").read_text()
+
+@functools.lru_cache(maxsize=1)
+def pymanager_install_json() -> str:
+    return (example_folder / "pymanager_install_list.json").read_text()
+
+
+# noinspection PyPropertyAccess
+def test_check_pymanager():
+    manager = PythonCoreManager()
+    with patch("shutil.which") as fake_which:
+        fake_which.return_value = r"C:\Users\david\AppData\Local\Microsoft\WindowsApps\pymanager.exe"
+
+        out = manager.executable
+
+        fake_which.assert_called()
+        assert out == r"C:\Users\david\AppData\Local\Microsoft\WindowsApps\pymanager.exe"
+
+    del manager.executable
+
+    with patch("shutil.which") as fake_which:
+        fake_which.return_value = None
+
+        out = manager.executable
+        fake_which.assert_called()
+        assert out is None
+
+def test_fake_pymanager(pymanager_executable):
+    manager = PythonCoreManager()
+    assert manager.executable == "pymanager.exe"
+
+
+def test_fetch_installed(pymanager_executable):
+    with patch("subprocess.run") as fake_process:
+        cmd_output = MagicMock()
+        cmd_output.stdout = pymanager_install_json()
+        fake_process.return_value = cmd_output
+
+        manager = PythonCoreManager()
+
+        installed_pys = manager.fetch_installed()
+
+        fake_process.assert_called_once_with(
+            [
+                "pymanager.exe", "list", "--only-managed", "--format=json",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        expected = [
+            'pythoncore-3.13t-64',
+            'pythoncore-3.12-64',
+            'pythoncore-3.12-32',
+            'pythoncore-3.12-arm64',
+            'pythoncore-3.14-64',
+        ]
+
+        assert [p.key for p in installed_pys] == expected
+
+
+def test_fetch_downloads(pymanager_executable):
+    # Fake as AMD64 for filtering
+    with patch("platform.machine") as machine_mock:
+        machine_mock.return_value = "AMD64"

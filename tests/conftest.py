@@ -26,7 +26,8 @@ from unittest.mock import patch, PropertyMock
 
 import pytest
 
-from ducktools.pytui.runtime_installers import uv
+from ducktools.pytui.runtime_installers import uv, pythoncore
+
 
 @pytest.fixture(scope="function")
 def uv_executable():
@@ -42,4 +43,11 @@ def uv_python_dir():
             fake_py_dir.return_value = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python"
         else:
             fake_py_dir.return_value = "/home/david/.local/share/uv/python"
+        yield
+
+
+@pytest.fixture(scope="function")
+def pymanager_executable():
+    with patch.object(pythoncore.PythonCoreManager, "executable", new_callable=PropertyMock) as fake_core:
+        fake_core.return_value = "pymanager.exe"
         yield
