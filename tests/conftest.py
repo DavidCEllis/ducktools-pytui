@@ -29,6 +29,11 @@ import pytest
 
 from ducktools.pytui.runtime_installers import uv, pythoncore
 
+collect_ignore = []
+
+if sys.platform != "win32":
+    collect_ignore.append("win32")
+
 
 @pytest.fixture(scope="function")
 def uv_executable():
