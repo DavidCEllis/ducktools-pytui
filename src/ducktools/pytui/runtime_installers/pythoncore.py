@@ -49,6 +49,7 @@ class PythonCoreManager(RuntimeManager):
     def executable(self):
         return shutil.which("pymanager")
 
+    @functools.lru_cache(maxsize=None)
     def fetch_installed(self) -> list[PythonCoreListing]:
         cmd = [
             self.executable, "list", "--only-managed", "--format=json",
@@ -63,6 +64,7 @@ class PythonCoreManager(RuntimeManager):
         ]
         return installed_pys
 
+    @functools.lru_cache(maxsize=None)
     def fetch_downloads(self) -> list[PythonCoreListing]:
         cmd = [
             self.executable, "list", "--online", "--format=json",
@@ -72,7 +74,7 @@ class PythonCoreManager(RuntimeManager):
         )
         json_data = json.loads(download_list_cmd.stdout)
 
-        installed_keys = {v.key for v in self.fetch_installed()}
+        installed_versions = {(v.key, v.version) for v in self.fetch_installed()}
 
         # PythonEmbed used for embedded distributions
         # PythonTest used for distributions with tests
@@ -84,7 +86,7 @@ class PythonCoreManager(RuntimeManager):
         download_listings = []
         for v in json_data.get("versions", []):
             # Already installed or test/docs releases - skip
-            if v["id"] in installed_keys or v["company"] != "PythonCore":
+            if (v["id"], v["sort-version"]) in installed_versions or v["company"] != "PythonCore":
                 continue
             listing = PythonCoreListing.from_dict(manager=self, entry=v)
 
@@ -97,8 +99,11 @@ class PythonCoreManager(RuntimeManager):
 
 @prefab(kw_only=True)
 class PythonCoreListing(PythonListing):
+    manager: PythonCoreManager
+
     name: str
     tag: str
+    install_for: list[str]
 
     @classmethod
     def from_dict(cls, manager: PythonCoreManager, entry: dict):
@@ -107,7 +112,8 @@ class PythonCoreListing(PythonListing):
         name = entry["display-name"]
 
         implementation = "cpython"
-        tag = entry["tag"]  # Used to install version
+        tag = entry["tag"]
+        install_for = entry["install-for"]
         variant = "freethreaded" if freethreaded_re.match(tag) else "default"
         path = entry.get("executable")
         url = entry.get("url")
@@ -131,17 +137,33 @@ class PythonCoreListing(PythonListing):
             implementation=implementation,
             variant=variant,
             tag=tag,
+            install_for=install_for,
             path=path,
             url=url,
             arch=arch,
         )
 
+    @property
+    def will_overwrite(self):
+        for v in self.manager.fetch_installed():
+            if self.tag == v.tag:
+                return True
+        return False
+
     def install(self):
         if self.path:
             return None
+
+        # Guard against empty list
+        if self.install_for:
+            tag = self.install_for[0]
+        else:
+            tag = self.tag
+
         cmd = [
-            self.manager.executable, "install", self.tag, "-y",
+            self.manager.executable, "install", tag, "-y",
         ]
+
         subprocess.run(
             cmd, capture_output=True, text=True, check=True
         )
@@ -151,8 +173,15 @@ class PythonCoreListing(PythonListing):
     def uninstall(self):
         if not (self.path and os.path.exists(self.path)):
             return None
+
+        # Guard against empty list
+        if self.install_for:
+            tag = self.install_for[0]
+        else:
+            tag = self.tag
+
         cmd = [
-            self.manager.executable, "uninstall", self.tag, "-y",
+            self.manager.executable, "uninstall", tag, "-y",
         ]
         subprocess.run(
             cmd, capture_output=True, text=True, check=True

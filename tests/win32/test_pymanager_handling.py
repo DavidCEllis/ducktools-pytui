@@ -33,11 +33,11 @@ from ducktools.pytui.runtime_installers.pythoncore import PythonCoreManager, Pyt
 
 example_folder = Path(__file__).parents[1] / "example_data" / "win32"
 
-@functools.lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=None)
 def pymanager_download_json() -> str:
     return (example_folder / "pymanager_download_list.json").read_text()
 
-@functools.lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=None)
 def pymanager_install_json() -> str:
     return (example_folder / "pymanager_install_list.json").read_text()
 
@@ -148,3 +148,39 @@ def test_fetch_downloads(pymanager_executable, pymanager_installed_pythons):
         ]
 
         assert [p.key for p in download_pys] == expected
+
+
+def test_install(pymanager_executable):
+    manager = PythonCoreManager()
+    listing = PythonCoreListing(
+        manager=manager,
+        key='pythoncore-3.14-64',
+        version='3.14.0b1',
+        implementation='cpython',
+        variant='default',
+        arch='x86_64',
+        path=None,
+        url='https://www.python.org/ftp/python/3.14.0/python-3.14.0b1t-amd64.zip',
+        name='Python 3.14.0b1',
+        tag='3.14-dev-64',
+        install_for=[
+            "3.14.0b1-64",
+            "3.14-64",
+            "3-64",
+            "3.14-dev-64",
+            "3-dev-64",
+        ]
+    )
+
+    with patch("subprocess.run") as fake_process, \
+        patch.object(PythonCoreManager, "fetch_installed") as fake_installed:
+        fake_installed.return_value = []
+        listing.install()
+        fake_process.assert_called_once_with(
+            [
+                "pymanager.exe", "install", "3.14.0b1-64", "-y"
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )

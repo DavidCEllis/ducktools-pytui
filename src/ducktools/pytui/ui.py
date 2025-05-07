@@ -620,6 +620,10 @@ class ManagerApp(App):
         runtime = await self.push_screen_wait(runtime_screen)
 
         if runtime is not None:
+            if runtime.will_overwrite:
+                # Add a confirmation prompt here
+                pass
+
             self._runtime_table.loading = True
             loop = asyncio.get_event_loop()
 

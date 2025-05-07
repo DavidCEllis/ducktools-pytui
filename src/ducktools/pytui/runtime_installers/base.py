@@ -104,6 +104,10 @@ class PythonListing(ABC):
     def full_key(self):
         return f"{type(self).__name__} / {self.key}"
 
+    @property
+    def will_overwrite(self):
+        return False
+
     @classmethod
     @abstractmethod
     def from_dict(cls, manager: RuntimeManager, entry: dict):

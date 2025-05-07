@@ -42,12 +42,12 @@ else:
     example_folder = Path(__file__).parent / "example_data"
 
 
-@functools.lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=None)
 def uv_download_json() -> str:
     return (example_folder / "uv_download_list.json").read_text()
 
 
-@functools.lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=None)
 def uv_install_json() -> str:
     return (example_folder / "uv_install_list.json").read_text()
 

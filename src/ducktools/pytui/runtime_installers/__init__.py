@@ -37,7 +37,7 @@ else:
     from . import uv
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=None)
 def get_managers() -> list[RuntimeManager]:
     return [
         m() for m in RuntimeManager.available_managers if m.executable

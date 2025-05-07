@@ -58,6 +58,7 @@ class UVManager(RuntimeManager):
             py_dir = cmd.stdout.strip()
         return py_dir
 
+    @functools.lru_cache(maxsize=None)
     def fetch_installed(self) -> list[UVPythonListing]:
         """
         Fetch Python installs managed by UV
@@ -81,6 +82,7 @@ class UVManager(RuntimeManager):
 
         return installed_pys
 
+    @functools.lru_cache(maxsize=None)
     def fetch_downloads(self, all_versions=False) -> list[UVPythonListing]:
         """
         Get available UV downloads and filter out any installs that are already present.
