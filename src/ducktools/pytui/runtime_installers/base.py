@@ -18,8 +18,10 @@
 from __future__ import annotations
 
 import functools
+import operator
 import os.path
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from typing import ClassVar
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
@@ -32,6 +34,13 @@ class RuntimeManager(ABC):
 
     def __init_subclass__(cls):
         RuntimeManager.available_managers.append(cls)
+
+    @staticmethod
+    def sort_listings(listings: Iterable[PythonListing]):
+        new_listings = sorted(listings, key=operator.attrgetter("variant", "arch", "key"))
+        new_listings.sort(key=operator.attrgetter("version_tuple"), reverse=True)
+        new_listings.sort(key=operator.attrgetter("implementation"))
+        return new_listings
 
     @functools.cached_property
     @abstractmethod

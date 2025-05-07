@@ -22,7 +22,6 @@
 # SOFTWARE.
 
 # Handle the Windows python PyManager
-
 from __future__ import annotations
 
 import functools
@@ -33,6 +32,8 @@ import re
 import shutil
 import subprocess
 
+from typing import ClassVar
+
 from ducktools.classbuilder.prefab import prefab
 
 from .base import RuntimeManager, PythonListing
@@ -42,7 +43,7 @@ freethreaded_re = re.compile(r"^\d+.\d+t.*$")
 
 
 class PythonCoreManager(RuntimeManager):
-    organisation = "PythonCore"
+    organisation: ClassVar[str] = "PythonCore"
 
     @functools.cached_property
     def executable(self):
@@ -91,7 +92,7 @@ class PythonCoreManager(RuntimeManager):
             if listing.arch == arch:
                 download_listings.append(listing)
 
-        return download_listings
+        return self.sort_listings(download_listings)
 
 
 @prefab(kw_only=True)

@@ -20,16 +20,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 import sys
 from functools import lru_cache
 
 from ducktools.pythonfinder import PythonInstall
 
-from . import base, uv
 from .base import PythonListing, RuntimeManager
 
+# Windows python installer should come before UV if available
 if sys.platform == "win32":
     from . import pythoncore
+    from . import uv
+else:
+    from . import uv
 
 
 @lru_cache(maxsize=1)

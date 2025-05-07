@@ -23,8 +23,11 @@
 from __future__ import annotations
 
 import functools
+import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock
+
+import pytest
 
 from ducktools.pytui.runtime_installers.pythoncore import PythonCoreManager, PythonCoreListing
 
@@ -37,6 +40,15 @@ def pymanager_download_json() -> str:
 @functools.lru_cache(maxsize=1)
 def pymanager_install_json() -> str:
     return (example_folder / "pymanager_install_list.json").read_text()
+
+@pytest.fixture()
+def pymanager_installed_pythons():
+    manager = PythonCoreManager()
+    pys = [
+        PythonCoreListing.from_dict(manager=manager, entry=v)
+        for v in json.loads(pymanager_install_json()).get("versions", [])
+    ]
+    return pys
 
 
 # noinspection PyPropertyAccess
@@ -94,7 +106,45 @@ def test_fetch_installed(pymanager_executable):
         assert [p.key for p in installed_pys] == expected
 
 
-def test_fetch_downloads(pymanager_executable):
+def test_fetch_downloads(pymanager_executable, pymanager_installed_pythons):
     # Fake as AMD64 for filtering
-    with patch("platform.machine") as machine_mock:
+    with patch("platform.machine") as machine_mock, \
+        patch("subprocess.run") as fake_process, \
+        patch.object(PythonCoreManager, "fetch_installed") as fake_installed:
+
         machine_mock.return_value = "AMD64"
+
+        fake_installed.return_value = pymanager_installed_pythons
+
+        cmd_output = MagicMock()
+        cmd_output.stdout = pymanager_download_json()
+        fake_process.return_value = cmd_output
+
+        manager = PythonCoreManager()
+        download_pys = manager.fetch_downloads()
+
+        fake_installed.assert_called()
+        fake_process.assert_called_once_with(
+            ["pymanager.exe", "list", "--online", "--format=json"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        # Check values have been filtered
+        for p in pymanager_installed_pythons:
+            assert p.key not in download_pys
+
+        expected = [
+            "pythoncore-3.14t-64",
+            "pythoncore-3.13-64",
+            "pythoncore-3.11-64",
+            "pythoncore-3.10-64",
+            "pythoncore-3.9-64",
+            "pythoncore-3.8-64",
+            "pythoncore-3.7-64",
+            "pythoncore-3.6-64",
+            "pythoncore-3.5-64",
+        ]
+
+        assert [p.key for p in download_pys] == expected

@@ -37,7 +37,7 @@ from .base import RuntimeManager, PythonListing
 
 
 class UVManager(RuntimeManager):
-    organisation: ClassVar[str] = "Astral UV"
+    organisation: ClassVar[str] = "Astral"
 
     @functools.cached_property
     def executable(self) -> str | None:
@@ -106,10 +106,10 @@ class UVManager(RuntimeManager):
 
         installed_keys = {v.key for v in self.fetch_installed()}
 
-        download_listings = [
+        download_listings = self.sort_listings(
             UVPythonListing.from_dict(manager=self, entry=v) for v in full_download_list
             if v["key"] not in installed_keys
-        ]
+        )
 
         return download_listings
 
