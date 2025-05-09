@@ -629,7 +629,7 @@ class ManagerApp(App):
 
             try:
                 result = await loop.run_in_executor(None, runtime.install)
-                self.notify(result.stderr)
+                # self.notify(result.stderr)
             except (FileNotFoundError, subprocess.CalledProcessError) as e:
                 self.notify(
                     f"Install Failed: {e}",
@@ -675,8 +675,8 @@ class ManagerApp(App):
         loop = asyncio.get_event_loop()
         self._runtime_table.loading = True
         try:
-            log = await loop.run_in_executor(None, listing.uninstall)
-            self.notify(log.stderr)
+            result = await loop.run_in_executor(None, listing.uninstall)
+            # self.notify(result.stderr)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             self.notify(
                 f"Uninstall Failed: {e}",
