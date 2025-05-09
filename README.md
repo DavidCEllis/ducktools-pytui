@@ -12,7 +12,7 @@ Run with `pytui` or `ducktools-pytui`.
 
 There is also now a zipapp available on 
 [the releases page](https://github.com/DavidCEllis/ducktools-pytui/releases/latest)
-and should be usable as long as you have Python 3.10 or newer.
+and should be usable as long as you have Python 3.8 or newer.
 
 ## Example ##
 
@@ -32,8 +32,8 @@ and should be usable as long as you have Python 3.10 or newer.
 * List installed packages in a venv (Python 3.9 or later)
 * Create a venv from a specific runtime in the working directory or a global folder (Python 3.4 or later)
 * Delete a selected venv
-* Install a runtime (Requires UV installed and on PATH)
-* Uninstall a runtime (UV runtimes only)
+* Install a runtime (Requires either the Windows Python Manager or UV to be available)
+* Uninstall a runtime (Only those managed by the Windows Python Manager or UV)
 
 ### Basic Configuration ###
 
