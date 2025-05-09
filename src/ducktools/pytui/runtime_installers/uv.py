@@ -58,7 +58,6 @@ class UVManager(RuntimeManager):
             py_dir = cmd.stdout.strip()
         return py_dir
 
-    @functools.lru_cache(maxsize=None)
     def fetch_installed(self) -> list[UVPythonListing]:
         """
         Fetch Python installs managed by UV
@@ -83,13 +82,7 @@ class UVManager(RuntimeManager):
         return installed_pys
 
     @functools.lru_cache(maxsize=None)
-    def fetch_downloads(self, all_versions=False) -> list[UVPythonListing]:
-        """
-        Get available UV downloads and filter out any installs that are already present.
-
-        :param all_versions: Include *ALL* possible installs
-        :return: list of possible python installs
-        """
+    def _get_download_cache(self, all_versions=False):
         cmd = [
             self.executable, "python", "list",
             "--output-format", "json",
@@ -106,11 +99,26 @@ class UVManager(RuntimeManager):
         )
         full_download_list = json.loads(download_list_cmd.stdout)
 
+        downloads = [
+            UVPythonListing.from_dict(manager=self, entry=v)
+            for v in full_download_list
+        ]
+        return downloads
+
+    def fetch_downloads(self, all_versions=False) -> list[UVPythonListing]:
+        """
+        Get available UV downloads and filter out any installs that are already present.
+
+        :param all_versions: Include *ALL* possible installs
+        :return: list of possible python installs
+        """
+        downloads = self._get_download_cache(all_versions=all_versions)
+
         installed_keys = {v.key for v in self.fetch_installed()}
 
         download_listings = self.sort_listings(
-            UVPythonListing.from_dict(manager=self, entry=v) for v in full_download_list
-            if v["key"] not in installed_keys
+            v for v in downloads
+            if v.key not in installed_keys
         )
 
         return download_listings
@@ -151,7 +159,7 @@ class UVPythonListing(PythonListing):
 
         return cls(manager=manager, **kwargs)
 
-    def install(self):
+    def install(self) -> subprocess.CompletedProcess:
         if self.path:
             # Can't install already installed Python
             return None
@@ -162,15 +170,15 @@ class UVPythonListing(PythonListing):
             "--color", "never",
             "--no-progress",
         ]
-        subprocess.run(
+        result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             check=True,
         )
-        return " ".join(cmd)
+        return result
 
-    def uninstall(self):
+    def uninstall(self) -> subprocess.CompletedProcess:
         if not self.path and os.path.exists(self.path):
             # Can't uninstall non-installed Python
             return None
@@ -181,10 +189,10 @@ class UVPythonListing(PythonListing):
             "--color", "never",
             "--no-progress",
         ]
-        subprocess.run(
+        result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             check=True,
         )
-        return " ".join(cmd)
+        return result

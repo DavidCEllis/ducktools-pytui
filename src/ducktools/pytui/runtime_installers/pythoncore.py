@@ -49,7 +49,6 @@ class PythonCoreManager(RuntimeManager):
     def executable(self):
         return shutil.which("pymanager")
 
-    @functools.lru_cache(maxsize=None)
     def fetch_installed(self) -> list[PythonCoreListing]:
         cmd = [
             self.executable, "list", "--only-managed", "--format=json",
@@ -65,7 +64,14 @@ class PythonCoreManager(RuntimeManager):
         return installed_pys
 
     @functools.lru_cache(maxsize=None)
-    def fetch_downloads(self) -> list[PythonCoreListing]:
+    def _get_download_cache(self):
+        """
+        Get the raw unfiltered download list.
+        This is cached to avoid repeated calls to PyManager for downloads.
+        This data should only change on new Python releases.
+
+        :return: List of PythonCoreListings for all downloads
+        """
         cmd = [
             self.executable, "list", "--online", "--format=json",
         ]
@@ -73,6 +79,21 @@ class PythonCoreManager(RuntimeManager):
             cmd, capture_output=True, text=True, check=True,
         )
         json_data = json.loads(download_list_cmd.stdout)
+
+        downloads = [
+            PythonCoreListing.from_dict(manager=self, entry=v)
+            for v in json_data.get("versions", [])
+        ]
+
+        return downloads
+
+    def fetch_downloads(self) -> list[PythonCoreListing]:
+        """
+        Get the filtered list of downloads, with installed versions removed.
+
+        :return: filtered download list
+        """
+        downloads = self._get_download_cache()
 
         installed_versions = {(v.key, v.version) for v in self.fetch_installed()}
 
@@ -83,16 +104,13 @@ class PythonCoreManager(RuntimeManager):
         if arch == "AMD64":
             arch = "x86_64"
 
-        download_listings = []
-        for v in json_data.get("versions", []):
-            # Already installed or test/docs releases - skip
-            if (v["id"], v["sort-version"]) in installed_versions or v["company"] != "PythonCore":
-                continue
-            listing = PythonCoreListing.from_dict(manager=self, entry=v)
-
-            # Don't list alternate architecture installs
-            if listing.arch == arch:
-                download_listings.append(listing)
+        download_listings = [
+            v
+            for v in downloads
+            if (v.key, v.version) not in installed_versions
+            and v.company == "PythonCore"
+            and v.arch == arch
+        ]
 
         return self.sort_listings(download_listings)
 
@@ -103,6 +121,7 @@ class PythonCoreListing(PythonListing):
 
     name: str
     tag: str
+    company: str
     install_for: list[str]
 
     @classmethod
@@ -110,6 +129,7 @@ class PythonCoreListing(PythonListing):
         key = entry["id"]
         version = entry["sort-version"]
         name = entry["display-name"]
+        company = entry["company"]
 
         implementation = "cpython"
         tag = entry["tag"]
@@ -134,6 +154,7 @@ class PythonCoreListing(PythonListing):
             key=key,
             version=version,
             name=name,
+            company=company,
             implementation=implementation,
             variant=variant,
             tag=tag,
@@ -150,7 +171,7 @@ class PythonCoreListing(PythonListing):
                 return True
         return False
 
-    def install(self):
+    def install(self) -> subprocess.CompletedProcess:
         if self.path:
             return None
 
@@ -164,13 +185,13 @@ class PythonCoreListing(PythonListing):
             self.manager.executable, "install", tag, "-y",
         ]
 
-        subprocess.run(
+        result = subprocess.run(
             cmd, capture_output=True, text=True, check=True
         )
-        return " ".join(cmd)
+        return result
 
 
-    def uninstall(self):
+    def uninstall(self) -> subprocess.CompletedProcess:
         if not (self.path and os.path.exists(self.path)):
             return None
 
@@ -183,7 +204,7 @@ class PythonCoreListing(PythonListing):
         cmd = [
             self.manager.executable, "uninstall", tag, "-y",
         ]
-        subprocess.run(
+        result = subprocess.run(
             cmd, capture_output=True, text=True, check=True
         )
-        return " ".join(cmd)
+        return result

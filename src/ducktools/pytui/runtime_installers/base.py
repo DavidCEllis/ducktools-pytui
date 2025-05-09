@@ -20,6 +20,7 @@ from __future__ import annotations
 import functools
 import operator
 import os.path
+import subprocess
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from typing import ClassVar
@@ -58,9 +59,15 @@ class RuntimeManager(ABC):
         ...
 
     @abstractmethod
+    def _get_download_cache(self):
+        """
+        List all available downloads (cached method)
+        """
+
+    @abstractmethod
     def fetch_downloads(self) -> list[PythonListing]:
         """
-        List available downloads, exclude already downloaded
+        List available downloads, exclude already downloaded (not cached)
         """
 
     def find_matching_listing(self, install: PythonInstall) -> PythonListing | None:
@@ -114,9 +121,9 @@ class PythonListing(ABC):
         ...
 
     @abstractmethod
-    def install(self):
+    def install(self) -> subprocess.CompletedProcess:
         ...
 
     @abstractmethod
-    def uninstall(self):
+    def uninstall(self) -> subprocess.CompletedProcess:
         ...
