@@ -364,6 +364,9 @@ def test_install(uv_executable, uv_python_dir):
         libc="none",
     )
     with patch("subprocess.run") as fake_process:
+        fake_out = MagicMock()
+        fake_process.return_value = fake_out
+
         output = listing.install()
 
         fake_process.assert_called_once_with(
@@ -381,9 +384,7 @@ def test_install(uv_executable, uv_python_dir):
             check=True,
         )
 
-        assert output == (
-            "uv python install cpython-3.14.0a5+freethreaded-windows-x86_64-none --color never --no-progress"
-        )
+        assert output == fake_out
 
 
 def test_uninstall(uv_executable, uv_python_dir):
@@ -412,6 +413,9 @@ def test_uninstall(uv_executable, uv_python_dir):
     )
 
     with patch("subprocess.run") as fake_process:
+        fake_out = MagicMock()
+        fake_process.return_value = fake_out
+
         output = listing.uninstall()
 
         fake_process.assert_called_once_with(
@@ -429,6 +433,4 @@ def test_uninstall(uv_executable, uv_python_dir):
             check=True,
         )
 
-        assert output == (
-            "uv python uninstall cpython-3.13.2-windows-x86_64-none --color never --no-progress"
-        )
+        assert output == fake_out

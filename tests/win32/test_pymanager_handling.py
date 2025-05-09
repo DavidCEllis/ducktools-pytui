@@ -162,6 +162,7 @@ def test_install(pymanager_executable):
         path=None,
         url='https://www.python.org/ftp/python/3.14.0/python-3.14.0b1t-amd64.zip',
         name='Python 3.14.0b1',
+        company="PythonCore",
         tag='3.14-dev-64',
         install_for=[
             "3.14.0b1-64",
