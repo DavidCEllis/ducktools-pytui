@@ -10,7 +10,7 @@ The easiest way to install ducktools.pytui is as a tool from PyPI using `uv` or 
 
 Run with `pytui` or `ducktools-pytui`.
 
-There is also now a zipapp available on 
+There is also now a zipapp available on
 [the releases page](https://github.com/DavidCEllis/ducktools-pytui/releases/latest)
 and should be usable as long as you have Python 3.8 or newer.
 
@@ -35,7 +35,16 @@ and should be usable as long as you have Python 3.8 or newer.
 * Install a runtime (Requires either the Windows Python Manager or UV to be available)
 * Uninstall a runtime (Only those managed by the Windows Python Manager or UV)
 
-### Basic Configuration ###
+### Notes on Defaults ###
+
+* venvs are created with `--upgrade-deps` where it exists
+  * If you don't need `pip` in your virtualenv, change the config for `include_pip` to `false`
+  * This will make venv creation **much** faster, but means `python -m pip` won't work, which is
+    why it is not the default
+* venvs are searched for based on the current working directory and parent directories.
+* 'Global' venvs are created in a ducktools specific folder
+
+## Basic Configuration ##
 
 Some configuration is available by editing the config.json file located here:
 
@@ -63,10 +72,10 @@ Some configuration is available by editing the config.json file located here:
   * `ducktools-env` is my project for managing these
   * Potentially that could gain a TUI, but I'm not sure I'd want to merge the two things
 * Handle Conda environments
-  * Conda environments are a completely separate ecosystem, 
+  * Conda environments are a completely separate ecosystem,
     while everything this supports uses the standard PyPI ecosystem
   * Supporting Conda would basically require a whole separate parallel set of commands
 * Manage `ducktools-pytui` specific runtimes
   * I don't want to add *yet another* place Python can be installed
-  * `ducktools-pytui` is intended to help manage the chaos of Python runtime installs and environments, 
-    not add a new dimension to it.
+  * `ducktools-pytui` is intended to help manage the chaos of Python runtime installs and environments,
+    not add a new dimension to it
