@@ -20,19 +20,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
 import sys
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 import pytest
 
 from ducktools.pytui.runtime_installers import uv
 
+collect_ignore = []
+
+if sys.platform != "win32":
+    collect_ignore.append("win32")
+
+
+@pytest.fixture(scope="function")
+def uv_executable():
+    with patch.object(uv.UVManager, "executable", new_callable=PropertyMock) as fake_uv:
+        fake_uv.return_value = "uv"
+        yield
+
+
 @pytest.fixture(scope="function")
 def uv_python_dir():
-    with patch.object(uv, "uv_python_dir") as fake_py_dir:
+    with patch.object(uv.UVManager, "runtime_folder", new_callable=PropertyMock) as fake_py_dir:
         if sys.platform == "win32":
             fake_py_dir.return_value = "C:\\Users\\ducks\\AppData\\Roaming\\uv\\python"
         else:
             fake_py_dir.return_value = "/home/david/.local/share/uv/python"
         yield
+
+

@@ -22,6 +22,7 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import json
 import os
 import os.path
 import shutil
@@ -168,6 +169,50 @@ def install_requirements(
     run(command)  # type: ignore
 
 
+def get_shell():
+    try:
+        shell_name, shell = shellingham.detect_shell()
+    except shellingham.ShellDetectionFailure:
+        if sys.platform == "win32":
+            shell_name, shell = None, None
+            # Check if there is a windows terminal default
+            localappdata = os.environ.get("LOCALAPPDATA", "")
+            winterm_cfg = os.path.join(
+                localappdata,
+                "Packages",
+                "Microsoft.WindowsTerminal_8wekyb3d8bbwe",
+                "LocalState",
+                "settings.json",
+            )
+
+            if os.path.exists(winterm_cfg):
+                with open(winterm_cfg, 'r') as f:
+                    data = json.load(f)
+                guid = data.get("defaultProfile")
+                profiles = data.get("profiles", {}).get("list")
+
+                if guid and profiles:
+                    for p in profiles:
+                        if p["guid"] == guid:
+                            shell = os.path.expandvars(p["commandline"])
+                            shell_name = os.path.splitext(os.path.basename(shell))[0]
+                            break
+
+            if shell is None:
+                # Backup - get "cmd.exe" path
+                shell = os.environ["COMSPEC"]
+                shell_name = os.path.splitext(os.path.basename(shell))[0]
+        else:
+            try:
+                shell = os.environ["SHELL"]
+            except KeyError:
+                raise RuntimeError(f"Shell detection failed")
+            else:
+                shell_name = os.path.basename(shell)
+
+    return shell_name, shell
+
+
 def launch_shell(venv: PythonVEnv) -> None:
     # Launch a shell with a virtual environment activated.
     env = os.environ.copy()
@@ -176,18 +221,8 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
     venv_bindir = os.path.dirname(venv.executable)
-    try:
-        shell_name, shell = shellingham.detect_shell()
-    except shellingham.ShellDetectionFailure:
-        if os.name == "posix":
-            shell = os.environ["SHELL"]
-            shell_name = os.path.basename(shell)
-        elif os.name == "nt":
-            # Almost certainly "cmd.exe"
-            shell = os.environ["COMSPEC"]
-            shell_name = os.path.splitext(os.path.basename(shell))[0]
-        else:
-            raise RuntimeError(f"Shell detection failed")
+
+    shell_name, shell = get_shell()
 
     # dedupe and construct the PATH for the shell here
     if sys.platform == "win32" and shell_name == "bash":
@@ -259,17 +294,17 @@ def launch_shell(venv: PythonVEnv) -> None:
         # Try to get the shell PS1 from subprocess
         prompt_getter = subprocess.run(
             [shell, "-ic", "echo $PS1"],
-            text=True, 
+            text=True,
             capture_output=True
         )
         shell_prompt = prompt_getter.stdout.strip()
-        
+
         if old_venv_prompt:
             shell_prompt = shell_prompt.removeprefix(old_venv_prompt)
-        
+
         if not shell_prompt:
             shell_prompt = "%n@%m %1~ %#"
-        
+
         shell_prompt = f"({venv_prompt}) {shell_prompt} "
         env["PS1"] = shell_prompt
         cmd = [shell, "--no-rcs"]

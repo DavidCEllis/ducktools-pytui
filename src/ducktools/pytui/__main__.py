@@ -40,20 +40,22 @@ def get_parser():
 
 
 def main():
-    # if sys.version_info < (3, 10):
-    #     v = sys.version_info
-    #     raise UnsupportedPythonError(
-    #         f"Python {v.major}.{v.minor}.{v.micro} is not supported. "
-    #         f"ducktools.pytui requires Python 3.10 or later."
-    #     )
+    if sys.version_info < (3, 8):
+        v = sys.version_info
+        raise UnsupportedPythonError(
+            f"Python {v.major}.{v.minor}.{v.micro} is not supported. "
+            f"ducktools.pytui requires Python 3.8 or later."
+        )
 
     if sys.argv[1:]:
         parser = get_parser()
         parser.parse_args()
 
     from .ui import ManagerApp
+    import asyncio
+
     app = ManagerApp()
-    app.run()
+    asyncio.run(app.run_async())
 
 
 if __name__ == "__main__":

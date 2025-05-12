@@ -22,42 +22,13 @@
 # SOFTWARE.
 from __future__ import annotations
 
-import sys
-from functools import lru_cache
+from unittest.mock import patch, PropertyMock
 
-from ducktools.pythonfinder import PythonInstall
+import pytest
+from ducktools.pytui.runtime_installers import pythoncore
 
-from .base import PythonListing, RuntimeManager
-
-# Windows python installer should come before UV if available
-if sys.platform == "win32":
-    from . import pythoncore
-    from . import uv
-else:
-    from . import uv
-
-
-@lru_cache(maxsize=None)
-def get_managers() -> list[RuntimeManager]:
-    return [
-        m() for m in RuntimeManager.available_managers if m.executable
-    ]
-
-
-def fetch_downloads() -> list[PythonListing]:
-    downloads = []
-    for m in get_managers():
-        downloads.extend(m.fetch_downloads())
-
-    return downloads
-
-
-def find_matching_listing(install: PythonInstall) -> PythonListing | None:
-    for manager in get_managers():
-        listing = manager.find_matching_listing(install)
-        if listing:
-            break
-    else:
-        listing = None
-
-    return listing
+@pytest.fixture(scope="function")
+def pymanager_executable():
+    with patch.object(pythoncore.PythonCoreManager, "executable", new_callable=PropertyMock) as fake_core:
+        fake_core.return_value = "pymanager.exe"
+        yield
