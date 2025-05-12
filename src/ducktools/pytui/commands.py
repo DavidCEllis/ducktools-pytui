@@ -193,8 +193,8 @@ def get_shell():
 
                 if guid and profiles:
                     for p in profiles:
-                        if p["guid"] == guid:
-                            shell = os.path.expandvars(p["commandline"])
+                        if p["guid"] == guid and (commandline := p.get("commandline")):
+                            shell = os.path.expandvars(commandline)
                             shell_name = os.path.splitext(os.path.basename(shell))[0]
                             break
 
@@ -206,7 +206,7 @@ def get_shell():
             try:
                 shell = os.environ["SHELL"]
             except KeyError:
-                raise RuntimeError(f"Shell detection failed")
+                raise RuntimeError("Shell detection failed")
             else:
                 shell_name = os.path.basename(shell)
 
