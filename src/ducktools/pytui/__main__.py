@@ -52,8 +52,10 @@ def main():
         parser.parse_args()
 
     from .ui import ManagerApp
+    import asyncio
+
     app = ManagerApp()
-    app.run()
+    asyncio.run(app.run_async())
 
 
 if __name__ == "__main__":
