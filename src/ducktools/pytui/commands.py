@@ -25,6 +25,7 @@ from __future__ import annotations
 import json
 import os
 import os.path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -156,7 +157,7 @@ def install_requirements(
     venv: PythonVEnv,
     requirements_path: str,
     no_deps: bool = False,
-):
+) -> None:
     command = [
         venv.executable,
         "-m", "pip",
@@ -169,7 +170,7 @@ def install_requirements(
     run(command)  # type: ignore
 
 
-def get_shell():
+def get_shell() -> tuple[str, str, list[str]]:
     try:
         shell_name, shell = shellingham.detect_shell()
     except shellingham.ShellDetectionFailure:
@@ -193,14 +194,23 @@ def get_shell():
 
                 if guid and profiles:
                     for p in profiles:
-                        if p["guid"] == guid and (commandline := p.get("commandline")):
-                            shell = os.path.expandvars(commandline)
-                            shell_name = os.path.splitext(os.path.basename(shell))[0]
-                            break
+                        if p["guid"] == guid:
+                            if (commandline := p.get("commandline")):
+                                shell_cmd, *_ = shlex.split(commandline, posix=False)  # Remove extra arguments
+                                shell = os.path.expandvars(shell_cmd).strip('"')  # Remove quotes around command
+                                shell_name = os.path.splitext(os.path.basename(shell_cmd))[0]
+                                break
 
             if shell is None:
-                # Backup - get "cmd.exe" path
-                shell = os.environ["COMSPEC"]
+                # Backups by priority
+                # shutil.which("pwsh.exe") - try to find powershell core
+                # shutil.which("powershell.exe") - try to find windows powershell
+                # os.environ["COMSPEC"] - Get the path to CMD
+                shell = (
+                    shutil.which("pwsh.exe")
+                    or shutil.which("powershell.exe")
+                    or os.environ["COMSPEC"]
+                )
                 shell_name = os.path.splitext(os.path.basename(shell))[0]
         else:
             try:
@@ -280,9 +290,7 @@ def launch_shell(venv: PythonVEnv) -> None:
 
     elif shell_name == "powershell":
         rcfile = get_shell_script("activate_pytui.ps1")
-        with open(rcfile, encoding="utf8") as f:
-            prompt_command = f.read()
-        cmd = [shell, "-NoExit", prompt_command]
+        cmd = [shell, "-NoExit", rcfile]
 
     elif shell_name == "bash":
         # Invoke our custom activation script as the rcfile
