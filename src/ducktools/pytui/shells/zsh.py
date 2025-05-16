@@ -23,9 +23,10 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 
-from ._shell_core import Shell, get_shell_script
+from ._shell_core import Shell
 
 
 class ZshShell(Shell):
@@ -34,16 +35,18 @@ class ZshShell(Shell):
     exclude = (sys.platform == "win32")
 
     def get_venv_shell_command(self, env):
-        zshrc_script = get_shell_script("zsh/.zshrc")
+        base_prompt = "%n@%m:%~/ >"  # The SUSE prompt theme
+        venv_prompt = env["PYTUI_VIRTUAL_ENV_PROMPT"]
+        prompt = f"({venv_prompt}) {base_prompt} "
 
-        cmd = [self.path]
+        cmd = [self.path, "--no-rcs"]
         # for zsh, make the folder to check for .zshrc our script
         # That sets the extra environment variables
         env_updates = {
-            "ZDOTDIR": os.path.dirname(zshrc_script),
+            "PATH": env["PYTUI_PATH"],
+            "VIRTUAL_ENV": env["PYTUI_VIRTUAL_ENV"],
+            "VIRTUAL_ENV_PROMPT": env["PYTUI_VIRTUAL_ENV_PROMPT"],
+            "PS1": prompt,
         }
-
-        if old_zdotdir := env.get("ZDOTDIR"):
-            env["OLD_ZDOTDIR"] = old_zdotdir
 
         return cmd, env_updates
