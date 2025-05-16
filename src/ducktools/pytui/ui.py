@@ -253,7 +253,7 @@ class VEnvTable(DataTable):
 
     def setup_columns(self):
         self.cursor_type = "row"
-        keys = self.add_columns("Version", "Global", "Environment Path", "Runtime Path")
+        self.add_columns("Version", "Global", "Environment Path", "Runtime Path")
 
     @staticmethod
     def _keysort(rowtuple):
@@ -634,7 +634,7 @@ class ManagerApp(App):
             )
             return
 
-        delete_venv(venv.folder)
+        delete_venv(venv)
         self._venv_table.remove_venv(venv)
         self._venv_dependency_cache.pop(venv.folder, None)
 
@@ -655,7 +655,7 @@ class ManagerApp(App):
             loop = asyncio.get_running_loop()
 
             try:
-                result = await loop.run_in_executor(None, runtime.install)
+                result = await loop.run_in_executor(None, runtime.install)  # noqa
                 # self.notify(result.stderr)
             except (FileNotFoundError, subprocess.CalledProcessError) as e:
                 self.notify(
@@ -702,7 +702,7 @@ class ManagerApp(App):
         loop = asyncio.get_running_loop()
         self._runtime_table.loading = True
         try:
-            result = await loop.run_in_executor(None, listing.uninstall)
+            result = await loop.run_in_executor(None, listing.uninstall)  # noqa
             # self.notify(result.stderr)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             self.notify(

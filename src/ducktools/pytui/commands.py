@@ -148,8 +148,8 @@ def create_venv(
     return PythonVEnv.from_cfg(config_path)
 
 
-def delete_venv(venv_path: str):
-    shutil.rmtree(venv_path, ignore_errors=True)
+def delete_venv(venv: PythonVEnv) -> None:
+    shutil.rmtree(venv.folder, ignore_errors=True)
 
 
 def install_requirements(
