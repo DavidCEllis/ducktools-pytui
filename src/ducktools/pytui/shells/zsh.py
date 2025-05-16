@@ -40,8 +40,8 @@ class ZshShell(Shell):
         prompt = f"({venv_prompt}) {base_prompt} "
 
         cmd = [self.path, "--no-rcs"]
-        # for zsh, make the folder to check for .zshrc our script
-        # That sets the extra environment variables
+
+        # Set all environment variables here
         env_updates = {
             "PATH": env["PYTUI_PATH"],
             "VIRTUAL_ENV": env["PYTUI_VIRTUAL_ENV"],
