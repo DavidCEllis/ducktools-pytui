@@ -23,9 +23,10 @@ and should be usable as long as you have Python 3.8 or newer.
 * List Python Virtual Environments relative to the current folder
 * List Python Runtimes discovered by [ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
 * Launch a Terminal with a selected venv activated
-  * Currently only 'tested' with bash (and limited git bash on Windows), zsh (on macos), powershell and cmd
-  * Other shells will almost certainly break the environment variable changes
-  * This isn't the standard `activate` script, as it puts PyTUI in the background and launches a new shell
+  * Currently only bash (and git bash on Windows), zsh, powershell and cmd are supported
+  * Change the launch shell with the `pytui --setshell <shell>` command
+    * `pytui --setshell bash` will set the shell to `bash` if it is on PATH
+    * `pytui --setshell
   * Use `exit` to close the shell and return to PyTUI
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime

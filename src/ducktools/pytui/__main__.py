@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse
+import os
 import sys
 
 from ._version import __version__
@@ -31,13 +31,20 @@ class UnsupportedPythonError(Exception):
 
 
 def get_parser():
+    import argparse
     parser = argparse.ArgumentParser(
         prog="ducktools-pytui",
         description="Prototype Python venv and runtime manager",
     )
     parser.add_argument("-V", "--version", action="version", version=__version__)
     parser.add_argument(
-        "--getconfig", action="store_true", help="print the path to the config file"
+        "--configpath", action="store_true", help="print the path to the config file"
+    )
+    parser.add_argument(
+        "--setshell",
+        action="store",
+        metavar="SHELL_NAME",
+        help="Set the shell to be used for launching activated environments"
     )
     return parser
 
@@ -54,11 +61,21 @@ def main():
         parser = get_parser()
         args = parser.parse_args()
 
-        if args.getconfig:
+        if args.configpath:
             from .platform_paths import CONFIG_FILE
             sys.stdout.write(CONFIG_FILE)
             sys.stdout.write("\n")
             return 0
+        elif shell_path := args.setshell:
+            from .config import Config
+            config = Config.from_file()
+            out_shell = config.set_shell(shell_path)
+            if out_shell:
+                print(f"'{out_shell}' will now be used to launch activated shells")
+                return
+            else:
+                print(f"'{shell_path}' could not be found or is an unsupported shell type")
+                return
 
     from .ui import ManagerApp
     import asyncio

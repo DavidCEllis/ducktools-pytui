@@ -89,6 +89,9 @@ class Shell(Prefab):
     @classmethod
     def from_path(cls, path: str) -> Shell | None:
         name = os.path.basename(path)
+        if sys.platform == "win32":
+            name = name.lower()  # .EXE can come from which
+
         shell_type = Shell.registry.get(name)
         if shell_type:
             return shell_type(path)

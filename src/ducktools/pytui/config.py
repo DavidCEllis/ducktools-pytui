@@ -29,6 +29,13 @@ import sys
 from typing import ClassVar
 
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
+from ducktools.lazyimporter import LazyImporter, ModuleImport
+
+_laz = LazyImporter(
+    [
+        ModuleImport("shutil"),
+    ]
+)
 
 from .shells import Shell
 
@@ -73,6 +80,16 @@ class Config(Prefab, kw_only=True):
             shell = Shell.from_path(self.shell_path)
 
         return shell
+
+    def set_shell(self, shell_path):
+        if not os.path.isfile(shell_path):
+            shell_path = _laz.shutil.which(shell_path)
+
+        if shell_path and Shell.from_path(shell_path) is not None:
+            self.shell_path = shell_path
+            self.write_config()
+
+        return shell_path
 
     def write_config(self):
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
