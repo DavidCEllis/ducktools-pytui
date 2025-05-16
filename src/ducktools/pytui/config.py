@@ -28,7 +28,7 @@ import os.path
 import sys
 from typing import ClassVar
 
-from ducktools.classbuilder.prefab import Prefab, as_dict, attribute, is_prefab_instance
+from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
 
 from .shells import Shell
 
