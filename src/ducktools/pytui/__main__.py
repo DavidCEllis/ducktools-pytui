@@ -36,6 +36,9 @@ def get_parser():
         description="Prototype Python venv and runtime manager",
     )
     parser.add_argument("-V", "--version", action="version", version=__version__)
+    parser.add_argument(
+        "--getconfig", action="store_true", help="print the path to the config file"
+    )
     return parser
 
 
@@ -49,14 +52,21 @@ def main():
 
     if sys.argv[1:]:
         parser = get_parser()
-        parser.parse_args()
+        args = parser.parse_args()
+
+        if args.getconfig:
+            from .platform_paths import CONFIG_FILE
+            sys.stdout.write(CONFIG_FILE)
+            sys.stdout.write("\n")
+            return 0
 
     from .ui import ManagerApp
     import asyncio
 
     app = ManagerApp()
     asyncio.run(app.run_async())
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

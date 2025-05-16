@@ -43,6 +43,14 @@ and should be usable as long as you have Python 3.8 or newer.
     why it is not the default
 * venvs are searched for based on the current working directory and parent directories.
 * 'Global' venvs are created in a ducktools specific folder
+* Shell detection is done on first launch and thereafter stored in the config file
+  * If a `SHELL` environment variable exists this will be checked first
+    * If it is a known shell it will be used, otherwise it will be ignored
+  * If a shell is not found PATH will be searched for known shells
+    * On windows the order of search is: pwsh.exe, powershell.exe, cmd.exe
+      * `COMSPEC` will be checked if none of these are found.
+    * On other platforms this is: zsh, bash
+      * An error will be raised if neither is found
 
 ## Basic Configuration ##
 

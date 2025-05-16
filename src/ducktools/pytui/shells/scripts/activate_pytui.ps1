@@ -10,3 +10,8 @@ function global:prompt {
 function deactivate {
     Exit 0
 }
+
+# Set the new environment variables from the PYTUI versions.
+$env:PATH = $env:PYTUI_PATH
+$env:VIRTUAL_ENV = $env:PYTUI_VIRTUAL_ENV
+$env:VIRTUAL_ENV_PROMPT = $env:PYTUI_VIRTUAL_ENV_PROMPT

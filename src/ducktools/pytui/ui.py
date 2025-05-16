@@ -520,10 +520,15 @@ class ManagerApp(App):
     def action_activated_shell(self):
         venv = self.selected_venv
         if venv is None:
+            self.notify("No VEnv selected")
+            return
+
+        if self.config.shell is None:
+            self.notify("Failed to find known shell on PATH")
             return
 
         with self.suspend():
-            launch_shell(venv)
+            launch_shell(venv, self.config.shell)
 
         # Redraw
         self.refresh()
