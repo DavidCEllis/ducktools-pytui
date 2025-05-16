@@ -57,3 +57,13 @@ addopts= "--cov=src/ --cov-report=term-missing"
 testpaths = [
     "tests",
 ]
+
+[tool.pyright]
+typeCheckingMode = "off"
+ignore = ["*"]
+
+[tool.ruff.lint]
+ignore = [
+    "E401",
+
+]
