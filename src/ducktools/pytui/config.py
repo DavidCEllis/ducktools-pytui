@@ -31,19 +31,18 @@ from typing import ClassVar
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
 from ducktools.lazyimporter import LazyImporter, ModuleImport
 
-_laz = LazyImporter(
-    [
-        ModuleImport("shutil"),
-    ]
-)
-
 from .shells import Shell
-
 
 from .platform_paths import (
     CONFIG_FILE, GLOBAL_VENV_FOLDER,
 )
 
+
+_laz = LazyImporter(
+    [
+        ModuleImport("shutil"),
+    ]
+)
 
 if sys.platform == "win32":
     SUPPORTED_SHELLS = [
