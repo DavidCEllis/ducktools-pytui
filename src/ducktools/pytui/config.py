@@ -25,7 +25,6 @@ from __future__ import annotations
 import json
 import os
 import os.path
-import sys
 from typing import ClassVar
 
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
@@ -44,24 +43,12 @@ _laz = LazyImporter(
     ]
 )
 
-if sys.platform == "win32":
-    SUPPORTED_SHELLS = [
-        "pwsh",  # New powershell
-        "powershell",
-        "cmd",
-        "bash",
-    ]
-else:
-    SUPPORTED_SHELLS = [
-        "zsh",
-        "bash",
-]
-
 
 class Config(Prefab, kw_only=True):
     VENV_SEARCH_MODES: ClassVar[set[str]] = {
         "cwd", "parents", "recursive", "recursive_parents"
     }
+
     config_file: str = attribute(default=CONFIG_FILE, serialize=False)
     venv_search_mode: str = "parents"
     include_pip: bool = True
@@ -80,7 +67,7 @@ class Config(Prefab, kw_only=True):
 
         return shell
 
-    def set_shell(self, shell_path):
+    def set_shell(self, shell_path: str) -> str | None:
         if not os.path.isfile(shell_path):
             shell_path = _laz.shutil.which(shell_path)
 
@@ -90,7 +77,7 @@ class Config(Prefab, kw_only=True):
 
         return shell_path
 
-    def write_config(self):
+    def write_config(self) -> None:
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
         data = as_dict(self)
 
@@ -98,7 +85,7 @@ class Config(Prefab, kw_only=True):
             json.dump(data, f, indent=4)
 
     @classmethod
-    def from_file(cls, config_file=CONFIG_FILE):
+    def from_file(cls, config_file=CONFIG_FILE) -> Config:
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
                 try:
