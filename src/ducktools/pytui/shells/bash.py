@@ -90,7 +90,7 @@ class GitBashShell(BashShell):
 
         components = [new_venv_bindir, *path.split(":")]
         for p in components:
-            p = p.removesuffix("/")  # Remove trailing slash
+            p = p.rstrip("/")  # Remove trailing slash
             if p and p not in deduped_path:
                 deduped_path.append(p)
 

@@ -83,7 +83,7 @@ class Shell(Prefab):
         components = [venv_path, *path.split(os.pathsep)]
         for p in components:
             # Remove a trailing \ or / if it exists
-            p = p.removesuffix(os.path.sep)
+            p = p.rstrip(os.path.sep)
             if p and p not in deduped_path:
                 deduped_path.append(p)
 
