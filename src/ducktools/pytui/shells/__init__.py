@@ -29,4 +29,4 @@ from ._shell_core import get_shell_script as get_shell_script
 if sys.platform == "win32":
     from . import powershell, cmd, bash  # noqa
 else:
-    from . import zsh, bash  # noqa
+    from . import bash, zsh  # noqa
