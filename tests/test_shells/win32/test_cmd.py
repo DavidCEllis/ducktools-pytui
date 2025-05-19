@@ -23,25 +23,25 @@
 from __future__ import annotations
 
 
-from ducktools.pytui.shells import Shell
-from ducktools.pytui.shells import cmd
+from ducktools.pytui.shells import _core as core, cmd
+
+
+CMD_PATH = R"C:\Windows\System32\cmd.exe"
 
 
 def test_registered():
-    assert cmd.CMDShell.bin_name in Shell.registry
-    assert cmd.CMDShell is Shell.registry[cmd.CMDShell.bin_name]
+    assert cmd.CMDShell.bin_name in core.Shell.registry
+    assert cmd.CMDShell is core.Shell.registry[cmd.CMDShell.bin_name]
 
 
 def test_frompath():
-    cmd_path = R"C:\Windows\System32\cmd.exe"
-    assert Shell.from_path(cmd_path) == cmd.CMDShell(cmd_path)
+    assert core.Shell.from_path(CMD_PATH) == cmd.CMDShell(CMD_PATH)
 
 
 def test_get_venv_shell_command():
-    cmd_path = R"C:\Windows\System32\cmd.exe"
     venv = R"C:\Users\David\Source\result\.venv"
     path = (
-        R"C:\Users\David\Source\result\.venv;"
+        R"C:\Users\David\Source\result\.venv\Scripts;"
         R"C:\Windows\system32;"
         R"C:\Users\David\.local\bin;"
         R"C:\Program Files\Github CLI"
@@ -55,11 +55,11 @@ def test_get_venv_shell_command():
         "PYTUI_VIRTUAL_ENV_PROMPT": prompt,
     }
 
-    cmdshell = cmd.CMDShell(cmd_path)
+    cmdshell = cmd.CMDShell(CMD_PATH)
 
     shell_cmd, env_updates = cmdshell.get_venv_shell_command(env)
 
-    assert shell_cmd == [cmd_path, "/k"]
+    assert shell_cmd == [CMD_PATH, "/k"]
     assert env_updates == {
         "PATH": path,
         "VIRTUAL_ENV": venv,

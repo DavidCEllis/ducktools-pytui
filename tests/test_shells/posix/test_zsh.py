@@ -21,30 +21,3 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import annotations
-
-import sys
-
-from ._core import Shell
-
-
-class ZshShell(Shell):
-    name = "Z shell"
-    bin_name = "zsh"
-    exclude = (sys.platform == "win32")
-
-    def get_venv_shell_command(self, env):
-        base_prompt = "%n@%m:%~/ >"  # The SUSE prompt theme
-        venv_prompt = env["PYTUI_VIRTUAL_ENV_PROMPT"]
-        prompt = f"({venv_prompt}) {base_prompt} "
-
-        cmd = [self.path, "--no-rcs"]
-
-        # Set all environment variables here
-        env_updates = {
-            "PATH": env["PYTUI_PATH"],
-            "VIRTUAL_ENV": env["PYTUI_VIRTUAL_ENV"],
-            "VIRTUAL_ENV_PROMPT": env["PYTUI_VIRTUAL_ENV_PROMPT"],
-            "PS1": prompt,
-        }
-
-        return cmd, env_updates

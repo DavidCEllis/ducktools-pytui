@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import sys
 
-from ._shell_core import Shell, get_shell_script
+from ._core import Shell, get_shell_script
 
 
 class PowerShell(Shell):  # This should be PowershellShell but no

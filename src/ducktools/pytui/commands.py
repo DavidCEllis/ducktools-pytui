@@ -121,7 +121,8 @@ def launch_shell(venv: PythonVEnv, shell: Shell) -> None:
     venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
     venv_bindir = os.path.dirname(venv.executable)
 
-    venv_env_path = shell.get_deduped_path(env.get("PATH", ""), venv_bindir)
+    base_path = shell.get_env_path()
+    venv_env_path = shell.get_deduped_path(base_path, venv_bindir)
 
     # Set the PYTUI versions of PATH/VIRTUAL_ENV/VIRTUAL_ENV_PROMPT
     # These are copied over in the activation script

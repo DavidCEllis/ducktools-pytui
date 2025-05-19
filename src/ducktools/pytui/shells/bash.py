@@ -26,7 +26,7 @@ import os
 import subprocess
 import sys
 
-from ._shell_core import Shell, get_shell_script
+from ._core import Shell, get_shell_script
 
 
 
@@ -53,7 +53,31 @@ class GitBashShell(BashShell):
     bin_name = "bash.exe"
     exclude = (sys.platform != "win32")
 
-    def get_deduped_path(self, path, venv_dir):
+    def get_env_path(self) -> str:
+        """
+        Get the git bash environment Path
+
+        This requires launching the shell and echoing
+        the default $PATH variable
+
+        :return: Git bash formatted PATH variable
+        """
+        prompt_getter = subprocess.run(
+            [self.path, "-ic", "echo $PATH"],
+            text=True,
+            capture_output=True
+        )
+        return prompt_getter.stdout.strip()
+
+    @staticmethod
+    def get_deduped_path(path, venv_dir):
+        """
+        Special dedupe handling for git bash PATH details
+
+        :param path: git bash $PATH output
+        :param venv_dir: regular windows style path to VENV
+        :return: new git bash style path without duplicates
+        """
         # The PATH environment variable on git bash needs to look more like a linux path
         drive, venv_dir = os.path.splitdrive(venv_dir)
         if ":" in drive:
@@ -62,16 +86,9 @@ class GitBashShell(BashShell):
         venv_dir = venv_dir.replace("\\", "/")
         new_venv_bindir = "".join([drive, venv_dir])
 
-        # Get the current git bash PATH
-        prompt_getter = subprocess.run(
-            [self.path, "-ic", "echo $PATH"],
-            text=True,
-            capture_output=True
-        )
-        git_bash_path = prompt_getter.stdout.strip()
         deduped_path = []
 
-        components = [new_venv_bindir, *git_bash_path.split(":")]
+        components = [new_venv_bindir, *path.split(":")]
         for p in components:
             p = p.removesuffix("/")  # Remove trailing slash
             if p and p not in deduped_path:

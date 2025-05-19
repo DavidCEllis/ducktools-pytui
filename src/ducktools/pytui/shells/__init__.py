@@ -23,8 +23,8 @@
 from __future__ import annotations
 import sys
 
-from ._shell_core import Shell as Shell
-from ._shell_core import get_shell_script as get_shell_script
+from ._core import Shell as Shell
+from ._core import get_shell_script as get_shell_script
 
 if sys.platform == "win32":
     from . import powershell, cmd, bash  # noqa

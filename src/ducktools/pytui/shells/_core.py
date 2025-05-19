@@ -51,7 +51,19 @@ class Shell(Prefab):
     def get_venv_shell_command(self, env: dict[str, str]) -> tuple[list[str], dict[str, str]]:
         raise NotImplementedError("get_venv_shell_command must be implemented in subclasses")
 
-    def get_deduped_path(self, path: str, venv_path: str) -> list[str]:
+    def get_env_path(self) -> str:
+        """
+        Get the PATH environment variable
+
+        This exists as a method because some shells will have specific modified PATH
+        variables.
+
+        :return: PATH variable string
+        """
+        return os.environ.get("PATH", "")
+
+    @staticmethod
+    def get_deduped_path(path: str, venv_path: str) -> list[str]:
         """
         Get the deduplicated PATH for an activated VENV
 

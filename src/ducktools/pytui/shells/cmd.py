@@ -22,7 +22,7 @@
 # SOFTWARE.
 from __future__ import annotations
 
-from ._shell_core import Shell
+from ._core import Shell
 
 
 class CMDShell(Shell):

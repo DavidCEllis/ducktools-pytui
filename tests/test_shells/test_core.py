@@ -29,7 +29,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ducktools.pytui.shells import _shell_core as core, get_shell_script
+from ducktools.pytui.shells import _core as core, get_shell_script
 from ducktools.pytui.shells.bash import BashShell, GitBashShell
 
 
