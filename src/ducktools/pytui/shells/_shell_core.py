@@ -28,13 +28,11 @@ import sys
 from typing import ClassVar
 
 from ducktools.classbuilder.prefab import Prefab
-from ducktools.lazyimporter import LazyImporter, ModuleImport
 
+
+from .. import _lazy_imports as _laz
 from .._version import __version__
 from ..platform_paths import PYTUI_FOLDER, SHELL_SCRIPT_FOLDER
-
-
-_laz = LazyImporter([ModuleImport("zipfile")])
 
 
 class Shell(Prefab):

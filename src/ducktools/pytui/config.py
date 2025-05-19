@@ -25,22 +25,15 @@ from __future__ import annotations
 import json
 import os
 import os.path
+import shutil
 from typing import ClassVar
 
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
-from ducktools.lazyimporter import LazyImporter, ModuleImport
 
 from .shells import Shell
 
 from .platform_paths import (
     CONFIG_FILE, GLOBAL_VENV_FOLDER,
-)
-
-
-_laz = LazyImporter(
-    [
-        ModuleImport("shutil"),
-    ]
 )
 
 
@@ -69,7 +62,7 @@ class Config(Prefab, kw_only=True):
 
     def set_shell(self, shell_path: str) -> str | None:
         if not os.path.isfile(shell_path):
-            shell_path = _laz.shutil.which(shell_path)
+            shell_path = shutil.which(shell_path)
 
         if shell_path and Shell.from_path(shell_path) is not None:
             self.shell_path = shell_path

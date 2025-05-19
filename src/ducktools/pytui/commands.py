@@ -22,23 +22,17 @@
 # SOFTWARE.
 from __future__ import annotations
 
-import json
 import os
 import os.path
-import shlex
 import shutil
 import subprocess
-import sys
 
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import PythonVEnv
-from ducktools.lazyimporter import LazyImporter, ModuleImport
-
 
 from .shells import Shell
 from .util import run
 
-_laz = LazyImporter([ModuleImport("zipfile")])
 
 _shell_scriptfiles = [
     "activate_pytui.ps1",

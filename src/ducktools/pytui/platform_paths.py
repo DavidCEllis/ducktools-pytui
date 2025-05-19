@@ -22,6 +22,7 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import shutil
 import sys
 import os, os.path
 
@@ -68,7 +69,6 @@ else:
 
     # If you used a version prior to v0.1.3
     if os.path.exists(OLD_FOLDER):
-        import shutil
 
         # Move the folder if the new one doesn't already exist, otherwise leave it
         if not os.path.exists(CONFIG_FOLDER):
