@@ -24,9 +24,9 @@ and should be usable as long as you have Python 3.8 or newer.
 * List Python Runtimes discovered by [ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
 * Launch a Terminal with a selected venv activated
   * Currently only bash (and git bash on Windows), zsh, powershell and cmd are supported
+    * zsh and cmd only have basic support
   * Change the launch shell with the `pytui --setshell <shell>` command
-    * `pytui --setshell bash` will set the shell to `bash` if it is on PATH
-    * `pytui --setshell
+    * For example `pytui --setshell bash` will set the shell to `bash` if it is on PATH
   * Use `exit` to close the shell and return to PyTUI
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
