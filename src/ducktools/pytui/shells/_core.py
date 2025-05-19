@@ -48,7 +48,10 @@ class Shell(Prefab):
         if not cls.exclude:
             Shell.registry[cls.bin_name] = cls
 
-    def get_venv_shell_command(self, env: dict[str, str]) -> tuple[list[str], dict[str, str]]:
+    def get_venv_shell_command(
+        self,
+        env: dict[str, str]
+    ) -> tuple[list[str], dict[str, str]]:  # pragma: no cover
         raise NotImplementedError("get_venv_shell_command must be implemented in subclasses")
 
     def get_env_path(self) -> str:
