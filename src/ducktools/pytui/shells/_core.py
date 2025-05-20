@@ -160,9 +160,13 @@ def get_shell_script(filename: str):
 
             # Get the zipfile path to open and the internal shell script folder
             zipfile_path = os.path.abspath(sys.argv[0])
+
+            # Python 3.8 lacks .removeprefix
             scripts_path = os.path.join(
                 os.path.dirname(__file__), "scripts"
-            ).removeprefix(zipfile_path + os.sep)
+            )
+            if scripts_path.startswith(zipfile_path + os.sep):
+                scripts_path = scripts_path[len(zipfile_path + os.sep):]
 
             if sys.platform == "win32":
                 # Zipfile needs '/' for internal paths
