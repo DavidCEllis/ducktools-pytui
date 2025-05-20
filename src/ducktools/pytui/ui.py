@@ -397,6 +397,7 @@ class RuntimeTable(DataTable):
                     key=install.executable
                 )
         finally:
+            self.refresh_bindings()
             self.loading = False
 
 
