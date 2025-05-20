@@ -171,7 +171,10 @@ def main():
         import asyncio
 
         app = ManagerApp()
-        asyncio.run(app.run_async())
+        if sys.version_info >= (3, 10):
+            asyncio.run(app.run_async())
+        else:
+            app.run()
 
     return 0
 
