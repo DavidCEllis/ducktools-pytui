@@ -21,3 +21,56 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import annotations
+
+from unittest.mock import patch
+
+from ducktools.pytui.shells import _core as core, bash
+
+BASH_PATH = "/bin/bash"
+
+def test_registered():
+    assert bash.BashShell.bin_name in core.Shell.registry
+    assert bash.BashShell is core.Shell.registry[bash.BashShell.bin_name]
+
+
+def test_frompath():
+    assert core.Shell.from_path(BASH_PATH) == bash.BashShell(BASH_PATH)
+
+
+def test_get_venv_shell_command():
+    venv = "/home/david/src/ducktools-pytui/.venv"
+    bash_path = (
+        "/home/david/src/ducktools-pytui/.venv"
+        "/home/david/.pyenv/shims:"
+        "/home/david/.cargo/bin:"
+        "/home/david/.pyenv/bin:"
+        "/home/david/.local/bin:"
+        "/home/david/bin:"
+        "/usr/local/sbin:"
+        "/usr/local/bin:"
+        "/usr/sbin:"
+        "/usr/bin:"
+        "/sbin:"
+        "/bin:"
+        "/usr/games:"
+        "/usr/local/games:"
+        "/snap/bin"
+    )
+    prompt = "pytui: .venv"
+
+    env = {
+        "PYTUI_PATH": bash_path,
+        "PYTUI_VIRTUAL_ENV": venv,
+        "PYTUI_VIRTUAL_ENV_PROMPT": prompt,
+    }
+
+    with patch("ducktools.pytui.shells.bash.get_shell_script") as script_mock:
+        def identity(x): return x
+        script_mock.side_effect = identity
+
+        shell = bash.BashShell(BASH_PATH)
+
+        cmd, env_updates = shell.get_venv_shell_command(env)
+
+        assert cmd == [BASH_PATH, "--rcfile", "activate_pytui.sh"]
+        assert env_updates == {}  # environment variables are set in the script
