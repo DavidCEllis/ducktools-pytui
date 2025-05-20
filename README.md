@@ -25,8 +25,6 @@ and should be usable as long as you have Python 3.8 or newer.
 * Launch a Terminal with a selected venv activated
   * Currently only bash (and git bash on Windows), zsh, powershell and cmd are supported
     * zsh and cmd only have basic support
-  * Change the launch shell with the `pytui --setshell <shell>` command
-    * For example `pytui --setshell bash` will set the shell to `bash` if it is on PATH
   * Use `exit` to close the shell and return to PyTUI
 * Launch a REPL with the selected venv
 * Launch a REPL with the selected runtime
@@ -36,23 +34,6 @@ and should be usable as long as you have Python 3.8 or newer.
 * Install a runtime (Requires either the Windows Python Manager or UV to be available)
 * Uninstall a runtime (Only those managed by the Windows Python Manager or UV)
 
-### Notes on Defaults ###
-
-* venvs are created with `--upgrade-deps` where it exists
-  * If you don't need `pip` in your virtualenv, change the config for `include_pip` to `false`
-  * This will make venv creation **much** faster, but means `python -m pip` won't work, which is
-    why it is not the default
-* venvs are searched for based on the current working directory and parent directories.
-* 'Global' venvs are created in a ducktools specific folder
-* Shell detection is done on first launch and thereafter stored in the config file
-  * If a `SHELL` environment variable exists this will be checked first
-    * If it is a known shell it will be used, otherwise it will be ignored
-  * If a shell is not found PATH will be searched for known shells
-    * On windows the order of search is: pwsh.exe, powershell.exe, cmd.exe
-      * `COMSPEC` will be checked if none of these are found.
-    * On other platforms this is: zsh, bash
-      * An error will be raised if neither is found
-
 ## Basic Configuration ##
 
 Some configuration is available by editing the config.json file located here:
@@ -60,7 +41,16 @@ Some configuration is available by editing the config.json file located here:
 * Windows: `%LOCALAPPDATA%\ducktools\pytui\config.json`
 * Linux/Mac/Other: `~/.config/ducktools/pytui/config.json`
 
+Config can be seen and edited from the commandline with the `config` subcommand.
+
+Some example commands:
+
+* `pytui config` - Shows the location of the config file and its current state
+* `pytui config -h` - Shows the options for modifying the config file
+* `pytui config --exclude-pip` - Prevent `pip` from being included
+
 ### Config Values ###
+
 * `venv_search_mode` - Where to search for VEnv folders
   * `"cwd"` - Search in the working directory only
   * `"parents"` - Search in the working directory and each parent folder (default)
@@ -69,6 +59,20 @@ Some configuration is available by editing the config.json file located here:
 * `include_pip` - Whether to include `pip` (and `setuptools` where appropriate) in created VEnvs (default: `True`)
 * `latest_pip` - Download the latest `pip` for Python versions where it is available (default: `True`)
 * `global_venv_folder` - The folder to use for global pytui venvs, `~/.local/share/ducktools/pytui/venvs` by default
+* `shell_path` - Path to the shell used to launch activated venvs
+
+### Shell Discovery ###
+
+By default PyTUI will check your `$SHELL` variable if it is set for the path to your default shell.
+If this exists and is a supported shell it will be used. Otherwise it will search `PATH` for shells
+in this order:
+
+* Windows: `pwsh.exe`, `powershell.exe`, `cmd.exe`, `bash.exe`
+* Non-Windows: `bash`, `zsh`
+
+On Windows as a last resort if none of these are found it will search for the `COMSPEC` environment
+variable to find a path to `cmd.exe`.
+
 
 ### Possible Extras ###
 
