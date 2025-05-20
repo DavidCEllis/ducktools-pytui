@@ -138,6 +138,7 @@ def get_shell_script(filename: str):
     if os.path.exists(__file__):
         # Use them from the source folder if available
         shell_script_folder = os.path.join(os.path.dirname(__file__), "scripts")
+
     elif os.path.isfile(sys.argv[0]):  # zipapp potentially
         # In a zipapp they may not be, so extract them
         shell_script_folder = SHELL_SCRIPT_FOLDER
@@ -178,13 +179,20 @@ def get_shell_script(filename: str):
                 path=SHELL_SCRIPT_FOLDER,
                 members=shell_script_files,
             )
+
             # Move the files into the appropriate folder
             shutil.move(
                 os.path.join(SHELL_SCRIPT_FOLDER, scripts_path),
                 PYTUI_FOLDER,
             )
-            # Clean out the extracted empty folders
-            shutil.rmtree(os.path.join(SHELL_SCRIPT_FOLDER, "ducktools"))
+            # Clean out the extracted empty folder
+            shutil.rmtree(SHELL_SCRIPT_FOLDER)
+
+            # rename "scripts" to "shell_scripts"
+            shutil.move(
+                os.path.join(PYTUI_FOLDER, "scripts"),
+                shell_script_folder,
+            )
 
             with open(shell_script_verfile, 'w') as f:
                 f.write(__version__)
