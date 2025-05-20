@@ -163,8 +163,9 @@ def get_shell_script(filename: str):
 
             # Python 3.8 lacks .removeprefix
             scripts_path = os.path.join(
-                os.path.dirname(__file__), "scripts"
+                os.path.dirname(os.path.abspath(__file__)), "scripts"
             )
+
             if scripts_path.startswith(zipfile_path + os.sep):
                 scripts_path = scripts_path[len(zipfile_path + os.sep):]
 
