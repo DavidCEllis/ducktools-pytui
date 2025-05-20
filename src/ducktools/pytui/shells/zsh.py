@@ -27,7 +27,7 @@ import sys
 from ._core import Shell
 
 
-class ZshShell(Shell):
+class ZShell(Shell):
     name = "Z shell"
     bin_name = "zsh"
     exclude = (sys.platform == "win32")

@@ -31,12 +31,12 @@ ZSH_PATH = "/bin/zsh"
 
 
 def test_registered():
-    assert zsh.ZshShell.bin_name in core.Shell.registry
-    assert zsh.ZshShell is core.Shell.registry[zsh.ZshShell.bin_name]
+    assert zsh.ZShell.bin_name in core.Shell.registry
+    assert zsh.ZShell is core.Shell.registry[zsh.ZShell.bin_name]
 
 
 def test_frompath():
-    assert core.Shell.from_path(ZSH_PATH) == zsh.ZshShell(ZSH_PATH)
+    assert core.Shell.from_path(ZSH_PATH) == zsh.ZShell(ZSH_PATH)
 
 
 def test_get_venv_shell_command():
@@ -66,7 +66,7 @@ def test_get_venv_shell_command():
         "PYTUI_VIRTUAL_ENV_PROMPT": prompt,
     }
 
-    shell = zsh.ZshShell(ZSH_PATH)
+    shell = zsh.ZShell(ZSH_PATH)
 
     cmd, env_updates = shell.get_venv_shell_command(env)
 
