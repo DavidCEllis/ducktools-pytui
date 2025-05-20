@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os.path
 import sys
 
 from ._version import __version__
@@ -31,20 +32,71 @@ class UnsupportedPythonError(Exception):
 
 def get_parser():
     import argparse
+
+    from .config import Config
+
     parser = argparse.ArgumentParser(
         prog="ducktools-pytui",
         description="Prototype Python venv and runtime manager",
     )
     parser.add_argument("-V", "--version", action="version", version=__version__)
-    parser.add_argument(
-        "--configpath", action="store_true", help="print the path to the config file"
-    )
-    parser.add_argument(
-        "--setshell",
+
+    # Config parser arguments
+    subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
+    config_parser = subparsers.add_parser("config", help="Subcommand for setting config options")
+
+    config_parser.add_argument(
+        "--set-shell",
         action="store",
-        metavar="SHELL_NAME",
+        metavar="SHELL_NAME or SHELL_PATH",
         help="Set the shell to be used for launching activated environments"
     )
+
+    config_parser.add_argument(
+        "--set-search-mode",
+        action="store",
+        choices=Config.VENV_SEARCH_MODES,
+        help="Set the search mode to be used",
+    )
+
+    config_parser.add_argument(
+        "--set-global-venv-dir",
+        action="store",
+        help="Set the global venv folder",
+    )
+
+    include_pip_group = config_parser.add_mutually_exclusive_group()
+    include_pip_group.add_argument(
+        "--include-pip",
+        dest="include_pip",
+        action="store_true",
+        default=None,
+        help="Include pip when creating venv"
+    )
+    include_pip_group.add_argument(
+        "--exclude-pip",
+        dest="include_pip",
+        action="store_false",
+        default=None,
+        help="Exclude pip when creating a venv"
+    )
+
+    update_pip_group = config_parser.add_mutually_exclusive_group()
+    update_pip_group.add_argument(
+        "--update-pip",
+        dest="update_pip",
+        action="store_true",
+        default=None,
+        help="Update pip to the latest version when creating a venv"
+    )
+    update_pip_group.add_argument(
+        "--bundled-pip",
+        dest="update_pip",
+        action="store_false",
+        default=None,
+        help="Use the version of pip bundled with the runtime when creating a venv"
+    )
+
     return parser
 
 
@@ -60,27 +112,67 @@ def main():
         parser = get_parser()
         args = parser.parse_args()
 
-        if args.configpath:
-            from .platform_paths import CONFIG_FILE
-            sys.stdout.write(CONFIG_FILE)
-            sys.stdout.write("\n")
-            return 0
-        elif shell_path := args.setshell:
+        if args.subcommand == "config":
             from .config import Config
             config = Config.from_file()
-            out_shell = config.set_shell(shell_path)
-            if out_shell:
-                print(f"'{out_shell}' will now be used to launch activated shells")
-                return
+
+            update_config = False
+            if (shell := args.set_shell) is not None:
+                new_shell = config.set_shell(shell)
+                if new_shell:
+                    print(f"Default shell set to '{new_shell}'")
+                    update_config = True
+                else:
+                    print(f"Shell '{shell}' could not be found.")
+
+            if (search_mode := args.set_search_mode) is not None:
+                update_config = True
+                config.venv_search_mode = search_mode
+                print(f"venv search mode set to '{search_mode}'")
+
+            if (venv_path := args.set_global_venv_dir) is not None:
+                update_config = True
+                venv_path = os.path.expanduser(venv_path)
+                config.global_venv_folder = venv_path
+                print(f"Global venv folder set to \"{venv_path}\"")
+
+            if (include_pip := args.include_pip) is not None:
+                update_config = True
+                config.include_pip = args.include_pip
+                if include_pip:
+                    print("New venvs will be created WITH pip")
+                else:
+                    print("New venvs will be created WITHOUT pip")
+
+            if (update_pip := args.update_pip) is not None:
+                update_config = True
+                config.latest_pip = update_pip
+                if update_pip:
+                    print("New venvs with pip will update to the latest pip")
+                else:
+                    print("New venvs with pip will use the bundled pip")
+
+            if update_config:
+                config.write_config()
             else:
-                print(f"'{shell_path}' could not be found or is an unsupported shell type")
-                return
+                import json
+                from ducktools.classbuilder.prefab import as_dict
 
-    from .ui import ManagerApp
-    import asyncio
+                print(f"Config file: \"{config.config_file}\"")
+                print("Current Settings:")
 
-    app = ManagerApp()
-    asyncio.run(app.run_async())
+                data = json.dumps(as_dict(config), indent=2)
+                print(data)
+                print("\nFor editing options, check '--help'")
+
+    else:
+        # No arguments, launch pytui
+        from .ui import ManagerApp
+        import asyncio
+
+        app = ManagerApp()
+        asyncio.run(app.run_async())
+
     return 0
 
 

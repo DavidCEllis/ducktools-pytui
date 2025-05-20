@@ -38,9 +38,9 @@ from .platform_paths import (
 
 
 class Config(Prefab, kw_only=True):
-    VENV_SEARCH_MODES: ClassVar[set[str]] = {
+    VENV_SEARCH_MODES: ClassVar[list[str]] = [
         "cwd", "parents", "recursive", "recursive_parents"
-    }
+    ]
 
     config_file: str = attribute(default=CONFIG_FILE, serialize=False)
     venv_search_mode: str = "parents"
@@ -66,7 +66,6 @@ class Config(Prefab, kw_only=True):
 
         if shell_path and Shell.from_path(shell_path) is not None:
             self.shell_path = shell_path
-            self.write_config()
 
         return shell_path
 
