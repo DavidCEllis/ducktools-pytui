@@ -22,36 +22,63 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import json
 import os
 import os.path
-import json
+import shutil
 from typing import ClassVar
 
 from ducktools.classbuilder.prefab import Prefab, as_dict, attribute
 
+from .shells import Shell
 
 from .platform_paths import (
     CONFIG_FILE, GLOBAL_VENV_FOLDER,
 )
 
 
-class Config(Prefab):
-    VENV_SEARCH_MODES: ClassVar[set[str]] = {
+class Config(Prefab, kw_only=True):
+    VENV_SEARCH_MODES: ClassVar[list[str]] = [
         "cwd", "parents", "recursive", "recursive_parents"
-    }
+    ]
+
     config_file: str = attribute(default=CONFIG_FILE, serialize=False)
     venv_search_mode: str = "parents"
     include_pip: bool = True
     latest_pip: bool = True
     global_venv_folder: str = GLOBAL_VENV_FOLDER
+    shell_path: str | None = None
 
-    def write_config(self):
+    @property
+    def shell(self) -> Shell | None:
+        if self.shell_path is None:
+            shell = Shell.get_default()
+            if shell:
+                self.shell_path = shell.path
+                self.write_config()  # Save the updated shell_path
+        else:
+            shell = Shell.from_path(self.shell_path)
+
+        return shell
+
+    def set_shell(self, shell_path: str) -> str | None:
+        if not os.path.isfile(shell_path):
+            shell_path = shutil.which(shell_path)
+
+        if shell_path and Shell.from_path(shell_path) is not None:
+            self.shell_path = shell_path
+
+        return shell_path
+
+    def write_config(self) -> None:
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
+        data = as_dict(self)
+
         with open(self.config_file, 'w') as f:
-            json.dump(as_dict(self), f, indent=4)
+            json.dump(data, f, indent=4)
 
     @classmethod
-    def from_file(cls, config_file=CONFIG_FILE):
+    def from_file(cls, config_file=CONFIG_FILE) -> Config:
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
                 try:
@@ -63,6 +90,7 @@ class Config(Prefab):
             include_pip = raw_input.get("include_pip", True)
             latest_pip = raw_input.get("latest_pip", True)
             global_venv_folder = raw_input.get("global_venv_folder", GLOBAL_VENV_FOLDER)
+            shell_path = raw_input.get("shell_path", None)
 
             if venv_search_mode not in cls.VENV_SEARCH_MODES:
                 venv_search_mode = "parents"
@@ -77,6 +105,7 @@ class Config(Prefab):
                 include_pip=include_pip,
                 latest_pip=latest_pip,
                 global_venv_folder=global_venv_folder,
+                shell_path=shell_path,
             )
 
             if raw_input != as_dict(config):

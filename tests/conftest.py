@@ -29,10 +29,12 @@ import pytest
 
 from ducktools.pytui.runtime_installers import uv
 
-collect_ignore = []
+collect_ignore_glob = []
 
 if sys.platform != "win32":
-    collect_ignore.append("win32")
+    collect_ignore_glob.append("**/win32/*")
+else:
+    collect_ignore_glob.append("**/posix/*")
 
 
 @pytest.fixture(scope="function")
@@ -50,5 +52,3 @@ def uv_python_dir():
         else:
             fake_py_dir.return_value = "/home/david/.local/share/uv/python"
         yield
-
-

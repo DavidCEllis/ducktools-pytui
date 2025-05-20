@@ -31,10 +31,10 @@ from .base import PythonListing, RuntimeManager
 
 # Windows python installer should come before UV if available
 if sys.platform == "win32":
-    from . import pythoncore
-    from . import uv
+    from . import pythoncore as pythoncore
+    from . import uv as uv
 else:
-    from . import uv
+    from . import uv as uv
 
 
 @lru_cache(maxsize=None)

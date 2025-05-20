@@ -20,5 +20,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
-from ._version import __version__ as __version__
+import sys
+
+from ._core import Shell, get_shell_script
+
+
+class PowerShell(Shell):  # This should be PowershellShell but no
+    # The newer powershellcore
+    name = "Powershell Core"
+    bin_name = "pwsh.exe"
+    exclude = (sys.platform != "win32")
+
+    def get_venv_shell_command(self, env):
+        rcfile = get_shell_script("activate_pytui.ps1")
+        cmd = [self.path, "-NoExit", rcfile]
+        env_updates = {}
+        return cmd, env_updates
+
+
+class WindowsPowerShell(PowerShell):
+    # The older windows powershell
+    name = "Windows Powershell"
+    bin_name = "powershell.exe"

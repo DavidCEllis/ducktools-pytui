@@ -20,5 +20,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
-from ._version import __version__ as __version__
+import sys
+
+from ._core import Shell, get_shell_script
+
+
+class FishShell(Shell):
+    name = "Fish"
+    bin_name = "fish"
+    exclude = (sys.platform == "win32")
+
+    def get_venv_shell_command(self, env):
+        config_file = get_shell_script("activate_pytui.fish")
+        cmd = [self.path, "-C", f"source \"{config_file}\"", "-i"]
+        env_updates = {}
+        return cmd, env_updates

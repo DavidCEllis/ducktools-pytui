@@ -20,5 +20,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
-from ._version import __version__ as __version__
+from ._core import Shell
+
+
+class CMDShell(Shell):
+    name = "Command Prompt"
+    bin_name = "cmd.exe"
+
+    def get_venv_shell_command(self, env):
+        shell_prompt = env.get("PROMPT", "$P$G")
+        old_venv_prompt = env.get("VIRTUAL_ENV_PROMPT")
+        new_venv_prompt = env["PYTUI_VIRTUAL_ENV_PROMPT"]
+
+
+        if old_venv_prompt and old_venv_prompt in shell_prompt:
+            new_prompt = shell_prompt.replace(old_venv_prompt, new_venv_prompt)
+        else:
+            new_prompt = f"({new_venv_prompt}) {shell_prompt}"
+
+        cmd = [self.path, "/k"]
+        env_updates = {
+            "PATH": env["PYTUI_PATH"],
+            "VIRTUAL_ENV": env["PYTUI_VIRTUAL_ENV"],
+            "VIRTUAL_ENV_PROMPT": env["PYTUI_VIRTUAL_ENV_PROMPT"],
+            "PROMPT": new_prompt,
+        }
+
+        return cmd, env_updates

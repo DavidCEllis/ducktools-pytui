@@ -20,5 +20,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+import sys
 
-from ._version import __version__ as __version__
+from ._core import Shell as Shell
+from ._core import get_shell_script as get_shell_script
+
+if sys.platform == "win32":
+    from . import powershell, cmd, bash  # noqa
+else:
+    from . import fish, bash, zsh  # noqa

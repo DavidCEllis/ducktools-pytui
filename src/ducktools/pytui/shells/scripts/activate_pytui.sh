@@ -1,4 +1,4 @@
-# This mostly exists in order to get the correct $PS1 value
+# Run the original bash config file *FIRST*
 bashrcfile="$HOME/.bashrc"
 [ -f "$bashrcfile" ] && source "$bashrcfile"
 
@@ -12,7 +12,12 @@ fi
 
 # bashrc running multiple times may have added dupes to PATH
 # Use deduped PATH from pytui - which also includes the venv
+# Also export all of the environment variables without pytui prefix
 export PATH=$PYTUI_PATH
+export VIRTUAL_ENV=$PYTUI_VIRTUAL_ENV
+export VIRTUAL_ENV_PROMPT=$PYTUI_VIRTUAL_ENV_PROMPT
+
+unset PYTHONHOME
 
 # Hash to make sure path changes are added
 hash -r 2>/dev/null

@@ -27,10 +27,11 @@ import os.path
 import sys
 
 import asyncio
+import functools
 import subprocess
 
 from ducktools.pythonfinder import PythonInstall
-from ducktools.pythonfinder.venv import get_python_venvs, PythonVEnv, PythonPackage
+from ducktools.pythonfinder.venv import list_python_venvs, PythonVEnv, PythonPackage
 
 from textual import work
 from textual.app import App
@@ -248,11 +249,11 @@ class VEnvTable(DataTable):
 
     def on_mount(self):
         self.setup_columns()
-        self.load_venvs(clear_first=False)
+        self.call_after_refresh(self.load_venvs, clear_first=False)
 
     def setup_columns(self):
         self.cursor_type = "row"
-        keys = self.add_columns("Version", "Global", "Environment Path", "Runtime Path")
+        self.add_columns("Version", "Global", "Environment Path", "Runtime Path")
 
     @staticmethod
     def _keysort(rowtuple):
@@ -285,7 +286,8 @@ class VEnvTable(DataTable):
         self.remove_row(row_key=venv.folder)
         self._venv_catalogue.pop(venv.folder)
 
-    def load_venvs(self, clear_first=True):
+    @work
+    async def load_venvs(self, clear_first=True):
         self.loading = True
         try:
             if clear_first:
@@ -294,24 +296,45 @@ class VEnvTable(DataTable):
 
             recursive = "recursive" in self.config.venv_search_mode
             search_parent_folders = "parents" in self.config.venv_search_mode
-            for venv in get_python_venvs(
+
+            global_venv_folder = self.config.global_venv_folder
+
+            loop = asyncio.get_running_loop()
+            get_venvs = functools.partial(
+                list_python_venvs,
                 base_dir=CWD,
                 recursive=recursive,
-                search_parent_folders=search_parent_folders,
-            ):
-                self.add_venv(venv, sort=False)
+                search_parent_folders=search_parent_folders
+            )
+
+            venvs = await loop.run_in_executor(
+                None,
+                get_venvs,
+            )
+
+            for venv in venvs:
+                if not os.path.commonpath([venv.folder, global_venv_folder]) == global_venv_folder:
+                    self.add_venv(venv, sort=False)
 
             if os.path.exists(self.config.global_venv_folder):
-                for venv in get_python_venvs(
+                get_global_venvs = functools.partial(
+                    list_python_venvs,
                     base_dir=self.config.global_venv_folder,
                     recursive=True,
                     search_parent_folders=False,
-                ):
-                    if venv.folder not in self._venv_catalogue:
-                        self.add_venv(venv, global_venv=True)
+                )
+
+                global_venvs = await loop.run_in_executor(
+                    None,
+                    get_global_venvs
+                )
+
+                for venv in global_venvs:
+                    self.add_venv(venv, global_venv=True, sort=False)
 
         finally:
             self.sort_by_path()
+            self.refresh_bindings()
             self.loading = False
 
 
@@ -338,7 +361,7 @@ class RuntimeTable(DataTable):
 
     def on_mount(self):
         self.setup_columns()
-        self.load_runtimes(clear_first=False)
+        self.call_after_refresh(self.load_runtimes, clear_first=False)
 
     def setup_columns(self):
         self.cursor_type = "row"
@@ -347,14 +370,18 @@ class RuntimeTable(DataTable):
     def runtime_from_key(self, key) -> PythonInstall:
         return self._runtime_catalogue[key]
 
-    def load_runtimes(self, clear_first=True):
+    @work
+    async def load_runtimes(self, clear_first=True):
         self.loading = True
         try:
             if clear_first:
                 self.clear()
                 self._runtime_catalogue = {}
 
-            for install in list_installs_deduped():
+            loop = asyncio.get_running_loop()
+            deduped_installs = await loop.run_in_executor(None, list_installs_deduped)
+
+            for install in deduped_installs:
                 self._runtime_catalogue[install.executable] = install
 
                 if install.version_str == install.implementation_version_str:
@@ -370,6 +397,7 @@ class RuntimeTable(DataTable):
                     key=install.executable
                 )
         finally:
+            self.refresh_bindings()
             self.loading = False
 
 
@@ -493,10 +521,15 @@ class ManagerApp(App):
     def action_activated_shell(self):
         venv = self.selected_venv
         if venv is None:
+            self.notify("No VEnv selected")
+            return
+
+        if self.config.shell is None:
+            self.notify("Failed to find known shell on PATH")
             return
 
         with self.suspend():
-            launch_shell(venv)
+            launch_shell(venv, self.config.shell)
 
         # Redraw
         self.refresh()
@@ -543,7 +576,7 @@ class ManagerApp(App):
         :return:
         """
         self._venv_table.loading = True
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         try:
             new_venv = await loop.run_in_executor(
                 None,
@@ -607,7 +640,7 @@ class ManagerApp(App):
             )
             return
 
-        delete_venv(venv.folder)
+        delete_venv(venv)
         self._venv_table.remove_venv(venv)
         self._venv_dependency_cache.pop(venv.folder, None)
 
@@ -625,10 +658,10 @@ class ManagerApp(App):
                 pass
 
             self._runtime_table.loading = True
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
 
             try:
-                result = await loop.run_in_executor(None, runtime.install)
+                result = await loop.run_in_executor(None, runtime.install)  # noqa
                 # self.notify(result.stderr)
             except (FileNotFoundError, subprocess.CalledProcessError) as e:
                 self.notify(
@@ -672,10 +705,10 @@ class ManagerApp(App):
             )
             return
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         self._runtime_table.loading = True
         try:
-            result = await loop.run_in_executor(None, listing.uninstall)
+            result = await loop.run_in_executor(None, listing.uninstall)  # noqa
             # self.notify(result.stderr)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             self.notify(
