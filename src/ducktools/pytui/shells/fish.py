@@ -21,12 +21,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import annotations
+
 import sys
 
-from ._core import Shell as Shell
-from ._core import get_shell_script as get_shell_script
+from ._core import Shell, get_shell_script
 
-if sys.platform == "win32":
-    from . import powershell, cmd, bash  # noqa
-else:
-    from . import fish, bash, zsh  # noqa
+
+class FishShell(Shell):
+    name = "Fish"
+    bin_name = "fish"
+    exclude = (sys.platform == "win32")
+
+    def get_venv_shell_command(self, env):
+        config_file = get_shell_script("activate_pytui.fish")
+        cmd = [self.path, "-C", f"source \"{config_file}\"", "-i"]
+        env_updates = {}
+        return cmd, env_updates

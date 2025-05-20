@@ -23,7 +23,7 @@ and should be usable as long as you have Python 3.8 or newer.
 * List Python Virtual Environments relative to the current folder
 * List Python Runtimes discovered by [ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
 * Launch a Terminal with a selected venv activated
-  * Currently only bash (and git bash on Windows), zsh, powershell and cmd are supported
+  * Currently only fish, bash (and git bash on Windows), zsh, powershell and cmd are supported
     * zsh and cmd only have basic support
   * Use `exit` to close the shell and return to PyTUI
 * Launch a REPL with the selected venv
@@ -68,7 +68,7 @@ If this exists and is a supported shell it will be used. Otherwise it will searc
 in this order:
 
 * Windows: `pwsh.exe`, `powershell.exe`, `cmd.exe`, `bash.exe`
-* Non-Windows: `bash`, `zsh`
+* Non-Windows: `fish`, `bash`, `zsh`
 
 On Windows as a last resort if none of these are found it will search for the `COMSPEC` environment
 variable to find a path to `cmd.exe`.
