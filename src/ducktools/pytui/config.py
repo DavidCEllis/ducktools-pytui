@@ -50,11 +50,12 @@ class Config(Prefab, kw_only=True):
     shell_path: str | None = None
 
     @property
-    def shell(self) -> Shell:
+    def shell(self) -> Shell | None:
         if self.shell_path is None:
             shell = Shell.get_default()
-            self.shell_path = shell.path
-            self.write_config()  # Save the updated shell_path
+            if shell:
+                self.shell_path = shell.path
+                self.write_config()  # Save the updated shell_path
         else:
             shell = Shell.from_path(self.shell_path)
 

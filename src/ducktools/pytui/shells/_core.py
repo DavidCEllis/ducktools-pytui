@@ -127,8 +127,9 @@ class Shell(Prefab):
                     break
             else:
                 if sys.platform == "win32":
-                    shell_path = os.environ["COMSPEC"]
-                    shell = Shell.from_path(shell_path)
+                    shell_path = os.environ.get("COMSPEC")
+                    if shell_path:
+                        shell = Shell.from_path(shell_path)
 
         return shell
 
