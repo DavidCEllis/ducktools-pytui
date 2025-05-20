@@ -15,3 +15,4 @@ function deactivate {
 $env:PATH = $env:PYTUI_PATH
 $env:VIRTUAL_ENV = $env:PYTUI_VIRTUAL_ENV
 $env:VIRTUAL_ENV_PROMPT = $env:PYTUI_VIRTUAL_ENV_PROMPT
+$env:PYTHONHOME = $null

@@ -17,5 +17,7 @@ export PATH=$PYTUI_PATH
 export VIRTUAL_ENV=$PYTUI_VIRTUAL_ENV
 export VIRTUAL_ENV_PROMPT=$PYTUI_VIRTUAL_ENV_PROMPT
 
+unset PYTHONHOME
+
 # Hash to make sure path changes are added
 hash -r 2>/dev/null

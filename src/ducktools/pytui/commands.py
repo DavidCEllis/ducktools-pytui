@@ -131,6 +131,8 @@ def launch_shell(venv: PythonVEnv, shell: Shell) -> None:
     env["PYTUI_VIRTUAL_ENV"] = venv.folder
     env["PYTUI_VIRTUAL_ENV_PROMPT"] = venv_prompt
 
+    env.pop("PYTHONHOME", None)
+
     if os.name == "nt" and not WIN_HISTORY_FIXED:
         fix_win_history()
 
