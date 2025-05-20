@@ -21,3 +21,59 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import annotations
+
+from unittest.mock import patch
+
+from ducktools.pytui.shells import _core as core, zsh
+
+
+ZSH_PATH = "/bin/zsh"
+
+
+def test_registered():
+    assert zsh.ZshShell.bin_name in core.Shell.registry
+    assert zsh.ZshShell is core.Shell.registry[zsh.ZshShell.bin_name]
+
+
+def test_frompath():
+    assert core.Shell.from_path(ZSH_PATH) == zsh.ZshShell(ZSH_PATH)
+
+
+def test_get_venv_shell_command():
+    venv = "/home/david/src/ducktools-pytui/.venv"
+    path_env = (
+        "/home/david/src/ducktools-pytui/.venv"
+        "/home/david/.pyenv/shims:"
+        "/home/david/.cargo/bin:"
+        "/home/david/.pyenv/bin:"
+        "/home/david/.local/bin:"
+        "/home/david/bin:"
+        "/usr/local/sbin:"
+        "/usr/local/bin:"
+        "/usr/sbin:"
+        "/usr/bin:"
+        "/sbin:"
+        "/bin:"
+        "/usr/games:"
+        "/usr/local/games:"
+        "/snap/bin"
+    )
+    prompt = "pytui: .venv"
+
+    env = {
+        "PYTUI_PATH": path_env,
+        "PYTUI_VIRTUAL_ENV": venv,
+        "PYTUI_VIRTUAL_ENV_PROMPT": prompt,
+    }
+
+    shell = zsh.ZshShell(ZSH_PATH)
+
+    cmd, env_updates = shell.get_venv_shell_command(env)
+
+    assert cmd == [ZSH_PATH, "--no-rcs"]
+    assert env_updates == {
+        "PATH": path_env,
+        "VIRTUAL_ENV": venv,
+        "VIRTUAL_ENV_PROMPT": prompt,
+        "PS1": "(pytui: .venv) %n@%m:%~/ > "
+    }
