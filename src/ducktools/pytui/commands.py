@@ -34,11 +34,6 @@ from .shells import Shell
 from .util import run
 
 
-_shell_scriptfiles = [
-    "activate_pytui.ps1",
-    "activate_pytui.sh",
-]
-
 WIN_HISTORY_FIXED = False
 
 
