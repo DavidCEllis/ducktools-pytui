@@ -14,13 +14,24 @@ There is also now a zipapp available on
 [the releases page](https://github.com/DavidCEllis/ducktools-pytui/releases/latest)
 and should be usable as long as you have Python 3.8 or newer.
 
-## Example ##
+## Screenshots ##
+
+### Managing virtual environments ###
 
 ![screenshot showing ducktools-pytui displaying a list of venvs and runtimes](images/pytui_menu.png)
 
+### Installing new runtimes ###
+
+![screenshot showing ducktools-pytui displaying a list of available runtimes to install](images/pytui_runtimes.png)
+
+### Listing packages installed in a virtual environment (3.9+ only) ###
+
+![screenshot showing ducktools-pytui listing packages installed in a virtual environment](images/pytui_package_list.png)
+
 ## Features ##
 
-* List Python Virtual Environments relative to the current folder
+* List Python Virtual Environments relative to the current folder alongside those installed in a
+  configurable global folder
 * List Python Runtimes discovered by [ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
 * Launch a Terminal with a selected venv activated
   * Currently only fish, bash (and git bash on Windows), zsh, powershell and cmd are supported
