@@ -21,13 +21,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os.path
+import os, os.path
 import sys
 
 from ._version import __version__
 
+
 class UnsupportedPythonError(Exception):
     pass
+
+
+def _check_windows_dir():
+    # Double-clicking to launch the zipapp may put the user in the system32
+    # folder on Windows.
+    # Inside a zipapp, __file__ won't exist on the file system as it is inside the archive.
+    if not os.path.exists(__file__) and (win_path := os.environ.get("WINDIR")):
+        sys32 = os.path.join(win_path, "System32")
+        if os.path.samefile(os.getcwd(), sys32) and (user_path := os.environ.get("USERPROFILE")):
+            os.chdir(user_path)
 
 
 def get_parser():
@@ -103,10 +114,12 @@ def get_parser():
 def main():
     if sys.version_info < (3, 8):
         v = sys.version_info
-        raise UnsupportedPythonError(
-            f"Python {v.major}.{v.minor}.{v.micro} is not supported. "
-            f"ducktools.pytui requires Python 3.8 or later."
+        print(
+            f"Unsupported Python: {v.major}.{v.minor}.{v.micro} is not supported. "
+            f"PyTUI requires Python 3.8 or later."
         )
+        input("Press ENTER to close")
+        sys.exit()
 
     if sys.argv[1:]:
         parser = get_parser()
@@ -166,6 +179,9 @@ def main():
                 print("\nFor editing options, check '--help'")
 
     else:
+        if sys.platform == "win32":
+            _check_windows_dir()
+
         # No arguments, launch pytui
         from .ui import ManagerApp
         import asyncio
