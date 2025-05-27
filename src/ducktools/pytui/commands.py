@@ -30,6 +30,7 @@ import subprocess
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import PythonVEnv
 
+from ._version import __version__
 from .shells import Shell
 from .util import run
 
@@ -113,7 +114,11 @@ def launch_shell(venv: PythonVEnv, shell: Shell) -> None:
     # Launch a shell with a virtual environment activated.
     env = os.environ.copy()
 
-    venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
+    if "dev" in __version__:
+        venv_prompt = f"pytui dev: {os.path.basename(venv.folder)}"
+    else:
+        venv_prompt = f"pytui: {os.path.basename(venv.folder)}"
+
     venv_bindir = os.path.dirname(venv.executable)
 
     base_path = shell.get_env_path()
