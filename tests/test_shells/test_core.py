@@ -24,50 +24,41 @@ from __future__ import annotations
 
 import os
 import sys
-from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 
 import pytest
 
+from ducktools.pytui import __version__
 from ducktools.pytui.shells import _core as core, get_shell_script
 from ducktools.pytui.shells.bash import BashShell, GitBashShell
+from ducktools.pytui.platform_paths import SHELL_SCRIPT_FOLDER
 
 
 windows_only = pytest.mark.skipif(sys.platform != "win32", reason="Windows Only")
 non_windows = pytest.mark.skipif(sys.platform == "win32", reason="Non-Windows Only")
 
 
-def test_get_shell_script():
-    # This only tests the non-zipapp logic
-    base_path = Path(core.__file__).parent
-
+def test_get_shell_script_output():
+    # Test the output value at least is as expected
     bash_script = "activate_pytui.sh"
 
-    assert get_shell_script(bash_script) == str(base_path / "scripts" / bash_script)
+    # Mock that the version *IS* the latest one
+    open_mock = mock_open(read_data=__version__)
 
-def test_get_shell_script_error():
-    # Test the FileNotFoundError for a missing shell script folder
-    with patch("os.path.exists") as path_mock, \
-            patch("os.path.isfile") as isfile_mock, \
-            patch("sys.argv") as argv_mock:
+    with patch("builtins.open", open_mock) as m, \
+            patch("os.path.exists") as exists_mock, \
+            patch("shutil.rmtree") as rmtree_mock:
 
-        def getitem(index):
-            return "pytui.pyz"
+        exists_mock.return_value = True
+        expected = os.path.join(SHELL_SCRIPT_FOLDER, bash_script)
 
-        argv_mock.__getitem__.side_effect = getitem
-        path_mock.return_value = False
-        isfile_mock.return_value = False
+        result = get_shell_script(bash_script)
 
-        with pytest.raises(FileNotFoundError):
-            get_shell_script("activate_pytui.sh")
+    assert result == expected
 
-        argv_mock.__getitem__.assert_called_once_with(0)
-        path_mock.assert_called_once_with(core.__file__)
-        isfile_mock.assert_called_once_with("pytui.pyz")
-
-
-class ZipappShellLogicTest:
-    pass
+    exists_mock.assert_called_once_with(expected)
+    m.assert_called_once_with(os.path.join(SHELL_SCRIPT_FOLDER, ".version"))
+    rmtree_mock.assert_not_called()
 
 
 class TestDedupePath:

@@ -134,74 +134,46 @@ class Shell(Prefab):
         return shell
 
 
-def get_shell_script(filename: str):
-    if os.path.exists(__file__):
-        # Use them from the source folder if available
-        shell_script_folder = os.path.join(os.path.dirname(__file__), "scripts")
+def get_shell_script(filename: str) -> str:
+    """
+    Get the path to the shell script in the SHELL_SCRIPT_FOLDER
+    Extract it from the archive or venv folder if needed.
 
-    elif os.path.isfile(sys.argv[0]):  # zipapp potentially
-        # In a zipapp they may not be, so extract them
-        shell_script_folder = SHELL_SCRIPT_FOLDER
+    ALWAYS overwrites the folder if the version does not match even if it is older.
 
-        shell_script_verfile = os.path.join(SHELL_SCRIPT_FOLDER, ".version")
-        valid_verfile = False
-        try:
-            with open(shell_script_verfile) as f:
-                script_ver = f.read()
-            if script_ver == __version__:
-                valid_verfile = True
-        except FileNotFoundError:
-            pass
+    :param filename: Filename of the script in scripts/
+    :return: Path to the file on the system
+    """
 
-        if not valid_verfile:
-            # Clear out anything that might be there and remake the folder
-            shutil.rmtree(SHELL_SCRIPT_FOLDER, ignore_errors=True)
-            os.makedirs(SHELL_SCRIPT_FOLDER, exist_ok=True)
+    shell_script_verfile = os.path.join(SHELL_SCRIPT_FOLDER, ".version")
+    valid_verfile = False
+    try:
+        with open(shell_script_verfile) as f:
+            script_ver = f.read()
+        if script_ver == __version__:
+            valid_verfile = True
+    except FileNotFoundError:
+        pass
 
-            # Get the zipfile path to open and the internal shell script folder
-            zipfile_path = os.path.abspath(sys.argv[0])
+    if not valid_verfile:
+        # Delete the old folder
+        shutil.rmtree(SHELL_SCRIPT_FOLDER, ignore_errors=True)
+        os.makedirs(SHELL_SCRIPT_FOLDER)
 
-            # Python 3.8 lacks .removeprefix
-            scripts_path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "scripts"
-            )
+        # Get the 'folder' for the scripts directory
+        script_folder = _laz.resources.files("ducktools.pytui.shells").joinpath("scripts")
+        for script in script_folder.iterdir():
+            dest = os.path.join(SHELL_SCRIPT_FOLDER, script.name)
+            with _laz.resources.as_file(script) as source:
+                shutil.copy(source, dest)
 
-            if scripts_path.startswith(zipfile_path + os.sep):
-                scripts_path = scripts_path[len(zipfile_path + os.sep):]
+        # Write the version file script
+        with open(shell_script_verfile, 'w') as f:
+            f.write(__version__)
 
-            if sys.platform == "win32":
-                # Zipfile needs '/' for internal paths
-                scripts_path = scripts_path.replace("\\", "/")
+    script_file = os.path.join(SHELL_SCRIPT_FOLDER, filename)
 
-            zipapp_contents = _laz.zipfile.ZipFile(zipfile_path)
+    if not os.path.exists(script_file):
+        raise FileNotFoundError(f"'{filename}' not found in '{SHELL_SCRIPT_FOLDER}'")
 
-            shell_script_files = [
-                p for p in zipapp_contents.namelist()
-                if p.startswith(scripts_path)
-            ]
-
-            zipapp_contents.extractall(
-                path=SHELL_SCRIPT_FOLDER,
-                members=shell_script_files,
-            )
-
-            # Move the files into the appropriate folder
-            shutil.move(
-                os.path.join(SHELL_SCRIPT_FOLDER, scripts_path),
-                PYTUI_FOLDER,
-            )
-            # Clean out the extracted empty folder
-            shutil.rmtree(SHELL_SCRIPT_FOLDER)
-
-            # rename "scripts" to "shell_scripts"
-            shutil.move(
-                os.path.join(PYTUI_FOLDER, "scripts"),
-                shell_script_folder,
-            )
-
-            with open(shell_script_verfile, 'w') as f:
-                f.write(__version__)
-    else:
-        raise FileNotFoundError("Could not find shell script folder.")
-
-    return os.path.join(shell_script_folder, filename)
+    return script_file

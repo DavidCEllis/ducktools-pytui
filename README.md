@@ -39,7 +39,7 @@ and should be usable as long as you have Python 3.8 or newer.
 Some configuration is available by editing the config.json file located here:
 
 * Windows: `%LOCALAPPDATA%\ducktools\pytui\config.json`
-* Linux/Mac/Other: `~/.config/ducktools/pytui/config.json`
+* Non-Windows: `~/.config/ducktools/pytui/config.json`
 
 Config can be seen and edited from the commandline with the `config` subcommand.
 
@@ -73,6 +73,10 @@ in this order:
 On Windows as a last resort if none of these are found it will search for the `COMSPEC` environment
 variable to find a path to `cmd.exe`.
 
+A data folder of shell scripts is kept in this location:
+
+* Windows: `%LOCALAPPDATA%\ducktools\pytui\shell_scripts
+* Non-Windows: `~/.local/share/ducktools/pytui/shell_scripts`
 
 ### Possible Extras ###
 

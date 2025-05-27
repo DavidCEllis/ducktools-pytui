@@ -18,6 +18,7 @@ dependencies = [
     "ducktools-pythonfinder>=0.8.6",
     "ducktools-lazyimporter>=0.7.3",
     "textual>=3.2.0",
+    "importlib_resources>=6.4",  # restricted in constraints for Python 3.8 support
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

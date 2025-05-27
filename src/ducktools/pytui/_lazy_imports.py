@@ -6,4 +6,4 @@ laz = LazyImporter()
 
 # These are actually imported lazily and do not exist within this module
 with capture_imports(laz):
-    import zipfile as zipfile
+    import importlib_resources as resources  # noqa: F401
