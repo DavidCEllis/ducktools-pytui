@@ -109,7 +109,7 @@ class PythonListing(ABC):
 
     # `attribute` is a field specifier as defined in dataclass_transform
     # Not sure why it's not being picked up
-    _version_tuple: _version_tuple_type | None = attribute(default=None, private=True)  # type: ignore[assignment]
+    _version_tuple: _version_tuple_type | None = attribute(default=None, private=True)
 
     @property
     def version_tuple(self) -> _version_tuple_type:
