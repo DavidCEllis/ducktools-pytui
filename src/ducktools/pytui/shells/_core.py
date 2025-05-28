@@ -32,7 +32,7 @@ from ducktools.classbuilder.prefab import Prefab
 
 from .. import _lazy_imports as _laz
 from .._version import __version__
-from ..platform_paths import PYTUI_FOLDER, SHELL_SCRIPT_FOLDER
+from ..platform_paths import SHELL_SCRIPT_FOLDER
 
 
 class Shell(Prefab):
@@ -66,7 +66,7 @@ class Shell(Prefab):
         return os.environ.get("PATH", "")
 
     @staticmethod
-    def get_deduped_path(path: str, venv_path: str) -> list[str]:
+    def get_deduped_path(path: str, venv_path: str) -> str:
         """
         Get the deduplicated PATH for an activated VENV
 
