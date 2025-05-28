@@ -42,7 +42,7 @@ class Config(Prefab, kw_only=True):
         "cwd", "parents", "recursive", "recursive_parents"
     ]
 
-    config_file: str = attribute(default=CONFIG_FILE, serialize=False)  # type: ignore[assignment]
+    config_file: str = attribute(default=CONFIG_FILE, serialize=False)
     venv_search_mode: str = "parents"
     include_pip: bool = True
     latest_pip: bool = True
