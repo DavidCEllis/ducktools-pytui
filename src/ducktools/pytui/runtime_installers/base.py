@@ -21,12 +21,20 @@ import functools
 import operator
 import os.path
 import subprocess
+import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from typing import ClassVar
+from typing import ClassVar, TypeAlias
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
 from ducktools.classbuilder.prefab import prefab, attribute
+
+# typing hack - avoid deprecated alias on newer python
+if sys.version_info >= (3, 9):
+    _version_tuple_type: TypeAlias = tuple[int, int, int, str, int]
+else:
+    from typing import Tuple
+    _version_tuple_type: TypeAlias = Tuple[int, int, int, str, int]
 
 
 class RuntimeManager(ABC):
@@ -99,10 +107,12 @@ class PythonListing(ABC):
     path: str | None
     url: str | None
 
-    _version_tuple: tuple[int, int, int, str, int] | None = attribute(default=None, private=True)
+    # `attribute` is a field specifier as defined in dataclass_transform
+    # Not sure why it's not being picked up
+    _version_tuple: _version_tuple_type | None = attribute(default=None, private=True)  # type: ignore[assignment]
 
     @property
-    def version_tuple(self) -> tuple[int, int, int, str, int]:
+    def version_tuple(self) -> _version_tuple_type:
         if not self._version_tuple:
             self._version_tuple = version_str_to_tuple(self.version)
         return self._version_tuple
@@ -117,13 +127,13 @@ class PythonListing(ABC):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, manager: RuntimeManager, entry: dict):
+    def from_dict(cls, manager, entry):
         ...
 
     @abstractmethod
-    def install(self) -> subprocess.CompletedProcess:
+    def install(self) -> subprocess.CompletedProcess | None:
         ...
 
     @abstractmethod
-    def uninstall(self) -> subprocess.CompletedProcess:
+    def uninstall(self) -> subprocess.CompletedProcess | None:
         ...
