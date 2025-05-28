@@ -58,7 +58,7 @@ class UVManager(RuntimeManager):
             py_dir = cmd.stdout.strip()
         return py_dir
 
-    def fetch_installed(self) -> list[UVPythonListing]:
+    def fetch_installed(self):
         """
         Fetch Python installs managed by UV
         """
@@ -105,7 +105,7 @@ class UVManager(RuntimeManager):
         ]
         return downloads
 
-    def fetch_downloads(self, all_versions=False) -> list[UVPythonListing]:
+    def fetch_downloads(self, all_versions=False):
         """
         Get available UV downloads and filter out any installs that are already present.
 
@@ -144,8 +144,9 @@ class UVPythonListing(PythonListing):
 
             # UV bug - key and path can mismatch if someone typoed the metadata
             base_path = self.manager.runtime_folder
-            key_path = str(Path(self.path).relative_to(base_path).parts[0])
-            self.key = key if key == key_path else key_path
+            if base_path:
+                key_path = str(Path(self.path).relative_to(base_path).parts[0])
+                self.key = key if key == key_path else key_path
 
     @classmethod
     def from_dict(cls, manager: UVManager, entry: dict):
@@ -159,7 +160,7 @@ class UVPythonListing(PythonListing):
 
         return cls(manager=manager, **kwargs)
 
-    def install(self) -> subprocess.CompletedProcess:
+    def install(self):
         if self.path:
             # Can't install already installed Python
             return None
@@ -178,8 +179,8 @@ class UVPythonListing(PythonListing):
         )
         return result
 
-    def uninstall(self) -> subprocess.CompletedProcess:
-        if not self.path and os.path.exists(self.path):
+    def uninstall(self):
+        if not (self.path and os.path.exists(self.path)):
             # Can't uninstall non-installed Python
             return None
 

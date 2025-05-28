@@ -49,7 +49,7 @@ class PythonCoreManager(RuntimeManager):
     def executable(self):
         return shutil.which("pymanager")
 
-    def fetch_installed(self) -> list[PythonCoreListing]:
+    def fetch_installed(self):
         cmd = [
             self.executable, "list", "--only-managed", "--format=json",
         ]
@@ -87,7 +87,7 @@ class PythonCoreManager(RuntimeManager):
 
         return downloads
 
-    def fetch_downloads(self) -> list[PythonCoreListing]:
+    def fetch_downloads(self):
         """
         Get the filtered list of downloads, with installed versions removed.
 
@@ -171,7 +171,7 @@ class PythonCoreListing(PythonListing):
                 return True
         return False
 
-    def install(self) -> subprocess.CompletedProcess:
+    def install(self):
         if self.path:
             return None
 
@@ -191,7 +191,7 @@ class PythonCoreListing(PythonListing):
         return result
 
 
-    def uninstall(self) -> subprocess.CompletedProcess:
+    def uninstall(self):
         if not (self.path and os.path.exists(self.path)):
             return None
 

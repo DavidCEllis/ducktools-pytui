@@ -60,7 +60,7 @@ class IgnoreSignals:
         pass
 
     def __init__(self, signums: list[int]):
-        self.old_signals = {}
+        self.old_signals: dict[int, signal._HANDLER] = {}
         self.signums = signums
 
     def __enter__(self):

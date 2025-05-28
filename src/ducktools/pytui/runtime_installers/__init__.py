@@ -39,9 +39,12 @@ else:
 
 @lru_cache(maxsize=None)
 def get_managers() -> list[RuntimeManager]:
-    return [
-        m() for m in RuntimeManager.available_managers if m.executable
-    ]
+    managers = []
+    for m in RuntimeManager.available_managers:
+        inst = m()
+        if inst.executable:
+            managers.append(inst)
+    return managers
 
 
 def fetch_downloads() -> list[PythonListing]:

@@ -142,6 +142,10 @@ class DependencyScreen(ModalScreen["list[PythonPackage]"]):
         Binding(key="escape", action="close", description="Close", show=True),
     ]
 
+    venv: PythonVEnv
+    dependency_cache: list[PythonPackage] | None
+    venv_table: DataTable
+
     def __init__(
         self,
         venv: PythonVEnv,
@@ -427,16 +431,21 @@ class ManagerApp(App):
     }
     """
 
+    config: Config
+    _venv_table: VEnvTable
+    _runtime_table: RuntimeTable
+    _venv_dependency_cache: dict[str, list[PythonPackage]]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.config: Config = Config.from_file()
+        self.config = Config.from_file()
 
         self._venv_table = VEnvTable(config=self.config)
         self._runtime_table = RuntimeTable(config=self.config)
         self._runtime_table.styles.height = "1fr"
 
-        self._venv_dependency_cache: dict[str, list[PythonPackage]] = {}
+        self._venv_dependency_cache = {}
 
     def on_mount(self):
         self.title = f"Ducktools.PyTUI v{app_version}: Python Environment and Runtime Manager"

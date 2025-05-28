@@ -42,7 +42,7 @@ class Config(Prefab, kw_only=True):
         "cwd", "parents", "recursive", "recursive_parents"
     ]
 
-    config_file: str = attribute(default=CONFIG_FILE, serialize=False)
+    config_file: str = attribute(default=CONFIG_FILE, serialize=False)  # type: ignore[assignment]
     venv_search_mode: str = "parents"
     include_pip: bool = True
     latest_pip: bool = True
@@ -63,12 +63,14 @@ class Config(Prefab, kw_only=True):
 
     def set_shell(self, shell_path: str) -> str | None:
         if not os.path.isfile(shell_path):
-            shell_path = shutil.which(shell_path)
+            out_path = shutil.which(shell_path)
+        else:
+            out_path = shell_path
 
-        if shell_path and Shell.from_path(shell_path) is not None:
-            self.shell_path = shell_path
+        if out_path and Shell.from_path(out_path) is not None:
+            self.shell_path = out_path
 
-        return shell_path
+        return out_path
 
     def write_config(self) -> None:
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
