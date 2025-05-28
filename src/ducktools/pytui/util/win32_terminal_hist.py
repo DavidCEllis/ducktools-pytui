@@ -1,3 +1,6 @@
+# mypy: disable-error-code="attr-defined"
+# attributes don't exist on non-windows platform
+# but this entire file is only imported on windows.
 """
 Helper code to 'fix' the windows terminal history in order to get command history
 in Python that doesn't use PyREPL.
