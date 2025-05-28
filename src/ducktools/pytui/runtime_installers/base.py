@@ -24,17 +24,17 @@ import subprocess
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from typing import ClassVar, TypeAlias
+from typing import ClassVar
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
 from ducktools.classbuilder.prefab import prefab, attribute
 
 # typing hack - avoid deprecated alias on newer python
 if sys.version_info >= (3, 9):
-    _version_tuple_type: TypeAlias = tuple[int, int, int, str, int]
+    _version_tuple_type = tuple[int, int, int, str, int]
 else:
     from typing import Tuple
-    _version_tuple_type: TypeAlias = Tuple[int, int, int, str, int]
+    _version_tuple_type = Tuple[int, int, int, str, int]
 
 
 class RuntimeManager(ABC):
