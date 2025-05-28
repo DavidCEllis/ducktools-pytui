@@ -412,9 +412,11 @@ def test_uninstall(uv_executable, uv_python_dir):
         libc="none",
     )
 
-    with patch("subprocess.run") as fake_process:
+    with patch("subprocess.run") as fake_process, \
+            patch("os.path.exists") as fake_exists:
         fake_out = MagicMock()
         fake_process.return_value = fake_out
+        fake_exists.return_value = True
 
         output = listing.uninstall()
 
