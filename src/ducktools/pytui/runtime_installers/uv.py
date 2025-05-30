@@ -37,7 +37,7 @@ from .base import RuntimeManager, PythonListing
 
 
 class UVManager(RuntimeManager):
-    organisation: ClassVar[str] = "Astral"
+    organisation: ClassVar[str] = "Astral uv"
 
     @functools.cached_property
     def executable(self) -> str | None:
