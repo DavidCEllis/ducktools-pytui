@@ -381,7 +381,6 @@ def test_install(uv_executable, uv_python_dir):
             ],
             capture_output=True,
             text=True,
-            check=True,
         )
 
         assert output == fake_out
@@ -432,7 +431,6 @@ def test_uninstall(uv_executable, uv_python_dir):
             ],
             capture_output=True,
             text=True,
-            check=True,
         )
 
         assert output == fake_out
