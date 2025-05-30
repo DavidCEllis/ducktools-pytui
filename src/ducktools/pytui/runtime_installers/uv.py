@@ -175,7 +175,6 @@ class UVPythonListing(PythonListing):
             cmd,
             capture_output=True,
             text=True,
-            check=True,
         )
         return result
 
@@ -194,6 +193,5 @@ class UVPythonListing(PythonListing):
             cmd,
             capture_output=True,
             text=True,
-            check=True,
         )
         return result

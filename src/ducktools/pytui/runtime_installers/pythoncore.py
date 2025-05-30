@@ -186,7 +186,7 @@ class PythonCoreListing(PythonListing):
         ]
 
         result = subprocess.run(
-            cmd, capture_output=True, text=True, check=True
+            cmd, capture_output=True, text=True
         )
         return result
 
@@ -205,6 +205,6 @@ class PythonCoreListing(PythonListing):
             self.manager.executable, "uninstall", tag, "-y",
         ]
         result = subprocess.run(
-            cmd, capture_output=True, text=True, check=True
+            cmd, capture_output=True, text=True
         )
         return result
