@@ -12,9 +12,9 @@ ducktools-lazyimporter==0.7.3 \
     # via
     #   ducktools-pytui (pyproject.toml)
     #   ducktools-pythonfinder
-ducktools-pythonfinder==0.8.6 \
-    --hash=sha256:8f593dba82f2a45341f9b1db2aa26d2aeb8ad91ddb7d9d3647040ac78495264b \
-    --hash=sha256:9dcb218fac1f8130d0b94f4ff39f15d8e49c23a82922a2909c7c2c475398595a
+ducktools-pythonfinder==0.9.0 \
+    --hash=sha256:940009666d234429177b7689bcd80db973d29a09a020bbf793f2c5e7dbdc79b5 \
+    --hash=sha256:cbb15b3b4af3b163377424ce0b5c7ba5e09f844e7c959ac7a328f3fdbd030036
     # via ducktools-pytui (pyproject.toml)
 importlib-resources==6.4.5 \
     --hash=sha256:980862a1d16c9e147a59603677fa2aa5fd82b87f223b6cb870695bcfce830065 \
