@@ -40,13 +40,14 @@ def list_installs_deduped() -> list[PythonInstall]:
 
     # First sort so the executables are in priority order
     deduped_installs = []
-    used_folders = set()
+    used_stdlib_folders = set()
     for inst in installs:
-        fld = os.path.dirname(inst.executable)
-        if fld in used_folders:
-            continue
-
-        used_folders.add(fld)
+        fld = inst.paths.get("stdlib")
+        if fld:
+            if fld in used_stdlib_folders:
+                continue
+            used_stdlib_folders.add(fld)
+    
         deduped_installs.append(inst)
 
     return deduped_installs
