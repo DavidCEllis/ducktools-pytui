@@ -72,6 +72,18 @@ Some example commands:
 * `global_venv_folder` - The folder to use for global pytui venvs, `~/.local/share/ducktools/pytui/venvs` by default
 * `shell_path` - Path to the shell used to launch activated venvs
 
+### Clearing the discovered Python install cache ###
+
+The Python install discovery cache is handled by the 
+[ducktools-pythonfinder](https://github.com/DavidCEllis/ducktools-pythonfinder)
+ package.
+
+The easiest way to clear the cache is to use the `ducktools-pythonfinder` commandline.
+
+* With uv: `uvx ducktools-pythonfinder clear-cache`
+* With pipx: `pipx run ducktools-pythonfinder clear-cache`
+* With the [pythonfinder zipapp](https://github.com/DavidCEllis/ducktools-pythonfinder/releases/latest): `python pythonfinder.pyz clear-cache`
+
 ### Shell Discovery ###
 
 By default PyTUI will check your `$SHELL` variable if it is set for the path to your default shell.
