@@ -29,11 +29,12 @@ import sys
 import asyncio
 import functools
 import subprocess
+import sysconfig
 
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import list_python_venvs, PythonVEnv, PythonPackage
 
-from textual import work
+from textual import work, markup
 from textual.app import App
 from textual.binding import Binding
 from textual.containers import Vertical
@@ -672,18 +673,27 @@ class ManagerApp(App):
             try:
                 result = await loop.run_in_executor(None, runtime.install)  # noqa
                 # self.notify(result.stderr)
-            except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            except FileNotFoundError as e:
                 self.notify(
-                    f"Install Failed: {e}",
-                    title="Error",
+                    f"Install Failed: {markup.escape(str(e))}",
+                    title="Manager Not Found",
                     severity="error",
                 )
             else:
-                self.notify(
-                    f"{runtime.key} installed successfully",
-                    title="New Install"
-                )
-                self._runtime_table.load_runtimes(clear_first=True)
+                if result.returncode == 0:
+                    self.notify(
+                        f"{runtime.key} installed successfully",
+                        title="New Install"
+                    )
+                    self._runtime_table.load_runtimes(clear_first=True)
+                else:
+                    for line in result.stderr.split("\n"):
+                        if line:   
+                            self.notify(
+                                markup.escape(line.strip()),
+                                title="Failed Install",
+                                severity="error"
+                            )
             finally:
                 self._runtime_table.loading = False
                 self.set_focus(self._runtime_table)
@@ -699,7 +709,7 @@ class ManagerApp(App):
             return
 
         # Check if the executable is within the base prefix folder
-        if os.path.commonpath([runtime.executable, sys.base_prefix]) == sys.base_prefix:
+        if runtime.paths.get("stdlib") == sysconfig.get_path("stdlib"):
             self.notify(
                 "Can not uninstall the runtime being used to run ducktools-pytui",
                 severity="warning",
@@ -719,16 +729,26 @@ class ManagerApp(App):
         try:
             result = await loop.run_in_executor(None, listing.uninstall)  # noqa
             # self.notify(result.stderr)
-        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+        except FileNotFoundError as e:
             self.notify(
-                f"Uninstall Failed: {e}",
+                f"Uninstall Failed: {markup.escape(str(e))}",
+                title="Manager Not Found",
                 severity="error",
             )
         else:
-            self.notify(
-                f"Runtime {listing.key!r} uninstalled."
-            )
-            self._runtime_table.load_runtimes(clear_first=True)
+            if result.returncode == 0:
+                self.notify(
+                    f"Runtime {listing.key!r} uninstalled."
+                )
+                self._runtime_table.load_runtimes(clear_first=True)
+            else:
+                for line in result.stderr.split("\n"):
+                    if line:   
+                        self.notify(
+                            markup.escape(line.strip()),
+                            title="Failed Uninstall",
+                            severity="error"
+                        )
         finally:
             self._runtime_table.loading = False
             self.set_focus(self._runtime_table)

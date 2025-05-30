@@ -239,7 +239,7 @@ def test_find_matching_listing_win(uv_installed_pythons):
         executable="C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\cpython-3.13.2-windows-x86_64-none\\python.exe",
         architecture="64bit",
         implementation="cpython",
-        managed_by="Astral UV",
+        managed_by="Astral uv",
         metadata={"freethreaded": False},
         shadowed=False,
     )
@@ -251,7 +251,7 @@ def test_find_matching_listing_win(uv_installed_pythons):
         executable="C:\\Users\\ducks\\AppData\\Roaming\\uv\\python\\pypy-3.10.19-windows-x86_64-none\\python.exe",
         architecture="64bit",
         implementation="pypy",
-        managed_by="Astral UV",
+        managed_by="Astral uv",
         metadata={"pypy_version": (7, 3, 19, "final", 0)},
         shadowed=False,
     )
@@ -302,7 +302,7 @@ def test_find_matching_listing_nonwin(uv_installed_pythons):
         executable="/home/david/.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/bin/python",
         architecture="64bit",
         implementation="cpython",
-        managed_by="Astral UV",
+        managed_by="Astral uv",
         metadata={"freethreaded": False},
         shadowed=False,
     )
@@ -314,7 +314,7 @@ def test_find_matching_listing_nonwin(uv_installed_pythons):
         executable="/home/david/.local/share/uv/python/pypy-3.10.19-linux-x86_64-gnu/bin/python",
         architecture="64bit",
         implementation="pypy",
-        managed_by="Astral UV",
+        managed_by="Astral uv",
         metadata={"pypy_version": (7, 3, 18, "final", 0)},
         shadowed=False,
     )
@@ -381,7 +381,6 @@ def test_install(uv_executable, uv_python_dir):
             ],
             capture_output=True,
             text=True,
-            check=True,
         )
 
         assert output == fake_out
@@ -432,7 +431,6 @@ def test_uninstall(uv_executable, uv_python_dir):
             ],
             capture_output=True,
             text=True,
-            check=True,
         )
 
         assert output == fake_out

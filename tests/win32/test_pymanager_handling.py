@@ -183,5 +183,4 @@ def test_install(pymanager_executable):
             ],
             capture_output=True,
             text=True,
-            check=True,
         )
