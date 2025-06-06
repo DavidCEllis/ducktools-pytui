@@ -58,6 +58,12 @@ from .runtime_installers import (
 
 CWD = os.getcwd()
 
+# This mapping handles nicer user facing names for "managed by"
+MANAGED_BY_MAPPING = {
+    "Astral": "Astral uv",  # UV Python Installer
+    "PythonCore": "python.org",  # Windows installer
+}
+
 
 class InstallableRuntimeTable(DataTable):
     def __init__(self, runtimes: list[PythonListing], *args, **kwargs):
@@ -74,9 +80,14 @@ class InstallableRuntimeTable(DataTable):
 
     def list_downloads(self):
         for dl in self.runtimes:
+            manager = MANAGED_BY_MAPPING.get(
+                dl.manager.organisation,
+                dl.manager.organisation
+            )
+
             self.add_row(
                 dl.version,
-                dl.manager.organisation,
+                manager,
                 dl.implementation,
                 dl.variant,
                 dl.arch,
@@ -394,9 +405,14 @@ class RuntimeTable(DataTable):
                 else:
                     version_str = f"{install.version_str} / {install.implementation_version_str}"
 
+                managed_by = MANAGED_BY_MAPPING.get(
+                    install.managed_by,
+                    install.managed_by
+                )
+
                 self.add_row(
                     version_str,
-                    install.managed_by,
+                    managed_by,
                     install.implementation,
                     install.executable,
                     key=install.executable
@@ -688,7 +704,7 @@ class ManagerApp(App):
                     self._runtime_table.load_runtimes(clear_first=True)
                 else:
                     for line in result.stderr.split("\n"):
-                        if line:   
+                        if line:
                             self.notify(
                                 markup.escape(line.strip()),
                                 title="Failed Install",
@@ -743,7 +759,7 @@ class ManagerApp(App):
                 self._runtime_table.load_runtimes(clear_first=True)
             else:
                 for line in result.stderr.split("\n"):
-                    if line:   
+                    if line:
                         self.notify(
                             markup.escape(line.strip()),
                             title="Failed Uninstall",
