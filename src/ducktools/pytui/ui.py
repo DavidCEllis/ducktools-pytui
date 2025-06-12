@@ -95,7 +95,7 @@ class InstallableRuntimeTable(DataTable):
             )
 
 
-class RuntimeInstallScreen(ModalScreen["PythonListing | None"]):
+class RuntimeInstallScreen(ModalScreen[PythonListing | None]):
     BINDINGS = [
         Binding(key="enter", action="install", description="Install Runtime", priority=True, show=True),
         Binding(key="escape", action="cancel", description="Cancel", show=True),
@@ -148,7 +148,7 @@ class RuntimeInstallScreen(ModalScreen["PythonListing | None"]):
             self.dismiss(None)
 
 
-class DependencyScreen(ModalScreen["list[PythonPackage]"]):
+class DependencyScreen(ModalScreen[list[PythonPackage]]):
     BINDINGS = [
         Binding(key="r", action="reload_dependencies", description="Reload Dependencies", show=True),
         Binding(key="escape", action="close", description="Close", show=True),
@@ -207,7 +207,7 @@ class DependencyScreen(ModalScreen["list[PythonPackage]"]):
         self.dependency_cache = dependencies
 
 
-class VEnvCreateScreen(ModalScreen["str | None"]):
+class VEnvCreateScreen(ModalScreen[str | None]):
     BINDINGS = [
         Binding(key="enter", action="create", description="Create VEnv", show=True, priority=True),
         Binding(key="escape", action="cancel", description="Cancel", show=True),
