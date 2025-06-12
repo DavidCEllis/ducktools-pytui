@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import sys
 
-from ._core import Shell
+from ._core import Shell, VEnvShellCommand
 
 
 class ZShell(Shell):
@@ -32,7 +32,7 @@ class ZShell(Shell):
     bin_name = "zsh"
     exclude = (sys.platform == "win32")
 
-    def get_venv_shell_command(self, env):
+    def get_venv_shell_command(self, env: dict[str, str]) -> VEnvShellCommand:
         base_prompt = "%n@%m:%~/ >"  # The SUSE prompt theme
         venv_prompt = env["PYTUI_VIRTUAL_ENV_PROMPT"]
         prompt = f"({venv_prompt}) {base_prompt} "
@@ -47,4 +47,4 @@ class ZShell(Shell):
             "PS1": prompt,
         }
 
-        return cmd, env_updates
+        return VEnvShellCommand(cmd, env_updates)

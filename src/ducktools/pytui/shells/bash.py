@@ -26,8 +26,7 @@ import os
 import subprocess
 import sys
 
-from ._core import Shell, get_shell_script
-
+from ._core import Shell, VEnvShellCommand, get_shell_script
 
 
 class BashShell(Shell):
@@ -38,11 +37,11 @@ class BashShell(Shell):
     bin_name = "bash"
     exclude = (sys.platform == "win32")
 
-    def get_venv_shell_command(self, env):
+    def get_venv_shell_command(self, env: dict[str, str]) -> VEnvShellCommand:
         rcfile = get_shell_script("activate_pytui.sh")
         cmd = [self.path, "--rcfile", rcfile]
-        env_updates = {}
-        return cmd, env_updates
+        env_updates: dict[str, str] = {}
+        return VEnvShellCommand(cmd, env_updates)
 
 
 class GitBashShell(BashShell):
@@ -70,7 +69,7 @@ class GitBashShell(BashShell):
         return prompt_getter.stdout.strip()
 
     @staticmethod
-    def get_deduped_path(path, venv_dir):
+    def get_deduped_path(path, venv_dir: str) -> str:
         """
         Special dedupe handling for git bash PATH details
 
