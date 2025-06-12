@@ -30,4 +30,5 @@ laz = LazyImporter()
 
 # These are actually imported lazily and do not exist within this module
 with capture_imports(laz):
-    import importlib.resources as resources  # noqa: F401
+    import importlib.resources as resources
+    import argparse as argparse
