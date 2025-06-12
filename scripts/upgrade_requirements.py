@@ -47,8 +47,8 @@ def upgrade_requirements():
             "--universal",
             "--generate-hashes",
             "-o", requirements_file,
-            "--constraint", constraints_file,
-            "--override", override_file,
+            # "--constraint", constraints_file,
+            # "--override", override_file,
             "--upgrade",
         ],
     )
