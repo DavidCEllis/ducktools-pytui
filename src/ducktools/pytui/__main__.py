@@ -184,13 +184,9 @@ def main():
 
         # No arguments, launch pytui
         from .ui import ManagerApp
-        import asyncio
-
+        
         app = ManagerApp()
-        if sys.version_info >= (3, 10):
-            asyncio.run(app.run_async())
-        else:
-            app.run()
+        app.run()
 
     return 0
 
