@@ -38,6 +38,7 @@ dynamic = ['version']
 
 [project.optional-dependencies]
 testing = ["pytest", "pytest-cov"]
+typing = ["mypy"]  # Make an extra for now, dependency group later
 
 [tool.setuptools.packages.find]
 where = ["src"]
