@@ -29,72 +29,13 @@ import subprocess
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from typing import ClassVar, Final, TypeAlias
+from typing import Any, ClassVar, Final, Generic, TypeAlias, TypeVar
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
 from ducktools.classbuilder.prefab import prefab, attribute
 
 
 _version_tuple_type: TypeAlias = tuple[int, int, int, str, int]  # type statement needs 3.12+
-
-
-class RuntimeManager(ABC):
-    available_managers: Final[list[type[RuntimeManager]]] = []
-    
-    organisation: ClassVar[str]
-
-    def __init_subclass__(cls):
-        RuntimeManager.available_managers.append(cls)
-
-    @staticmethod
-    def sort_listings(listings: Iterable[PythonListing]):
-        new_listings = sorted(listings, key=operator.attrgetter("variant", "arch", "key"))
-        new_listings.sort(key=operator.attrgetter("version_tuple"), reverse=True)
-        new_listings.sort(key=operator.attrgetter("implementation"))
-        return new_listings
-
-    @functools.cached_property
-    @abstractmethod
-    def executable(self) -> str | None:
-        """
-        Get the path to the manager executable or None if it is not installed
-        """
-        ...
-
-    @abstractmethod
-    def fetch_installed(self) -> list[PythonListing]:
-        """
-        Get a list of installed runtimes managed by the manager
-        """
-        ...
-
-    @abstractmethod
-    def _get_download_cache(self):
-        """
-        List all available downloads (cached method)
-        """
-
-    @abstractmethod
-    def fetch_downloads(self) -> list[PythonListing]:
-        """
-        List available downloads, exclude already downloaded (not cached)
-        """
-
-    def find_matching_listing(self, install: PythonInstall) -> PythonListing | None:
-        if install.managed_by is None or not install.managed_by.startswith(self.organisation):
-            return None
-
-        # Executable names may not match, one may find python.exe, the other pypy.exe
-        # Use the parent folder.
-        installed_dict = {
-            os.path.dirname(os.path.abspath(py.path)): py
-            for py in self.fetch_installed()
-            if py.path is not None
-        }
-
-        install_path = os.path.dirname(install.executable)
-
-        return installed_dict.get(install_path, None)
 
 
 @prefab(kw_only=True)
@@ -120,16 +61,16 @@ class PythonListing(ABC):
         return self._version_tuple
 
     @property
-    def full_key(self):
+    def full_key(self) -> str:
         return f"{type(self).__name__} / {self.key}"
 
     @property
-    def will_overwrite(self):
+    def will_overwrite(self) -> bool:
         return False
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, manager, entry):
+    def from_dict(cls, manager, entry) -> PythonListing:
         ...
 
     @abstractmethod
@@ -139,3 +80,65 @@ class PythonListing(ABC):
     @abstractmethod
     def uninstall(self) -> subprocess.CompletedProcess | None:
         ...
+
+
+Listing = TypeVar("Listing", bound=PythonListing)
+
+
+class RuntimeManager(Generic[Listing], ABC):
+    available_managers: Final[list[type[RuntimeManager]]] = []
+    
+    organisation: ClassVar[str]
+
+    def __init_subclass__(cls) -> None:
+        RuntimeManager.available_managers.append(cls)
+
+    @staticmethod
+    def sort_listings(listings: Iterable[Listing]) -> list[Listing]:
+        new_listings = sorted(listings, key=operator.attrgetter("variant", "arch", "key"))
+        new_listings.sort(key=operator.attrgetter("version_tuple"), reverse=True)
+        new_listings.sort(key=operator.attrgetter("implementation"))
+        return new_listings
+
+    @functools.cached_property
+    @abstractmethod
+    def executable(self) -> str | None:
+        """
+        Get the path to the manager executable or None if it is not installed
+        """
+        ...
+
+    @abstractmethod
+    def fetch_installed(self) -> list[Listing]:
+        """
+        Get a list of installed runtimes managed by the manager
+        """
+        ...
+
+    @abstractmethod
+    def _get_download_cache(self) -> list[Listing]:
+        """
+        List all available downloads (cached method)
+        """
+
+    @abstractmethod
+    def fetch_downloads(self) -> list[Listing]:
+        """
+        List available downloads, exclude already downloaded (not cached)
+        """
+
+    def find_matching_listing(self, install: PythonInstall) -> Listing | None:
+        if install.managed_by is None or not install.managed_by.startswith(self.organisation):
+            return None
+
+        # Executable names may not match, one may find python.exe, the other pypy.exe
+        # Use the parent folder.
+        installed_dict = {
+            os.path.dirname(os.path.abspath(py.path)): py
+            for py in self.fetch_installed()
+            if py.path is not None
+        }
+
+        install_path = os.path.dirname(install.executable)
+
+        return installed_dict.get(install_path, None)
