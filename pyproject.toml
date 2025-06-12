@@ -12,7 +12,7 @@ authors = [
   { name="David C Ellis" },
 ]
 readme="README.md"
-requires-python = ">=3.8.0"
+requires-python = ">=3.10"
 dependencies = [
     "ducktools-classbuilder>=0.9.1",
     "ducktools-pythonfinder>=0.9.3",
@@ -22,8 +22,6 @@ dependencies = [
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
