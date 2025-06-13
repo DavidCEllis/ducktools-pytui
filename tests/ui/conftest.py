@@ -14,10 +14,10 @@ DATA_FOLDER = Path(__file__).parents[1] / "example_data" / "pythonfinder"
 
 
 @fixture
-def patched_config():
+async def patched_config():
     with (
         patch.object(Config, "from_file") as patched_config, 
-        patch.object(Config, "write_config") as patched_write,  # prevent accidental writes
+        patch.object(Config, "write_config"),  # prevent accidental writes
     ):
         # This file shouldn't actually be created as the write is patched
         config = Config(config_file="/tmp/pytui_test_config.json")
@@ -26,14 +26,15 @@ def patched_config():
 
 
 @fixture(scope="session")
-def runtimes() -> list[PythonInstall]:
+async def runtimes() -> list[PythonInstall]:
     raw_installs = json.loads((DATA_FOLDER / "runtimes_data.json").read_text())
     pys = [PythonInstall.from_json(**inst) for inst in raw_installs]
+    assert len(pys) > 0
     return pys
 
 
 @fixture(scope="session")
-def local_venvs() -> list[PythonVEnv]:
+async def local_venvs() -> list[PythonVEnv]:
     raw_venvs = json.loads((DATA_FOLDER / "local_venvs.json").read_text())
     venvs = []
     for v in raw_venvs:
@@ -42,14 +43,14 @@ def local_venvs() -> list[PythonVEnv]:
             executable=v["executable"],
             version=tuple(v["version"]),
             parent_path=v["parent_path"],
-            _parent_executable=v["parent_executable"],
+            _parent_executable=v["_parent_executable"],
         )
         venvs.append(venv)
     return venvs
 
 
 @fixture(scope="session")
-def global_venvs() -> list[PythonVEnv]:
+async def global_venvs() -> list[PythonVEnv]:
     raw_venvs = json.loads((DATA_FOLDER / "global_venvs.json").read_text())
     venvs = []
     for v in raw_venvs:
@@ -58,21 +59,21 @@ def global_venvs() -> list[PythonVEnv]:
             executable=v["executable"],
             version=tuple(v["version"]),
             parent_path=v["parent_path"],
-            _parent_executable=v["parent_executable"],
+            _parent_executable=v["_parent_executable"],
         )
         venvs.append(venv)
     return venvs
 
 
 @fixture(autouse=True)
-def patch_list_installs(runtimes):
-    with mock.patch("ducktools.pytui.ui.list_installs_deduped") as mock_deduped:
+async def patch_list_installs(runtimes):
+    with patch("ducktools.pytui.ui.list_installs_deduped") as mock_deduped:
         mock_deduped.return_value = runtimes
         yield
 
 
 @fixture(autouse=True)
-def patch_list_venvs(local_venvs, global_venvs, patched_config):
+async def patch_list_venvs(local_venvs, global_venvs, patched_config):
     def get_venv(base_dir=None, recursive=False, search_parent_folders=False):
         if base_dir == patched_config.global_venv_folder:
             return global_venvs
@@ -80,6 +81,6 @@ def patch_list_venvs(local_venvs, global_venvs, patched_config):
             return local_venvs
 
 
-    with mock.patch("ducktools.pytui.ui.list_python_venvs") as venv_mock:
-        venv.mock.side_effect = get_venv
+    with patch("ducktools.pytui.ui.list_python_venvs") as venv_mock:
+        venv_mock.side_effect = get_venv
         yield
