@@ -13,6 +13,18 @@ from ducktools.pytui.config import Config
 DATA_FOLDER = Path(__file__).parents[1] / "example_data" / "pythonfinder"
 
 
+@fixture
+def patched_config():
+    with (
+        patch.object(Config, "from_file") as patched_config, 
+        patch.object(Config, "write_config") as patched_write,  # prevent accidental writes
+    ):
+        # This file shouldn't actually be created as the write is patched
+        config = Config(config_file="/tmp/pytui_test_config.json")
+        patched_config.return_value = config
+        yield config
+
+
 @fixture(scope="session")
 def runtimes() -> list[PythonInstall]:
     raw_installs = json.loads((DATA_FOLDER / "runtimes_data.json").read_text())
@@ -60,11 +72,14 @@ def patch_list_installs(runtimes):
 
 
 @fixture(autouse=True)
-def patched_config():
-    with (
-        patch.object(Config, "from_file") as patched_config, 
-        patch.object(Config, "write_config") as patched_write,  # prevent accidental writes
-    ):
-        # This file shouldn't actually be created as the write is patched
-        patched_config.return_value = Config(config_file="/tmp/pytui_test_config.json")
+def patch_list_venvs(local_venvs, global_venvs, patched_config):
+    def get_venv(base_dir=None, recursive=False, search_parent_folders=False):
+        if base_dir == patched_config.global_venv_folder:
+            return global_venvs
+        else:
+            return local_venvs
+
+
+    with mock.patch("ducktools.pytui.ui.list_python_venvs") as venv_mock:
+        venv.mock.side_effect = get_venv
         yield
