@@ -37,9 +37,9 @@ from ducktools.pytui.runtime_installers import uv
 from ducktools.pytui.runtime_installers.uv import UVPythonListing, UVManager
 
 if sys.platform == "win32":
-    example_folder = Path(__file__).parent / "example_data" / "win32"
+    example_folder = Path(__file__).parent / "example_data" / "install_managers" / "win32"
 else:
-    example_folder = Path(__file__).parent / "example_data"
+    example_folder = Path(__file__).parent / "example_data" / "install_managers"
 
 
 @functools.lru_cache(maxsize=None)
