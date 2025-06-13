@@ -1,0 +1,70 @@
+import json
+from pathlib import Path
+from unittest.mock import patch
+
+from pytest import fixture
+
+from ducktools.pythonfinder import PythonInstall
+from ducktools.pythonfinder.venv import PythonVEnv
+
+from ducktools.pytui.config import Config
+
+
+DATA_FOLDER = Path(__file__).parents[1] / "example_data" / "pythonfinder"
+
+
+@fixture(scope="session")
+def runtimes() -> list[PythonInstall]:
+    raw_installs = json.loads((DATA_FOLDER / "runtimes_data.json").read_text())
+    pys = [PythonInstall.from_json(**inst) for inst in raw_installs]
+    return pys
+
+
+@fixture(scope="session")
+def local_venvs() -> list[PythonVEnv]:
+    raw_venvs = json.loads((DATA_FOLDER / "local_venvs.json").read_text())
+    venvs = []
+    for v in raw_venvs:
+        venv = PythonVEnv(
+            folder=v["folder"],
+            executable=v["executable"],
+            version=tuple(v["version"]),
+            parent_path=v["parent_path"],
+            _parent_executable=v["parent_executable"],
+        )
+        venvs.append(venv)
+    return venvs
+
+
+@fixture(scope="session")
+def global_venvs() -> list[PythonVEnv]:
+    raw_venvs = json.loads((DATA_FOLDER / "global_venvs.json").read_text())
+    venvs = []
+    for v in raw_venvs:
+        venv = PythonVEnv(
+            folder=v["folder"],
+            executable=v["executable"],
+            version=tuple(v["version"]),
+            parent_path=v["parent_path"],
+            _parent_executable=v["parent_executable"],
+        )
+        venvs.append(venv)
+    return venvs
+
+
+@fixture(autouse=True)
+def patch_list_installs(runtimes):
+    with mock.patch("ducktools.pytui.ui.list_installs_deduped") as mock_deduped:
+        mock_deduped.return_value = runtimes
+        yield
+
+
+@fixture(autouse=True)
+def patched_config():
+    with (
+        patch.object(Config, "from_file") as patched_config, 
+        patch.object(Config, "write_config") as patched_write,  # prevent accidental writes
+    ):
+        # This file shouldn't actually be created as the write is patched
+        patched_config.return_value = Config(config_file="/tmp/pytui_test_config.json")
+        yield

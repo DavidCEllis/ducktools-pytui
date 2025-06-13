@@ -37,7 +37,7 @@ dynamic = ['version']
 "ducktools-pytui" = "ducktools.pytui.__main__:main"  # For uvx invocations
 
 [project.optional-dependencies]
-testing = ["pytest", "pytest-cov"]
+testing = ["pytest", "pytest-cov", "pytest-asyncio"]
 typing = ["mypy"]  # Make an extra for now, dependency group later
 
 [tool.setuptools.packages.find]
