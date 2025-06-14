@@ -122,6 +122,9 @@ def get_parser() -> _laz.argparse.ArgumentParser:
 
 
 def main() -> int:
+    if not sys.stdout.isatty():
+        raise RuntimeError("No TTY detected, exiting")
+
     if sys.version_info < (3, 10):
         v = sys.version_info
         print(
