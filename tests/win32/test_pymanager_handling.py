@@ -31,7 +31,7 @@ import pytest
 
 from ducktools.pytui.runtime_installers.pythoncore import PythonCoreManager, PythonCoreListing
 
-example_folder = Path(__file__).parents[1] / "example_data" / "win32"
+example_folder = Path(__file__).parents[1] / "example_data" / "install_managers" / "win32"
 
 @functools.lru_cache(maxsize=None)
 def pymanager_download_json() -> str:

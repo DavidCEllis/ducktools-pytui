@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.8"  # build with oldest supported python
+        python-version: "3.10"  # build with oldest supported python
     - name: Build the Zipapp
       run: >-
         python3 scripts/build_zipapp.py

@@ -32,7 +32,7 @@ import re
 import shutil
 import subprocess
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from ducktools.classbuilder.prefab import prefab
 
@@ -40,79 +40,6 @@ from .base import RuntimeManager, PythonListing
 
 
 freethreaded_re = re.compile(r"^\d+.\d+t.*$")
-
-
-class PythonCoreManager(RuntimeManager):
-    organisation: ClassVar[str] = "PythonCore"
-
-    @functools.cached_property
-    def executable(self):
-        return shutil.which("pymanager")
-
-    def fetch_installed(self):
-        cmd = [
-            self.executable, "list", "--only-managed", "--format=json",
-        ]
-        installed_list_cmd = subprocess.run(
-            cmd, capture_output=True, text=True, check=True,
-        )
-        json_data = json.loads(installed_list_cmd.stdout)
-        installed_pys = [
-            PythonCoreListing.from_dict(manager=self, entry=v)
-            for v in json_data.get("versions", [])
-        ]
-        return installed_pys
-
-    @functools.lru_cache(maxsize=None)
-    def _get_download_cache(self):
-        """
-        Get the raw unfiltered download list.
-        This is cached to avoid repeated calls to PyManager for downloads.
-        This data should only change on new Python releases.
-
-        :return: List of PythonCoreListings for all downloads
-        """
-        cmd = [
-            self.executable, "list", "--online", "--format=json",
-        ]
-        download_list_cmd = subprocess.run(
-            cmd, capture_output=True, text=True, check=True,
-        )
-        json_data = json.loads(download_list_cmd.stdout)
-
-        downloads = [
-            PythonCoreListing.from_dict(manager=self, entry=v)
-            for v in json_data.get("versions", [])
-        ]
-
-        return downloads
-
-    def fetch_downloads(self):
-        """
-        Get the filtered list of downloads, with installed versions removed.
-
-        :return: filtered download list
-        """
-        downloads = self._get_download_cache()
-
-        installed_versions = {(v.key, v.version) for v in self.fetch_installed()}
-
-        # PythonEmbed used for embedded distributions
-        # PythonTest used for distributions with tests
-        # PythonCore are the ones we want
-        arch = platform.machine()
-        if arch == "AMD64":
-            arch = "x86_64"
-
-        download_listings = [
-            v
-            for v in downloads
-            if (v.key, v.version) not in installed_versions
-            and v.company == "PythonCore"
-            and v.arch == arch
-        ]
-
-        return self.sort_listings(download_listings)
 
 
 @prefab(kw_only=True)
@@ -125,7 +52,8 @@ class PythonCoreListing(PythonListing):
     install_for: list[str]
 
     @classmethod
-    def from_dict(cls, manager: PythonCoreManager, entry: dict):
+    def from_dict(cls, manager: PythonCoreManager, entry: dict[str, Any]) -> PythonCoreListing:
+    
         key = entry["id"]
         version = entry["sort-version"]
         name = entry["display-name"]
@@ -165,13 +93,16 @@ class PythonCoreListing(PythonListing):
         )
 
     @property
-    def will_overwrite(self):
+    def will_overwrite(self) -> bool:
         for v in self.manager.fetch_installed():
             if self.tag == v.tag:
                 return True
         return False
 
-    def install(self):
+    def install(self) -> subprocess.CompletedProcess | None:
+        if self.manager.executable is None:
+            raise FileNotFoundError("Could not find the 'pymanager' executable on PATH")
+
         if self.path:
             return None
 
@@ -191,7 +122,10 @@ class PythonCoreListing(PythonListing):
         return result
 
 
-    def uninstall(self):
+    def uninstall(self) -> subprocess.CompletedProcess | None:
+        if self.manager.executable is None:
+            raise FileNotFoundError("Could not find the 'pymanager' executable on PATH")
+
         if not (self.path and os.path.exists(self.path)):
             return None
 
@@ -208,3 +142,82 @@ class PythonCoreListing(PythonListing):
             cmd, capture_output=True, text=True
         )
         return result
+
+
+class PythonCoreManager(RuntimeManager[PythonCoreListing]):
+    organisation: ClassVar[str] = "PythonCore"
+
+    @functools.cached_property
+    def executable(self) -> str | None:
+        return shutil.which("pymanager")
+
+    def fetch_installed(self) -> list[PythonCoreListing]:
+        if self.executable is None:
+            raise FileNotFoundError("Could not find the 'pymanager' executable on PATH")
+        
+        cmd = [
+            self.executable, "list", "--only-managed", "--format=json",
+        ]
+        installed_list_cmd = subprocess.run(
+            cmd, capture_output=True, text=True, check=True,
+        )
+        json_data = json.loads(installed_list_cmd.stdout)
+        installed_pys = [
+            PythonCoreListing.from_dict(manager=self, entry=v)
+            for v in json_data.get("versions", [])
+        ]
+        return installed_pys
+
+    @functools.lru_cache(maxsize=None)
+    def _get_download_cache(self) -> list[PythonCoreListing]:
+        """
+        Get the raw unfiltered download list.
+        This is cached to avoid repeated calls to PyManager for downloads.
+        This data should only change on new Python releases.
+
+        :return: List of PythonCoreListings for all downloads
+        """
+        if self.executable is None:
+            raise FileNotFoundError("Could not find the 'pymanager' executable on PATH")
+        
+        cmd = [
+            self.executable, "list", "--online", "--format=json",
+        ]
+        download_list_cmd = subprocess.run(
+            cmd, capture_output=True, text=True, check=True,
+        )
+        json_data = json.loads(download_list_cmd.stdout)
+
+        downloads = [
+            PythonCoreListing.from_dict(manager=self, entry=v)
+            for v in json_data.get("versions", [])
+        ]
+
+        return downloads
+
+    def fetch_downloads(self) -> list[PythonCoreListing]:
+        """
+        Get the filtered list of downloads, with installed versions removed.
+
+        :return: filtered download list
+        """
+        downloads = self._get_download_cache()
+
+        installed_versions = {(v.key, v.version) for v in self.fetch_installed()}
+
+        # PythonEmbed used for embedded distributions
+        # PythonTest used for distributions with tests
+        # PythonCore are the ones we want
+        arch = platform.machine()
+        if arch == "AMD64":
+            arch = "x86_64"
+
+        download_listings = [
+            v
+            for v in downloads
+            if (v.key, v.version) not in installed_versions
+            and v.company == "PythonCore"
+            and v.arch == arch
+        ]
+
+        return self.sort_listings(download_listings)

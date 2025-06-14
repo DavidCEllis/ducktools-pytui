@@ -22,14 +22,14 @@
 # SOFTWARE.
 from __future__ import annotations
 
-from ._core import Shell
+from ._core import Shell, VEnvShellCommand
 
 
 class CMDShell(Shell):
     name = "Command Prompt"
     bin_name = "cmd.exe"
 
-    def get_venv_shell_command(self, env):
+    def get_venv_shell_command(self, env: dict[str, str]) -> VEnvShellCommand:
         shell_prompt = env.get("PROMPT", "$P$G")
         old_venv_prompt = env.get("VIRTUAL_ENV_PROMPT")
         new_venv_prompt = env["PYTUI_VIRTUAL_ENV_PROMPT"]
@@ -48,4 +48,4 @@ class CMDShell(Shell):
             "PROMPT": new_prompt,
         }
 
-        return cmd, env_updates
+        return VEnvShellCommand(cmd, env_updates)

@@ -1,0 +1,313 @@
+[
+  {
+    "version": [
+      3,
+      13,
+      5,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/bin/python",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "Astral",
+    "metadata": {
+      "freethreaded": false
+    },
+    "paths": {
+      "stdlib": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/lib/python3.13",
+      "platstdlib": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/lib/python3.13",
+      "purelib": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/lib/python3.13/site-packages",
+      "platlib": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/lib/python3.13/site-packages",
+      "include": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/include/python3.13",
+      "platinclude": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/include/python3.13",
+      "scripts": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/bin",
+      "data": "/home/ducksual/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu"
+    }
+  },
+  {
+    "version": [
+      3,
+      13,
+      4,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.pyenv/versions/3.13.4/bin/python",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "pyenv",
+    "metadata": {
+      "freethreaded": false
+    },
+    "paths": {
+      "stdlib": "/home/ducksual/.pyenv/versions/3.13.4/lib/python3.13",
+      "platstdlib": "/home/ducksual/.pyenv/versions/3.13.4/lib/python3.13",
+      "purelib": "/home/ducksual/.pyenv/versions/3.13.4/lib/python3.13/site-packages",
+      "platlib": "/home/ducksual/.pyenv/versions/3.13.4/lib/python3.13/site-packages",
+      "include": "/home/ducksual/.pyenv/versions/3.13.4/include/python3.13",
+      "platinclude": "/home/ducksual/.pyenv/versions/3.13.4/include/python3.13",
+      "scripts": "/home/ducksual/.pyenv/versions/3.13.4/bin",
+      "data": "/home/ducksual/.pyenv/versions/3.13.4"
+    }
+  },
+  {
+    "version": [
+      3,
+      13,
+      4,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/bin/python",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "Astral",
+    "metadata": {
+      "freethreaded": false
+    },
+    "paths": {
+      "stdlib": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/lib/python3.13",
+      "platstdlib": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/lib/python3.13",
+      "purelib": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/lib/python3.13/site-packages",
+      "platlib": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/lib/python3.13/site-packages",
+      "include": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/include/python3.13",
+      "platinclude": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/include/python3.13",
+      "scripts": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/bin",
+      "data": "/home/ducksual/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu"
+    }
+  },
+  {
+    "version": [
+      3,
+      13,
+      3,
+      "final",
+      0
+    ],
+    "executable": "/usr/bin/python3",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "OS",
+    "metadata": {
+      "freethreaded": false
+    },
+    "paths": {
+      "stdlib": "/usr/lib64/python3.13",
+      "platstdlib": "/usr/local/lib64/python3.13",
+      "purelib": "/usr/local/lib/python3.13/site-packages",
+      "platlib": "/usr/local/lib64/python3.13/site-packages",
+      "include": "/usr/include/python3.13",
+      "platinclude": "/usr/include/python3.13",
+      "scripts": "/usr/local/bin",
+      "data": "/usr/local"
+    }
+  },
+  {
+    "version": [
+      3,
+      12,
+      11,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/bin/python",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "Astral",
+    "metadata": {},
+    "paths": {
+      "stdlib": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12",
+      "platstdlib": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12",
+      "purelib": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/site-packages",
+      "platlib": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/site-packages",
+      "include": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/include/python3.12",
+      "platinclude": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/include/python3.12",
+      "scripts": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/bin",
+      "data": "/home/ducksual/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu"
+    }
+  },
+  {
+    "version": [
+      3,
+      11,
+      13,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/bin/python",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "Astral",
+    "metadata": {},
+    "paths": {
+      "stdlib": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/lib/python3.11",
+      "platstdlib": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/lib/python3.11",
+      "purelib": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/lib/python3.11/site-packages",
+      "platlib": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/lib/python3.11/site-packages",
+      "include": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/include/python3.11",
+      "platinclude": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/include/python3.11",
+      "scripts": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/bin",
+      "data": "/home/ducksual/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu"
+    }
+  },
+  {
+    "version": [
+      3,
+      11,
+      11,
+      "final",
+      0
+    ],
+    "executable": "/usr/bin/pypy3",
+    "architecture": "64bit",
+    "implementation": "pypy",
+    "managed_by": "OS",
+    "metadata": {
+      "pypy_version": [
+        7,
+        3,
+        19,
+        "final",
+        0
+      ]
+    },
+    "paths": {
+      "stdlib": "/usr/lib64/pypy3.11",
+      "platstdlib": "/usr/lib64/pypy3.11",
+      "purelib": "/usr/lib/pypy3.11/site-packages",
+      "platlib": "/usr/lib64/pypy3.11/site-packages",
+      "include": "/usr/include/pypy3.11",
+      "platinclude": "/usr/include/pypy3.11",
+      "scripts": "/usr/bin",
+      "data": "/usr"
+    }
+  },
+  {
+    "version": [
+      3,
+      11,
+      7,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/bin/python",
+    "architecture": "64bit",
+    "implementation": "graalpy",
+    "managed_by": "Astral",
+    "metadata": {
+      "graalpy_version": [
+        24,
+        2,
+        1,
+        "final",
+        0
+      ]
+    },
+    "paths": {
+      "stdlib": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/lib/python3.11",
+      "platstdlib": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/lib/python3.11",
+      "purelib": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/lib/python3.11/site-packages",
+      "platlib": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/lib/python3.11/site-packages",
+      "include": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/include/python3.11",
+      "platinclude": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/include/python3.11",
+      "scripts": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu/bin",
+      "data": "/home/ducksual/.local/share/uv/python/graalpy-3.11.0-linux-x86_64-gnu"
+    }
+  },
+  {
+    "version": [
+      3,
+      10,
+      18,
+      "final",
+      0
+    ],
+    "executable": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/bin/python",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "Astral",
+    "metadata": {},
+    "paths": {
+      "stdlib": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/lib/python3.10",
+      "platstdlib": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/lib/python3.10",
+      "purelib": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/lib/python3.10/site-packages",
+      "platlib": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/lib/python3.10/site-packages",
+      "include": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/include/python3.10",
+      "platinclude": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/include/python3.10",
+      "scripts": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu/bin",
+      "data": "/home/ducksual/.local/share/uv/python/cpython-3.10.18-linux-x86_64-gnu"
+    }
+  },
+  {
+    "version": [
+      3,
+      4,
+      0,
+      "final",
+      0
+    ],
+    "executable": "/usr/bin/micropython",
+    "architecture": "64bit",
+    "implementation": "micropython",
+    "managed_by": "OS",
+    "metadata": {
+      "micropython_version": [
+        1,
+        25,
+        0
+      ]
+    },
+    "paths": {}
+  },
+  {
+    "version": [
+      2,
+      7,
+      18,
+      "final",
+      42
+    ],
+    "executable": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/bin/python",
+    "architecture": "64bit",
+    "implementation": "pypy",
+    "managed_by": "pyenv",
+    "metadata": {},
+    "paths": {
+      "stdlib": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/lib-pypy/2.7",
+      "platstdlib": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/lib-pypy/2.7",
+      "purelib": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/site-packages",
+      "platlib": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/site-packages",
+      "include": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/include",
+      "platinclude": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/include",
+      "scripts": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19/bin",
+      "data": "/home/ducksual/.pyenv/versions/pypy2.7-7.3.19"
+    }
+  },
+  {
+    "version": [
+      3,
+      14,
+      0,
+      "beta",
+      2
+    ],
+    "executable": "/usr/bin/python3.14",
+    "architecture": "64bit",
+    "implementation": "cpython",
+    "managed_by": "OS",
+    "metadata": {
+      "freethreaded": false
+    },
+    "paths": {
+      "stdlib": "/usr/lib64/python3.14",
+      "platstdlib": "/usr/local/lib64/python3.14",
+      "purelib": "/usr/local/lib/python3.14/site-packages",
+      "platlib": "/usr/local/lib64/python3.14/site-packages",
+      "include": "/usr/include/python3.14",
+      "platinclude": "/usr/include/python3.14",
+      "scripts": "/usr/local/bin",
+      "data": "/usr/local"
+    }
+  }
+]
