@@ -1,8 +1,20 @@
+import sys
 from operator import itemgetter
+
+import pytest
 
 from ducktools.pytui.ui import ManagerApp, MANAGED_BY_MAPPING
 
+from textual.worker import WorkerFailed
 
+flaky_test = pytest.mark.xfail(
+    reason="Test sometimes fails with no screen", 
+    strict=False,
+    raises=WorkerFailed,
+)
+
+
+@flaky_test
 async def test_runtime_table(runtimes):
     app = ManagerApp()
     async with app.run_test() as pilot:

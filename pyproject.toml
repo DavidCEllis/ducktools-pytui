@@ -36,9 +36,13 @@ dynamic = ['version']
 "pytui" = "ducktools.pytui.__main__:main"
 "ducktools-pytui" = "ducktools.pytui.__main__:main"  # For uvx invocations
 
-[project.optional-dependencies]
-testing = ["pytest", "pytest-cov", "pytest-asyncio"]
-typing = ["mypy"]  # Make an extra for now, dependency group later
+[dependency-groups]
+dev = [
+    "pytest>=8.4",
+    "pytest-cov>=6.1",
+    "pytest-asyncio>=1.0",
+    "mypy>=1.16",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
