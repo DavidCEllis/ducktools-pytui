@@ -52,3 +52,7 @@ def uv_python_dir():
         else:
             fake_py_dir.return_value = "/home/david/.local/share/uv/python"
         yield
+
+
+def pytest_report_header():
+    return f"virtualenv: {sys.prefix}"
