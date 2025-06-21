@@ -1,20 +1,25 @@
-# This file is a part of ducktools.pytui
-# A TUI for managing Python installs and virtual environments
+# ducktools-pytui
+# MIT License
 #
-# Copyright (C) 2025  David C Ellis
+# Copyright (c) 2025 David C Ellis
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 from __future__ import annotations
 
 import functools
@@ -24,75 +29,13 @@ import subprocess
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from typing import ClassVar
+from typing import Any, ClassVar, Final, Generic, TypeAlias, TypeVar
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
 from ducktools.classbuilder.prefab import prefab, attribute
 
-# typing hack - avoid deprecated alias on newer python
-if sys.version_info >= (3, 9):
-    _version_tuple_type = tuple[int, int, int, str, int]
-else:
-    from typing import Tuple
-    _version_tuple_type = Tuple[int, int, int, str, int]
 
-
-class RuntimeManager(ABC):
-    available_managers: ClassVar[list[type[RuntimeManager]]] = []
-    organisation: ClassVar[str | None] = None
-
-    def __init_subclass__(cls):
-        RuntimeManager.available_managers.append(cls)
-
-    @staticmethod
-    def sort_listings(listings: Iterable[PythonListing]):
-        new_listings = sorted(listings, key=operator.attrgetter("variant", "arch", "key"))
-        new_listings.sort(key=operator.attrgetter("version_tuple"), reverse=True)
-        new_listings.sort(key=operator.attrgetter("implementation"))
-        return new_listings
-
-    @functools.cached_property
-    @abstractmethod
-    def executable(self) -> str | None:
-        """
-        Get the path to the manager executable or None if it is not installed
-        """
-        ...
-
-    @abstractmethod
-    def fetch_installed(self) -> list[PythonListing]:
-        """
-        Get a list of installed runtimes managed by the manager
-        """
-        ...
-
-    @abstractmethod
-    def _get_download_cache(self):
-        """
-        List all available downloads (cached method)
-        """
-
-    @abstractmethod
-    def fetch_downloads(self) -> list[PythonListing]:
-        """
-        List available downloads, exclude already downloaded (not cached)
-        """
-
-    def find_matching_listing(self, install: PythonInstall) -> PythonListing | None:
-        if install.managed_by is None or not install.managed_by.startswith(self.organisation):
-            return None
-
-        # Executable names may not match, one may find python.exe, the other pypy.exe
-        # Use the parent folder.
-        installed_dict = {
-            os.path.dirname(os.path.abspath(py.path)): py
-            for py in self.fetch_installed()
-            if py.path is not None
-        }
-
-        install_path = os.path.dirname(install.executable)
-
-        return installed_dict.get(install_path, None)
+_version_tuple_type: TypeAlias = tuple[int, int, int, str, int]  # type statement needs 3.12+
 
 
 @prefab(kw_only=True)
@@ -118,16 +61,16 @@ class PythonListing(ABC):
         return self._version_tuple
 
     @property
-    def full_key(self):
+    def full_key(self) -> str:
         return f"{type(self).__name__} / {self.key}"
 
     @property
-    def will_overwrite(self):
+    def will_overwrite(self) -> bool:
         return False
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, manager, entry):
+    def from_dict(cls, manager, entry) -> PythonListing:
         ...
 
     @abstractmethod
@@ -137,3 +80,65 @@ class PythonListing(ABC):
     @abstractmethod
     def uninstall(self) -> subprocess.CompletedProcess | None:
         ...
+
+
+Listing = TypeVar("Listing", bound=PythonListing)
+
+
+class RuntimeManager(Generic[Listing], ABC):
+    available_managers: Final[list[type[RuntimeManager]]] = []
+    
+    organisation: ClassVar[str]
+
+    def __init_subclass__(cls) -> None:
+        RuntimeManager.available_managers.append(cls)
+
+    @staticmethod
+    def sort_listings(listings: Iterable[Listing]) -> list[Listing]:
+        new_listings = sorted(listings, key=operator.attrgetter("variant", "arch", "key"))
+        new_listings.sort(key=operator.attrgetter("version_tuple"), reverse=True)
+        new_listings.sort(key=operator.attrgetter("implementation"))
+        return new_listings
+
+    @functools.cached_property
+    @abstractmethod
+    def executable(self) -> str | None:
+        """
+        Get the path to the manager executable or None if it is not installed
+        """
+        ...
+
+    @abstractmethod
+    def fetch_installed(self) -> list[Listing]:
+        """
+        Get a list of installed runtimes managed by the manager
+        """
+        ...
+
+    @abstractmethod
+    def _get_download_cache(self) -> list[Listing]:
+        """
+        List all available downloads (cached method)
+        """
+
+    @abstractmethod
+    def fetch_downloads(self) -> list[Listing]:
+        """
+        List available downloads, exclude already downloaded (not cached)
+        """
+
+    def find_matching_listing(self, install: PythonInstall) -> Listing | None:
+        if install.managed_by is None or not install.managed_by.startswith(self.organisation):
+            return None
+
+        # Executable names may not match, one may find python.exe, the other pypy.exe
+        # Use the parent folder.
+        installed_dict = {
+            os.path.dirname(os.path.abspath(py.path)): py
+            for py in self.fetch_installed()
+            if py.path is not None
+        }
+
+        install_path = os.path.dirname(install.executable)
+
+        return installed_dict.get(install_path, None)

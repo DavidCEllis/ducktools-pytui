@@ -25,7 +25,7 @@ from __future__ import annotations
 import os
 import shutil
 import sys
-from typing import ClassVar
+from typing import ClassVar, NamedTuple
 
 from ducktools.classbuilder.prefab import Prefab
 
@@ -33,6 +33,15 @@ from ducktools.classbuilder.prefab import Prefab
 from .. import _lazy_imports as _laz
 from .._version import __version__
 from ..platform_paths import SHELL_SCRIPT_FOLDER
+
+
+class VEnvShellCommand(NamedTuple):
+    """
+    Class to store the command and environment variables for the venv
+    shell creation command.
+    """
+    cmd: list[str]
+    env: dict[str, str]
 
 
 class Shell(Prefab):
@@ -51,7 +60,7 @@ class Shell(Prefab):
     def get_venv_shell_command(
         self,
         env: dict[str, str]
-    ) -> tuple[list[str], dict[str, str]]:  # pragma: no cover
+    ) -> VEnvShellCommand:  # pragma: no cover
         raise NotImplementedError("get_venv_shell_command must be implemented in subclasses")
 
     def get_env_path(self) -> str:

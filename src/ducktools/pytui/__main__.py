@@ -20,18 +20,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
 
 import os, os.path
 import sys
 
-from ._version import __version__
+from ducktools.lazyimporter import LazyImporter, FromImport
+
+from . import _lazy_imports as _laz  # Shared LazyImporter for external imports
+
+
+_laz_internal = LazyImporter(
+    [
+        FromImport("._version", "__version__", "app_version"),
+        FromImport(".config", "Config"),
+        FromImport(".ui", "ManagerApp"),
+    ],
+    globs=globals(),
+)
 
 
 class UnsupportedPythonError(Exception):
     pass
 
 
-def _check_windows_dir():
+def _check_windows_dir() -> None:
     # Double-clicking to launch the zipapp may put the user in the system32
     # folder on Windows.
     # Inside a zipapp, __file__ won't exist on the file system as it is inside the archive.
@@ -41,16 +54,13 @@ def _check_windows_dir():
             os.chdir(user_path)
 
 
-def get_parser():
-    import argparse
+def get_parser() -> _laz.argparse.ArgumentParser:
 
-    from .config import Config
-
-    parser = argparse.ArgumentParser(
+    parser = _laz.argparse.ArgumentParser(
         prog="ducktools-pytui",
         description="Prototype Python venv and runtime manager",
     )
-    parser.add_argument("-V", "--version", action="version", version=__version__)
+    parser.add_argument("-V", "--version", action="version", version=_laz_internal.app_version)
 
     # Config parser arguments
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
@@ -66,7 +76,7 @@ def get_parser():
     config_parser.add_argument(
         "--set-search-mode",
         action="store",
-        choices=Config.VENV_SEARCH_MODES,
+        choices=_laz_internal.Config.VENV_SEARCH_MODES,
         help="Set the search mode to be used",
     )
 
@@ -111,12 +121,15 @@ def get_parser():
     return parser
 
 
-def main():
-    if sys.version_info < (3, 8):
+def main() -> int:
+    if not sys.stdout.isatty():
+        raise RuntimeError("No TTY detected, exiting")
+
+    if sys.version_info < (3, 10):
         v = sys.version_info
         print(
             f"Unsupported Python: {v.major}.{v.minor}.{v.micro} is not supported. "
-            f"PyTUI requires Python 3.8 or later."
+            f"PyTUI requires Python 3.10 or later."
         )
         input("Press ENTER to close")
         sys.exit()
@@ -182,15 +195,8 @@ def main():
         if sys.platform == "win32":
             _check_windows_dir()
 
-        # No arguments, launch pytui
-        from .ui import ManagerApp
-        import asyncio
-
-        app = ManagerApp()
-        if sys.version_info >= (3, 10):
-            asyncio.run(app.run_async())
-        else:
-            app.run()
+        app = _laz_internal.ManagerApp()
+        app.run()
 
     return 0
 

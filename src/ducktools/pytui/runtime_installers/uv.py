@@ -28,100 +28,12 @@ import os.path
 import shutil
 import subprocess
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 
 from ducktools.classbuilder.prefab import get_attributes, prefab
 
 from .base import RuntimeManager, PythonListing
-
-
-class UVManager(RuntimeManager):
-    organisation: ClassVar[str] = "Astral"
-
-    @functools.cached_property
-    def executable(self) -> str | None:
-        return shutil.which("uv")
-
-    @functools.cached_property
-    def runtime_folder(self) -> str | None:
-        try:
-            cmd = subprocess.run(
-                ["uv", "python", "dir"],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except (FileNotFoundError, subprocess.CalledProcessError):
-            py_dir = None
-        else:
-            py_dir = cmd.stdout.strip()
-        return py_dir
-
-    def fetch_installed(self):
-        """
-        Fetch Python installs managed by UV
-        """
-        installed_list_cmd = subprocess.run(
-            [
-                self.executable, "python", "list",
-                "--output-format", "json",
-                "--only-installed",
-                "--python-preference", "only-managed",
-                "--all-versions",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        json_data = json.loads(installed_list_cmd.stdout)
-        installed_pys = [
-            UVPythonListing.from_dict(manager=self, entry=v) for v in json_data
-        ]
-
-        return installed_pys
-
-    @functools.lru_cache(maxsize=None)
-    def _get_download_cache(self, all_versions=False):
-        cmd = [
-            self.executable, "python", "list",
-            "--output-format", "json",
-            "--only-downloads",
-        ]
-        if all_versions:
-            cmd.append("--all-versions")
-
-        download_list_cmd = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        full_download_list = json.loads(download_list_cmd.stdout)
-
-        downloads = [
-            UVPythonListing.from_dict(manager=self, entry=v)
-            for v in full_download_list
-        ]
-        return downloads
-
-    def fetch_downloads(self, all_versions=False):
-        """
-        Get available UV downloads and filter out any installs that are already present.
-
-        :param all_versions: Include *ALL* possible installs
-        :return: list of possible python installs
-        """
-        downloads = self._get_download_cache(all_versions=all_versions)
-
-        installed_keys = {v.key for v in self.fetch_installed()}
-
-        download_listings = self.sort_listings(
-            v for v in downloads
-            if v.key not in installed_keys
-        )
-
-        return download_listings
 
 
 @prefab(kw_only=True)
@@ -149,7 +61,7 @@ class UVPythonListing(PythonListing):
                 self.key = key if key == key_path else key_path
 
     @classmethod
-    def from_dict(cls, manager: UVManager, entry: dict):
+    def from_dict(cls, manager: UVManager, entry: dict[str, Any]) -> UVPythonListing:
         # designed to not fail if extra keys are added
         attrib_names = set(get_attributes(cls))
 
@@ -160,7 +72,10 @@ class UVPythonListing(PythonListing):
 
         return cls(manager=manager, **kwargs)
 
-    def install(self):
+    def install(self) -> subprocess.CompletedProcess | None:
+        if self.manager.executable is None:
+            raise FileNotFoundError("Could not find the 'uv' executable on PATH")
+        
         if self.path:
             # Can't install already installed Python
             return None
@@ -178,7 +93,10 @@ class UVPythonListing(PythonListing):
         )
         return result
 
-    def uninstall(self):
+    def uninstall(self) -> subprocess.CompletedProcess | None:
+        if self.manager.executable is None:
+            raise FileNotFoundError("Could not find the 'uv' executable on PATH")
+        
         if not (self.path and os.path.exists(self.path)):
             # Can't uninstall non-installed Python
             return None
@@ -195,3 +113,97 @@ class UVPythonListing(PythonListing):
             text=True,
         )
         return result
+
+
+class UVManager(RuntimeManager[UVPythonListing]):
+    organisation: ClassVar[str] = "Astral"
+
+    @functools.cached_property
+    def executable(self) -> str | None:
+        return shutil.which("uv")
+
+    @functools.cached_property
+    def runtime_folder(self) -> str | None:
+        try:
+            cmd = subprocess.run(
+                ["uv", "python", "dir"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            py_dir = None
+        else:
+            py_dir = cmd.stdout.strip()
+        return py_dir
+
+    def fetch_installed(self) -> list[UVPythonListing]:
+        """
+        Fetch Python installs managed by UV
+        """
+        if self.executable is None:
+            raise FileNotFoundError("Could not find the 'uv' executable on PATH")
+
+        installed_list_cmd = subprocess.run(
+            [
+                self.executable, "python", "list",
+                "--output-format", "json",
+                "--only-installed",
+                "--python-preference", "only-managed",
+                "--all-versions",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        json_data = json.loads(installed_list_cmd.stdout)
+        installed_pys = [
+            UVPythonListing.from_dict(manager=self, entry=v) for v in json_data
+        ]
+
+        return installed_pys
+
+    @functools.lru_cache(maxsize=None)
+    def _get_download_cache(self, all_versions=False) -> list[UVPythonListing]:
+        if self.executable is None:
+            raise FileNotFoundError("Could not find the 'uv' executable on PATH")
+
+        cmd = [
+            self.executable, "python", "list",
+            "--output-format", "json",
+            "--only-downloads",
+        ]
+        if all_versions:
+            cmd.append("--all-versions")
+
+        download_list_cmd = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        full_download_list = json.loads(download_list_cmd.stdout)
+
+        downloads = [
+            UVPythonListing.from_dict(manager=self, entry=v)
+            for v in full_download_list
+        ]
+        return downloads
+
+    def fetch_downloads(self, all_versions=False) -> list[UVPythonListing]:
+        """
+        Get available UV downloads and filter out any installs that are already present.
+
+        :param all_versions: Include *ALL* possible installs
+        :return: list of possible python installs
+        """
+        downloads = self._get_download_cache(all_versions=all_versions)
+
+        installed_keys = {v.key for v in self.fetch_installed()}
+
+        download_listings = self.sort_listings(
+            v for v in downloads
+            if v.key not in installed_keys
+        )
+
+        return download_listings
