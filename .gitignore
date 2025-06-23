@@ -150,6 +150,3 @@ scratch/
 
 # Version file
 _version.py
-
-# UV keeps trying to make a lockfile
-uv.lock

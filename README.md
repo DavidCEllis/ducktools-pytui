@@ -12,7 +12,7 @@ Run with `pytui` or `ducktools-pytui`.
 
 There is also now a zipapp available on
 [the releases page](https://github.com/DavidCEllis/ducktools-pytui/releases/latest)
-and should be usable as long as you have Python 3.8 or newer.
+and should be usable as long as you have Python 3.10 or newer.
 
 ## Screenshots ##
 

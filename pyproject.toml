@@ -12,18 +12,15 @@ authors = [
   { name="David C Ellis" },
 ]
 readme="README.md"
-requires-python = ">=3.8.0"
+requires-python = ">=3.10"
 dependencies = [
     "ducktools-classbuilder>=0.9.1",
     "ducktools-pythonfinder>=0.9.3",
     "ducktools-lazyimporter>=0.7.3",
     "textual>=3.3.0",
-    "importlib_resources>=6.4",  # restricted in constraints for Python 3.8 support
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -39,8 +36,14 @@ dynamic = ['version']
 "pytui" = "ducktools.pytui.__main__:main"
 "ducktools-pytui" = "ducktools.pytui.__main__:main"  # For uvx invocations
 
-[project.optional-dependencies]
-testing = ["pytest", "pytest-cov"]
+[dependency-groups]
+dev = [
+    "pytest>=8.4",
+    "pytest-cov>=6.1",
+    "pytest-asyncio>=1.0",
+    "mypy>=1.16",
+    "pytest-rerunfailures>=15.1",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -57,6 +60,7 @@ addopts= "--cov=src/ --cov-report=term-missing"
 testpaths = [
     "tests",
 ]
+asyncio_mode = "auto"
 
 [tool.pyright]
 typeCheckingMode = "off"

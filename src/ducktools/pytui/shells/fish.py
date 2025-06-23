@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import sys
 
-from ._core import Shell, get_shell_script
+from ._core import Shell, VEnvShellCommand, get_shell_script
 
 
 class FishShell(Shell):
@@ -32,8 +32,8 @@ class FishShell(Shell):
     bin_name = "fish"
     exclude = (sys.platform == "win32")
 
-    def get_venv_shell_command(self, env):
+    def get_venv_shell_command(self, env: dict[str, str]) -> VEnvShellCommand:
         config_file = get_shell_script("activate_pytui.fish")
         cmd = [self.path, "-C", f"source \"{config_file}\"", "-i"]
-        env_updates = {}
-        return cmd, env_updates
+        env_updates: dict[str, str] = {}
+        return VEnvShellCommand(cmd, env_updates)
