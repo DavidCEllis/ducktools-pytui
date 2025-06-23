@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 from ducktools.pytui.ui import substitute_home
@@ -14,6 +16,7 @@ from ducktools.pytui.ui import substitute_home
 def test_substitute_home(path, expected):
     homedir = "/home/david"
 
-    expected = expected if expected is not None else path
+    if expected is None or sys.platform == "win32":
+        expected = path
 
     assert substitute_home(path, homedir=homedir) == expected
