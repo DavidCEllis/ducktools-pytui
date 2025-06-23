@@ -44,7 +44,7 @@ jobs:
         name: pytui-zipapp
         path: dist/
     - name: Sign the zipapp with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v3.0.0
+      uses: sigstore/gh-action-sigstore-python@v3.0.1
       with:
         release-signing-artifacts: false
         inputs: >-
