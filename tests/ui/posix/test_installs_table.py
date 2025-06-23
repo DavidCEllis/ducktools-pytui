@@ -1,5 +1,6 @@
 import sys
 from operator import itemgetter
+from unittest.mock import patch
 
 import pytest
 
@@ -8,6 +9,7 @@ from ducktools.pytui.ui import ManagerApp, MANAGED_BY_MAPPING, substitute_home
 from textual.worker import WorkerFailed
 
 
+@patch("ducktools.pytui.ui.HOME", "/home/ducksual")
 @pytest.mark.flaky(reruns=5)
 async def test_runtime_table(runtimes):
     app = ManagerApp()
@@ -20,7 +22,7 @@ async def test_runtime_table(runtimes):
                 py.version_str if py.implementation_version_str == py.version_str else f"{py.version_str} / {py.implementation_version_str}",
                 MANAGED_BY_MAPPING.get(py.managed_by, py.managed_by),
                 py.implementation,
-                substitute_home(py.executable, homedir="/home/ducksual")
+                substitute_home(py.executable)
             ]
             for py in runtimes
         ]
