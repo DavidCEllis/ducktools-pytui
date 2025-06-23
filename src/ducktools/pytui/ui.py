@@ -31,6 +31,8 @@ import functools
 import subprocess
 import sysconfig
 
+from typing import overload, TYPE_CHECKING
+
 from ducktools.pythonfinder import PythonInstall
 from ducktools.pythonfinder.venv import list_python_venvs, PythonVEnv, PythonPackage
 
@@ -38,6 +40,7 @@ from textual import work, markup
 from textual.app import App
 from textual.binding import Binding
 from textual.containers import Vertical
+from textual.markup import escape
 from textual.screen import ModalScreen
 from textual.validation import Length
 from textual.widgets import Button, DataTable, Footer, Header, Input, Label
@@ -57,12 +60,32 @@ from .runtime_installers import (
 
 
 CWD = os.getcwd()
+HOME = os.environ.get("HOME")
 
 # This mapping handles nicer user facing names for "managed by"
 MANAGED_BY_MAPPING = {
     "Astral": "Astral uv",  # UV Python Installer
     "PythonCore": "python.org",  # Windows installer
 }
+
+if TYPE_CHECKING:
+    @overload
+    def substitute_home(p: None, homedir: str | None = ...) -> None: ...
+
+    @overload
+    def substitute_home(p: str, homedir: str | None = ...) -> str: ...
+
+
+def substitute_home(p, homedir=HOME):
+    if (
+        p 
+        and sys.platform != "win32" 
+        and homedir 
+        and os.path.commonpath([p, homedir]) == homedir
+    ):
+        relpath = os.path.relpath(p, start=homedir)
+        p = os.path.join("~", relpath)
+    return p
 
 
 class InstallableRuntimeTable(DataTable):
@@ -283,18 +306,24 @@ class VEnvTable(DataTable):
 
     def add_venv(self, venv: PythonVEnv, sort=False, global_venv=False):
         self._venv_catalogue[venv.folder] = venv
-
+        
         if global_venv:
             self.add_row(
                 venv.version_str,
                 True,
-                venv.folder,
-                venv.parent_executable,
+                substitute_home(venv.folder),
+                substitute_home(venv.parent_executable),
                 key=venv.folder
             )
         else:
             folder = os.path.relpath(venv.folder, start=CWD)
-            self.add_row(venv.version_str, False, folder, venv.parent_executable, key=venv.folder)
+            self.add_row(
+                venv.version_str, 
+                False, 
+                folder, 
+                substitute_home(venv.parent_executable), 
+                key=venv.folder
+            )
         if sort:
             self.sort_by_path()
 
@@ -414,7 +443,7 @@ class RuntimeTable(DataTable):
                     version_str,
                     managed_by,
                     install.implementation,
-                    install.executable,
+                    substitute_home(install.executable),
                     key=install.executable
                 )
         finally:
@@ -434,11 +463,12 @@ class ManagerApp(App):
     }
     .boxed_fillheight {
         height: 1fr;
+        min-height: 40h;
         border: $primary-darken-2;
     }
     .boxed_limitheight {
         height: auto;
-        max-height: 90%;
+        max-height: 60h;
         border: $primary-darken-2;
     }
     .boxed_noborder {
@@ -469,7 +499,7 @@ class ManagerApp(App):
 
     def compose(self):
         yield Header()
-        with Vertical(classes="boxed"):
+        with Vertical(classes="boxed_limitheight"):
             yield Label("Virtual Environments")
             yield self._venv_table
         with Vertical(classes="boxed_fillheight"):

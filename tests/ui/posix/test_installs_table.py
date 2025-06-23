@@ -3,7 +3,7 @@ from operator import itemgetter
 
 import pytest
 
-from ducktools.pytui.ui import ManagerApp, MANAGED_BY_MAPPING
+from ducktools.pytui.ui import ManagerApp, MANAGED_BY_MAPPING, substitute_home
 
 from textual.worker import WorkerFailed
 
@@ -20,7 +20,7 @@ async def test_runtime_table(runtimes):
                 py.version_str if py.implementation_version_str == py.version_str else f"{py.version_str} / {py.implementation_version_str}",
                 MANAGED_BY_MAPPING.get(py.managed_by, py.managed_by),
                 py.implementation,
-                py.executable
+                substitute_home(py.executable, homedir="/home/ducksual")
             ]
             for py in runtimes
         ]
