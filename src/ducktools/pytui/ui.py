@@ -78,9 +78,9 @@ if TYPE_CHECKING:
 
 def substitute_home(p, homedir=HOME):
     if (
-        p 
-        and sys.platform != "win32" 
-        and homedir 
+        p
+        and sys.platform != "win32"
+        and homedir
         and os.path.commonpath([p, homedir]) == homedir
     ):
         relpath = os.path.relpath(p, start=homedir)
@@ -190,13 +190,13 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
         self.venv = venv
         self.dependency_cache = dependency_cache
 
-        self.venv_table = DataTable()
+        self.venv_table = DataTable(classes="boxed_noborder")
 
     def compose(self):
         with Vertical(classes="boxed"):
             yield Label(f"Packages installed in {self.venv.folder}")
             yield self.venv_table
-            yield Footer()
+        yield Footer()
 
     def on_mount(self):
         self.venv_table.cursor_type = "row"
@@ -306,7 +306,7 @@ class VEnvTable(DataTable):
 
     def add_venv(self, venv: PythonVEnv, sort=False, global_venv=False):
         self._venv_catalogue[venv.folder] = venv
-        
+
         if global_venv:
             self.add_row(
                 venv.version_str,
@@ -318,10 +318,10 @@ class VEnvTable(DataTable):
         else:
             folder = os.path.relpath(venv.folder, start=CWD)
             self.add_row(
-                venv.version_str, 
-                False, 
-                folder, 
-                substitute_home(venv.parent_executable), 
+                venv.version_str,
+                False,
+                folder,
+                substitute_home(venv.parent_executable),
                 key=venv.folder
             )
         if sort:
@@ -458,7 +458,7 @@ class ManagerApp(App):
 
     CSS = """
     .boxed {
-        height: auto;
+        height: 1fr;
         border: $primary-darken-2;
     }
     .boxed_fillheight {

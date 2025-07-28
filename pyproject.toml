@@ -14,10 +14,10 @@ authors = [
 readme="README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "ducktools-classbuilder>=0.9.1",
+    "ducktools-classbuilder>=0.10.0",
     "ducktools-pythonfinder>=0.9.3",
     "ducktools-lazyimporter>=0.7.3",
-    "textual>=3.5.0",
+    "textual>=5.0.1",
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
