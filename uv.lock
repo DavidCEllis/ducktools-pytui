@@ -163,10 +163,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ducktools-classbuilder", specifier = ">=0.9.1" },
+    { name = "ducktools-classbuilder", specifier = ">=0.10.0" },
     { name = "ducktools-lazyimporter", specifier = ">=0.7.3" },
     { name = "ducktools-pythonfinder", specifier = ">=0.9.3" },
-    { name = "textual", specifier = ">=3.5.0" },
+    { name = "textual", specifier = ">=5.0.1" },
 ]
 
 [package.metadata.requires-dev]
