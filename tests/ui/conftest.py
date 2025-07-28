@@ -16,7 +16,7 @@ DATA_FOLDER = Path(__file__).parents[1] / "example_data" / "pythonfinder"
 @fixture
 async def patched_config():
     with (
-        patch.object(Config, "from_file") as patched_config, 
+        patch.object(Config, "from_file") as patched_config,
         patch.object(Config, "write_config"),  # prevent accidental writes
     ):
         # This file shouldn't actually be created as the write is patched
@@ -69,7 +69,7 @@ async def global_venvs() -> list[PythonVEnv]:
 async def patch_list_installs(runtimes):
     with patch("ducktools.pytui.ui.list_installs_deduped") as mock_deduped:
         mock_deduped.return_value = runtimes
-        yield
+        yield mock_deduped
 
 
 @fixture(autouse=True)
@@ -83,4 +83,4 @@ async def patch_list_venvs(local_venvs, global_venvs, patched_config):
 
     with patch("ducktools.pytui.ui.list_python_venvs") as venv_mock:
         venv_mock.side_effect = get_venv
-        yield
+        yield venv_mock
