@@ -127,7 +127,7 @@ class RuntimeInstallScreen(ModalScreen[PythonListing | None]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.runtimes = fetch_downloads()
-        self.install_table = InstallableRuntimeTable(self.runtimes)
+        self.install_table = InstallableRuntimeTable(self.runtimes, classes="boxed_noborder")
 
         self.install_button = Button("Install", variant="success", id="install")
         self.cancel_button = Button("Cancel", id="cancel")
@@ -196,7 +196,7 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
         with Vertical(classes="boxed"):
             yield Label(f"Packages installed in {self.venv.folder}")
             yield self.venv_table
-        yield Footer()
+            yield Footer()
 
     def on_mount(self):
         self.venv_table.cursor_type = "row"
@@ -458,7 +458,8 @@ class ManagerApp(App):
 
     CSS = """
     .boxed {
-        height: 1fr;
+        height: auto;
+        max-height: 95h;
         border: $primary-darken-2;
     }
     .boxed_fillheight {
