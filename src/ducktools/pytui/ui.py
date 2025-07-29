@@ -459,7 +459,7 @@ class ManagerApp(App):
     CSS = """
     .boxed {
         height: auto;
-        max-height: 90h;
+        max-height: 95h;
         border: $primary-darken-2;
     }
     .boxed_fillheight {
