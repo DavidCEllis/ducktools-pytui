@@ -678,6 +678,9 @@ class ManagerApp(App):
         venv_screen = VEnvCreateScreen(runtime=runtime, global_venv=True)
         venv_name = await self.push_screen_wait(venv_screen)
 
+        if venv_name is None:
+            return
+
         venv_path = os.path.join(self.config.global_venv_folder, venv_name)
 
         self._venv_table.loading = True
