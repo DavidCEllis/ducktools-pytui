@@ -43,7 +43,7 @@ from textual.containers import Vertical
 from textual.markup import escape
 from textual.screen import ModalScreen
 from textual.validation import Length
-from textual.widgets import Button, DataTable, Footer, Header, Input, Label
+from textual.widgets import Button, DataTable, Footer, Header, Input
 from textual.widgets.data_table import CellDoesNotExist
 
 
