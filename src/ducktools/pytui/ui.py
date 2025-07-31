@@ -43,7 +43,7 @@ from textual.containers import Vertical
 from textual.markup import escape
 from textual.screen import ModalScreen
 from textual.validation import Length
-from textual.widgets import Button, DataTable, Footer, Header, Input, Label
+from textual.widgets import Button, DataTable, Footer, Header, Input
 from textual.widgets.data_table import CellDoesNotExist
 
 
@@ -127,7 +127,7 @@ class RuntimeInstallScreen(ModalScreen[PythonListing | None]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.runtimes = fetch_downloads()
-        self.install_table = InstallableRuntimeTable(self.runtimes, classes="boxed_noborder")
+        self.install_table = InstallableRuntimeTable(self.runtimes)
 
         self.install_button = Button("Install", variant="success", id="install")
         self.cancel_button = Button("Cancel", id="cancel")
@@ -150,8 +150,9 @@ class RuntimeInstallScreen(ModalScreen[PythonListing | None]):
         return self.runtimes_by_key.get(row.row_key.value)
 
     def compose(self):
-        with Vertical(classes="boxed"):
-            yield Label("Available Python Runtimes")
+        vert = Vertical(classes="boxed")
+        vert.border_title = "Installable Python Runtimes"
+        with vert:
             yield self.install_table
             yield Footer()
 
@@ -179,7 +180,7 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
 
     venv: PythonVEnv
     dependency_cache: list[PythonPackage] | None
-    venv_table: DataTable
+    dependency_table: DataTable
 
     def __init__(
         self,
@@ -189,18 +190,18 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
         super().__init__()
         self.venv = venv
         self.dependency_cache = dependency_cache
-
-        self.venv_table = DataTable(classes="boxed_noborder")
+        self.dependency_table = DataTable()
 
     def compose(self):
-        with Vertical(classes="boxed"):
-            yield Label(f"Packages installed in {self.venv.folder}")
-            yield self.venv_table
+        vert = Vertical(classes="boxed")
+        vert.border_title = f"Packages installed in {self.venv.folder}"
+        with vert:
+            yield self.dependency_table
             yield Footer()
 
     def on_mount(self):
-        self.venv_table.cursor_type = "row"
-        self.venv_table.add_columns("Dependency", "Version")
+        self.dependency_table.cursor_type = "row"
+        self.dependency_table.add_columns("Dependency", "Version")
         self.load_dependencies()
 
     def action_close(self):
@@ -211,10 +212,10 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
 
     @work
     async def load_dependencies(self, clear=False):
-        self.venv_table.loading = True
+        self.dependency_table.loading = True
         try:
             if clear:
-                self.venv_table.clear()
+                self.dependency_table.clear()
                 self.dependency_cache = None
 
             dependencies = self.dependency_cache
@@ -223,9 +224,9 @@ class DependencyScreen(ModalScreen[list[PythonPackage]]):
                 dependencies = await loop.run_in_executor(None, self.venv.list_packages)
 
             for dep in sorted(dependencies, key=lambda x: x.name.lower()):
-                self.venv_table.add_row(dep.name, dep.version, key=dep.name)
+                self.dependency_table.add_row(dep.name, dep.version, key=dep.name)
         finally:
-            self.venv_table.loading = False
+            self.dependency_table.loading = False
 
         self.dependency_cache = dependencies
 
@@ -241,19 +242,22 @@ class VEnvCreateScreen(ModalScreen[str | None]):
         self.runtime = runtime
         self.global_venv = global_venv
 
+        self.vert = Vertical(classes="boxed")
+
         if global_venv:
             self.venv_input = Input(
                 placeholder="VEnv Path",
                 validators=[Length(minimum=1)],
                 validate_on=["submitted"],
             )
+            self.vert.border_title = f"Create global VENV from {self.runtime.implementation} {self.runtime.version_str}"
         else:
             self.venv_input = Input(placeholder="VEnv Path (default='.venv')")
+            self.vert.border_title = f"Create VENV from {self.runtime.implementation} {self.runtime.version_str}"
 
 
     def compose(self):
-        with Vertical(classes="boxed"):
-            yield Label(f"Create VENV from {self.runtime.implementation} {self.runtime.version_str}")
+        with self.vert:
             with Vertical(classes="boxed_noborder"):
                 yield self.venv_input
             yield Footer()
@@ -282,6 +286,7 @@ class VEnvTable(DataTable):
     def __init__(self, *args, config, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.border_title = "Virtual Environments"
         self.config = config
 
         self._venv_catalogue = {}
@@ -402,6 +407,7 @@ class RuntimeTable(DataTable):
         super().__init__(*args, **kwargs)
 
         self.config = config
+        self.border_title = "Python Runtimes"
         self._runtime_catalogue = {}
 
     def on_mount(self):
@@ -460,17 +466,20 @@ class ManagerApp(App):
     .boxed {
         height: auto;
         max-height: 95h;
-        border: $primary-darken-2;
+        border: $primary-darken-1;
+        border-title-color: $text-accent;
     }
     .boxed_fillheight {
         height: 1fr;
         min-height: 40h;
-        border: $primary-darken-2;
+        border: $primary-darken-1;
+        border-title-color: $text-accent;
     }
     .boxed_limitheight {
         height: auto;
         max-height: 60h;
-        border: $primary-darken-2;
+        border: $primary-darken-1;
+        border-title-color: $text-accent;
     }
     .boxed_noborder {
         height: auto;
@@ -488,10 +497,10 @@ class ManagerApp(App):
         super().__init__(*args, **kwargs)
 
         self.config = Config.from_file()
+        self.theme = self.config.theme
 
-        self._venv_table = VEnvTable(config=self.config)
-        self._runtime_table = RuntimeTable(config=self.config)
-        self._runtime_table.styles.height = "1fr"
+        self._venv_table = VEnvTable(config=self.config, classes="boxed_limitheight")
+        self._runtime_table = RuntimeTable(config=self.config, classes="boxed_fillheight")
 
         self._venv_dependency_cache = {}
 
@@ -500,12 +509,8 @@ class ManagerApp(App):
 
     def compose(self):
         yield Header()
-        with Vertical(classes="boxed_limitheight"):
-            yield Label("Virtual Environments")
-            yield self._venv_table
-        with Vertical(classes="boxed_fillheight"):
-            yield Label("Python Runtimes")
-            yield self._runtime_table
+        yield self._venv_table
+        yield self._runtime_table
         yield Footer()
 
     @property
@@ -803,3 +808,10 @@ class ManagerApp(App):
             self._runtime_table.loading = False
             self.set_focus(self._runtime_table)
             self.refresh_bindings()
+
+    async def action_quit(self) -> None:
+        # Override the quit action to save the theme first
+        if self.theme != self.config.theme:
+            self.config.theme = self.theme
+            self.config.write_config()
+        await super().action_quit()

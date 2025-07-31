@@ -43,6 +43,7 @@ dev = [
     "pytest-asyncio>=1.0",
     "mypy>=1.16",
     "pytest-rerunfailures>=15.1",
+    "textual-dev>=1.7.0",
 ]
 
 [tool.setuptools.packages.find]

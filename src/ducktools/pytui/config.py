@@ -48,6 +48,7 @@ class Config(Prefab, kw_only=True):
     latest_pip: bool = True
     global_venv_folder: str = GLOBAL_VENV_FOLDER
     shell_path: str | None = None
+    theme: str = "textual-dark"
 
     @property
     def shell(self) -> Shell | None:
@@ -93,6 +94,7 @@ class Config(Prefab, kw_only=True):
             latest_pip = raw_input.get("latest_pip", True)
             global_venv_folder = raw_input.get("global_venv_folder", GLOBAL_VENV_FOLDER)
             shell_path = raw_input.get("shell_path", None)
+            theme = raw_input.get("theme", "textual-dark")
 
             if venv_search_mode not in cls.VENV_SEARCH_MODES:
                 venv_search_mode = "parents"
@@ -108,6 +110,7 @@ class Config(Prefab, kw_only=True):
                 latest_pip=latest_pip,
                 global_venv_folder=global_venv_folder,
                 shell_path=shell_path,
+                theme=theme,
             )
 
             if raw_input != as_dict(config):
