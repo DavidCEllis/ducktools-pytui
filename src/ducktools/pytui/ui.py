@@ -242,19 +242,22 @@ class VEnvCreateScreen(ModalScreen[str | None]):
         self.runtime = runtime
         self.global_venv = global_venv
 
+        self.vert = Vertical(classes="boxed")
+
         if global_venv:
             self.venv_input = Input(
                 placeholder="VEnv Path",
                 validators=[Length(minimum=1)],
                 validate_on=["submitted"],
             )
+            self.vert.border_title = f"Create global VENV from {self.runtime.implementation} {self.runtime.version_str}"
         else:
             self.venv_input = Input(placeholder="VEnv Path (default='.venv')")
+            self.vert.border_title = f"Create VENV from {self.runtime.implementation} {self.runtime.version_str}"
 
 
     def compose(self):
-        with Vertical(classes="boxed"):
-            yield Label(f"Create VENV from {self.runtime.implementation} {self.runtime.version_str}")
+        with self.vert:
             with Vertical(classes="boxed_noborder"):
                 yield self.venv_input
             yield Footer()
