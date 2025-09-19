@@ -279,6 +279,7 @@ class VEnvTable(DataTable):
     BINDINGS = [
         Binding(key="enter", action="app.activated_shell", description="Launch VEnv Shell", show=True),
         Binding(key="r", action="app.launch_venv_repl", description="Launch VEnv REPL", show=True),
+        Binding(key="ctrl+r", action="venv_scan", description="Recursively Scan for VEnvs", show=True),
         Binding(key="p", action="app.list_venv_packages", description="List Packages", show=True),
         Binding(key="delete", action="app.delete_venv", description="Delete VEnv", show=True),
     ]
@@ -336,16 +337,25 @@ class VEnvTable(DataTable):
         self.remove_row(row_key=venv.folder)
         self._venv_catalogue.pop(venv.folder)
 
+    def action_venv_scan(self):
+        """
+        Scan for all virtual environments
+        """
+        self.load_venvs(full_search=True, clear_first=True)
+
     @work
-    async def load_venvs(self, clear_first=True):
+    async def load_venvs(self, full_search=False, clear_first=True):
         self.loading = True
         try:
             if clear_first:
                 self.clear(columns=False)
                 self._venv_catalogue = {}
 
-            recursive = "recursive" in self.config.venv_search_mode
-            search_parent_folders = "parents" in self.config.venv_search_mode
+            if full_search:
+                recursive, search_parent_folders = True, True
+            else:
+                recursive = "recursive" in self.config.venv_search_mode
+                search_parent_folders = "parents" in self.config.venv_search_mode
 
             global_venv_folder = self.config.global_venv_folder
 
