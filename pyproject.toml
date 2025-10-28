@@ -15,8 +15,8 @@ readme="README.md"
 requires-python = ">=3.10"
 dependencies = [
     "ducktools-classbuilder>=0.10.0",
-    "ducktools-pythonfinder>=0.10.0",
-    "ducktools-lazyimporter>=0.7.3",
+    "ducktools-pythonfinder>=0.10.3",
+    "ducktools-lazyimporter>=0.8.4",
     "textual>=5.0.1",
 ]
 classifiers = [
