@@ -40,7 +40,6 @@ from textual import work, markup
 from textual.app import App
 from textual.binding import Binding
 from textual.containers import Vertical
-from textual.markup import escape
 from textual.screen import ModalScreen
 from textual.validation import Length
 from textual.widgets import Button, DataTable, Footer, Header, Input
