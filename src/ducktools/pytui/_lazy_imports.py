@@ -30,5 +30,5 @@ laz = LazyImporter()
 
 # These are actually imported lazily and do not exist within this module
 with capture_imports(laz):
-    import importlib.resources as resources
+    from importlib import resources as resources
     import argparse as argparse

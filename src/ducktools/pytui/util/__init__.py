@@ -22,7 +22,6 @@
 # SOFTWARE.
 from __future__ import annotations
 
-import os.path
 import functools
 import signal
 import subprocess
@@ -47,7 +46,7 @@ def list_installs_deduped() -> list[PythonInstall]:
             if fld in used_stdlib_folders:
                 continue
             used_stdlib_folders.add(fld)
-    
+
         deduped_installs.append(inst)
 
     return deduped_installs

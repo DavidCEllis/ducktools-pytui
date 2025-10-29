@@ -26,10 +26,10 @@ import functools
 import operator
 import os.path
 import subprocess
-import sys
+
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from typing import Any, ClassVar, Final, Generic, TypeAlias, TypeVar
+from typing import ClassVar, Final, Generic, TypeAlias, TypeVar
 
 from ducktools.pythonfinder.shared import PythonInstall, version_str_to_tuple
 from ducktools.classbuilder.prefab import prefab, attribute
@@ -87,7 +87,7 @@ Listing = TypeVar("Listing", bound=PythonListing)
 
 class RuntimeManager(Generic[Listing], ABC):
     available_managers: Final[list[type[RuntimeManager]]] = []
-    
+
     organisation: ClassVar[str]
 
     def __init_subclass__(cls) -> None:
