@@ -41,7 +41,7 @@ jobs:
 
     steps:
     - name: Download the zipapp
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: pytui-zipapp
         path: dist/
