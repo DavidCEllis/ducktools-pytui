@@ -58,6 +58,7 @@ class UVPythonListing(PythonListing):
             # UV bug - key and path can mismatch if someone typoed the metadata
             base_path = self.manager.runtime_folder
             if base_path:
+                base_path = os.path.realpath(base_path)  # resolve base path symlink too
                 key_path = str(Path(self.path).relative_to(base_path).parts[0])
                 self.key = key if key == key_path else key_path
 
