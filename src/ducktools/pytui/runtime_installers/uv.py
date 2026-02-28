@@ -46,20 +46,20 @@ class UVPythonListing(PythonListing):
     os: str
     libc: str | None  # Apparently this is the string "none" instead of an actual None.
 
-    def __prefab_post_init__(self, path: str | None) -> None:
+    def __prefab_post_init__(self, key: str, path: str | None) -> None:
         if path is None:
+            self.key = key
             self.path = path
         else:
             # Resolve path always, sometimes UV gives a relative path to cwd.
             # Sometimes the path is also a symlink
             self.path = os.path.realpath(os.path.abspath(path))
 
-            # There was a UV bug with mismatching metadata - if this becomes an issue again
-            # uncomment this code, but realistically we should be using the key UV gives
-            # base_path = self.manager.runtime_folder
-            # if base_path:
-            #     key_path = str(Path(self.path).relative_to(base_path).parts[0])
-            #     self.key = key if key == key_path else key_path
+            # UV bug - key and path can mismatch if someone typoed the metadata
+            base_path = self.manager.runtime_folder
+            if base_path:
+                key_path = str(Path(self.path).relative_to(base_path).parts[0])
+                self.key = key if key == key_path else key_path
 
     @classmethod
     def from_dict(cls, manager: UVManager, entry: dict[str, Any]) -> UVPythonListing:
