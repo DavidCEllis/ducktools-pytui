@@ -139,6 +139,6 @@ class RuntimeManager(Generic[Listing], ABC):
             if py.path is not None
         }
 
-        install_path = os.path.dirname(install.executable)
+        install_path = os.path.realpath(os.path.dirname(install.executable))
 
         return installed_dict.get(install_path, None)
