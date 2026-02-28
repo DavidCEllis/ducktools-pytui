@@ -52,11 +52,13 @@ class UVPythonListing(PythonListing):
             self.path = path
         else:
             # Resolve path always, sometimes UV gives a relative path to cwd.
-            self.path = os.path.abspath(path)
+            # Sometimes the path is also a symlink
+            self.path = os.path.realpath(os.path.abspath(path))
 
             # UV bug - key and path can mismatch if someone typoed the metadata
             base_path = self.manager.runtime_folder
             if base_path:
+                base_path = os.path.realpath(base_path)  # resolve base path symlink too
                 key_path = str(Path(self.path).relative_to(base_path).parts[0])
                 self.key = key if key == key_path else key_path
 
@@ -75,7 +77,7 @@ class UVPythonListing(PythonListing):
     def install(self) -> subprocess.CompletedProcess | None:
         if self.manager.executable is None:
             raise FileNotFoundError("Could not find the 'uv' executable on PATH")
-        
+
         if self.path:
             # Can't install already installed Python
             return None
@@ -96,7 +98,7 @@ class UVPythonListing(PythonListing):
     def uninstall(self) -> subprocess.CompletedProcess | None:
         if self.manager.executable is None:
             raise FileNotFoundError("Could not find the 'uv' executable on PATH")
-        
+
         if not (self.path and os.path.exists(self.path)):
             # Can't uninstall non-installed Python
             return None
