@@ -5,6 +5,8 @@ on:
   release:
     types: [published]
 
+permissions: {}
+
 jobs:
   build:
     name: Build zipapp
@@ -14,6 +16,7 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         fetch-depth: 0
+        persist-credentials: false
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       with:
@@ -54,10 +57,11 @@ jobs:
     - name: Upload artifact signature to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+      shell: bash
       # Upload to GitHub Release using the `gh` CLI.
       # `dist/` contains the built packages, and the
       # sigstore-produced signatures and certificates.
       run: >-
         gh release upload
-        '${{ github.ref_name }}' dist/**
-        --repo '${{ github.repository }}'
+        "${GITHUB_REF_NAME}" dist/**
+        --repo "${GITHUB_REPOSITORY}"
