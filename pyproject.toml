@@ -76,3 +76,13 @@ ignore = [
 
 [tool.mypy]
 disable_error_code = ["import-untyped"]
+
+[tool.uv]
+exclude-newer = "1 week"
+
+[tool.uv.exclude-newer-package]
+# Exclude other projects I own as they may contain early fixes
+ducktools-classbuilder = false
+ducktools-lazyimporter = false
+ducktools-pythonfinder = false
+reannotate = false
