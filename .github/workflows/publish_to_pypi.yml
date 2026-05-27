@@ -4,19 +4,22 @@ on:
   release:
     types: [published]
 
+permissions: {}
+
 jobs:
   build:
     name: Build distribution 📦
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         fetch-depth: 0
+        persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       with:
-        python-version: "3.10"
+        python-version: "3.12"
     - name: Install pypa/build
       run: >-
         python3 -m
@@ -26,7 +29,7 @@ jobs:
     - name: Build a binary wheel and a source tarball
       run: python3 -m build
     - name: Store the distribution packages
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         name: python-package-distributions
         path: dist/
@@ -45,12 +48,12 @@ jobs:
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: python-package-distributions
         path: dist/
     - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
 
   github-release:
     name: >-
@@ -66,12 +69,12 @@ jobs:
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: python-package-distributions
         path: dist/
     - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v3.2.0
+      uses: sigstore/gh-action-sigstore-python@a5caf349bc536fbef3668a10ed7f5cd309a4b53d # v3.2.0
       with:
         release-signing-artifacts: false
         inputs: >-
@@ -80,10 +83,11 @@ jobs:
     - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+      shell: bash
       # Upload to GitHub Release using the `gh` CLI.
       # `dist/` contains the built packages, and the
       # sigstore-produced signatures and certificates.
       run: >-
         gh release upload
-        '${{ github.ref_name }}' dist/**
-        --repo '${{ github.repository }}'
+        "${GITHUB_REF_NAME}" dist/**
+        --repo "${GITHUB_REPOSITORY}"
