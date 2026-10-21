@@ -68,7 +68,7 @@ class UVPythonListing(PythonListing):
         attrib_names = set(get_attributes(cls))
 
         kwargs = entry.copy()
-        for key in entry.keys():
+        for key in entry:
             if key not in attrib_names:
                 del kwargs[key]
 
@@ -92,6 +92,7 @@ class UVPythonListing(PythonListing):
             cmd,
             capture_output=True,
             text=True,
+            check=True,
         )
         return result
 
@@ -113,6 +114,7 @@ class UVPythonListing(PythonListing):
             cmd,
             capture_output=True,
             text=True,
+            check=True,
         )
         return result
 
@@ -159,13 +161,17 @@ class UVManager(RuntimeManager[UVPythonListing]):
             check=True,
         )
         json_data = json.loads(installed_list_cmd.stdout)
-        installed_pys = [
-            UVPythonListing.from_dict(manager=self, entry=v) for v in json_data
-        ]
+
+        installed_pys = []
+        for v in json_data:
+            exe_path = Path(v["path"])
+            # Filter out executables not inside the runtime folder
+            if exe_path.is_relative_to(self.runtime_folder):
+                installed_pys.append(UVPythonListing.from_dict(manager=self, entry=v))
 
         return installed_pys
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache  # noqa
     def _get_download_cache(self, all_versions=False) -> list[UVPythonListing]:
         if self.executable is None:
             raise FileNotFoundError("Could not find the 'uv' executable on PATH")
