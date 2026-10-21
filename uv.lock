@@ -407,16 +407,16 @@ wheels = [
 
 [[package]]
 name = "ducktools-pythonfinder"
-version = "0.11.0"
+version = "0.11.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ducktools-classbuilder" },
     { name = "ducktools-lazyimporter" },
     { name = "packaging" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/1c/f0e20fcecec0d44291de587f3953e7eba38d684bf6a14b2db151af94d9c8/ducktools_pythonfinder-0.11.0.tar.gz", hash = "sha256:7d4ee3320e16a80fe1ff368216aaa3d86eca15fc409cdc7b068fce18f8d47e66", size = 56348, upload-time = "2026-06-09T14:53:41.525Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/06/01/340ecce84ef6581dcbfca87ac62e105caf5f81d434dc8dfdd04bece7d4aa/ducktools_pythonfinder-0.11.1.tar.gz", hash = "sha256:c9da91f0a254f2b2a2640148f87a43765b37f99b65012735483a15d1ebff6b13", size = 67480, upload-time = "2026-10-21T16:16:30.922Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3a/10/6bd29adfb32d5e7b7ca308e7ed4f2b27192e2632d34aafa6ccc3f251b8b6/ducktools_pythonfinder-0.11.0-py3-none-any.whl", hash = "sha256:e19f2fc9a37379f45c5f8d3d640de6049b989c00e4ae56ddd86c5cf20f3db31c", size = 32880, upload-time = "2026-06-09T14:53:40.251Z" },
+    { url = "https://files.pythonhosted.org/packages/03/6d/a46573c7588e6beac0ad8c2d13ce1549844cbe5dfd13e5cd168755d13c2d/ducktools_pythonfinder-0.11.1-py3-none-any.whl", hash = "sha256:6929b84e88691fcb4f842322dec10596f89becd55eee135387a904b3b64c9e42", size = 34327, upload-time = "2026-10-21T16:16:29.7Z" },
 ]
 
 [[package]]
