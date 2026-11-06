@@ -59,7 +59,8 @@ def main():
             "--no-compile",
             "-r", str(project_path / "requirements.txt"),
             "--target", str(build_path),
-        ]
+        ],
+        check=True,
     )
 
     # Install just the current package in another folder
@@ -70,7 +71,8 @@ def main():
             "--no-compile", str(project_path),
             "--no-deps",
             "--target", str(project_build_path)
-        ]
+        ],
+        check=True,
     )
 
     shutil.move(
