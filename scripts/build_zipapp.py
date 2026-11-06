@@ -30,6 +30,9 @@ import zipapp
 
 from pathlib import Path
 
+if sys.version_info < (3, 14):
+    raise RuntimeError("Builds must be done with Python 3.14 or later")
+
 
 project_path = Path(__file__).parents[1]
 project_build_path = project_path / "build" / "project_build"
