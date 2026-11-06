@@ -14,7 +14,7 @@ authors = [
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "ducktools-classbuilder>=0.15.3",
     "ducktools-pythonfinder>=0.11.1",
@@ -77,6 +77,7 @@ disable_error_code = ["import-untyped"]
 
 [tool.uv]
 exclude-newer = "1 week"
+fork-strategy = "fewest"
 
 [tool.uv.exclude-newer-package]
 # Exclude other projects I own as they may contain early fixes
