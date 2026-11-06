@@ -30,6 +30,9 @@ import zipapp
 
 from pathlib import Path
 
+if sys.version_info < (3, 14):
+    raise RuntimeError("Builds must be done with Python 3.14 or later")
+
 
 project_path = Path(__file__).parents[1]
 project_build_path = project_path / "build" / "project_build"
@@ -56,7 +59,8 @@ def main():
             "--no-compile",
             "-r", str(project_path / "requirements.txt"),
             "--target", str(build_path),
-        ]
+        ],
+        check=True,
     )
 
     # Install just the current package in another folder
@@ -67,7 +71,8 @@ def main():
             "--no-compile", str(project_path),
             "--no-deps",
             "--target", str(project_build_path)
-        ]
+        ],
+        check=True,
     )
 
     shutil.move(
@@ -88,6 +93,8 @@ def main():
         interpreter="/usr/bin/env python3",
         main=main_func,
     )
+
+    shutil.rmtree(build_path)
 
 
 if __name__ == "__main__":

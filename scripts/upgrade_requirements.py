@@ -27,6 +27,8 @@ import subprocess
 from typing import NamedTuple
 from pathlib import Path
 
+from ducktools.pytui.runtime_installers.uv import UVManager
+
 base_dir = Path(__file__).parents[1]
 pyproject_file = str(base_dir  / "pyproject.toml")
 requirements_file = str(base_dir / "requirements.txt")
@@ -35,7 +37,7 @@ override_file = str(base_dir / "overrides.txt")
 
 
 constraint_pattern = re.compile(
-    R"(?P<package>.*?==\d+\.\d+\.?\d*)\s*;\s*(?P<constraints>.*?)\s*\\"
+    R"(?P<package>.*?)==\d+\.\d+\.?\d*\s*;\s*(?P<constraints>.*?)\s*\\"
 )
 
 
@@ -47,33 +49,43 @@ class ConstraintIssue(NamedTuple):
 def check_version_constraints() -> None:
     # Check the requirements file for python version constraints
     discovered_constraints = []
-        
+
+    # Allow reannotate as builds are always done with Python >= 3.14
+    allowed_constraints = {
+        ConstraintIssue("reannotate", "python_full_version >= '3.14'"),
+    }
+
     with open(requirements_file, 'r') as f:
         for line in f:
             if match := constraint_pattern.match(line):
-                discovered_constraints.append(
-                    ConstraintIssue(match["package"], match["constraints"])
-                )                  
+                issue = ConstraintIssue(match["package"], match["constraints"])
+                if issue not in allowed_constraints:
+                    discovered_constraints.append(
+                        ConstraintIssue(match["package"], match["constraints"])
+                    )
     if discovered_constraints:
         constraint_msg = "\n".join(
             f"\t{c.package!r}: {c.constraints!r}" for c in discovered_constraints
         )
-        
+
         raise ValueError(f"Packages discovered with banned constraints:\n{constraint_msg}")
 
 
 def upgrade_requirements():
+    uv_path = UVManager().executable
+    if uv_path is None:
+        raise FileNotFoundError("UV is required on PATH in order to upgrade requirements")
+
     subprocess.run(
         [
-            "uv", "pip", "compile",
-            pyproject_file,
-            "--universal",
-            "--generate-hashes",
+            uv_path, "export",
+            "--locked",
+            "--no-dev",
+            "--no-header",
+            "--no-emit-project",
             "-o", requirements_file,
-            # "--constraint", constraints_file,
-            # "--override", override_file,
-            "--upgrade",
         ],
+        check=True,
     )
 
 

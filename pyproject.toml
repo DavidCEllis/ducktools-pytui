@@ -14,7 +14,7 @@ authors = [
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "ducktools-classbuilder>=0.15.3",
     "ducktools-pythonfinder>=0.11.1",
@@ -38,12 +38,25 @@ dynamic = ['version']
 
 [dependency-groups]
 dev = [
+    {include-group = "test"},
+    {include-group = "type-check"},
+    {include-group = "build"},
+    "textual-dev>=1.8.0",
+]
+
+build = [
+    "pip>=26.3",
+]
+
+test = [
     "pytest>=9.1",
     "pytest-cov>=7.1",
     "pytest-asyncio>=1.4",
-    "mypy>=2.4",
     "pytest-rerunfailures>=16.7",
-    "textual-dev>=1.8.0",
+]
+
+type-check = [
+    "mypy>=2.4",
 ]
 
 [tool.setuptools.packages.find]
@@ -62,6 +75,7 @@ testpaths = [
     "tests",
 ]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
 
 [tool.pyright]
 typeCheckingMode = "off"
@@ -77,6 +91,7 @@ disable_error_code = ["import-untyped"]
 
 [tool.uv]
 exclude-newer = "1 week"
+fork-strategy = "fewest"
 
 [tool.uv.exclude-newer-package]
 # Exclude other projects I own as they may contain early fixes
@@ -84,3 +99,4 @@ ducktools-classbuilder = false
 ducktools-lazyimporter = false
 ducktools-pythonfinder = false
 reannotate = false
+pip = "2 days"
