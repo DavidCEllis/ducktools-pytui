@@ -94,6 +94,8 @@ def main():
         main=main_func,
     )
 
+    shutil.rmtree(build_path)
+
 
 if __name__ == "__main__":
     main()
