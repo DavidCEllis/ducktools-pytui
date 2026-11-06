@@ -164,7 +164,8 @@ class UVManager(RuntimeManager[UVPythonListing]):
 
         installed_pys = []
         for v in json_data:
-            exe_path = Path(v["path"])
+            # Resolve to absolute paths but don't follow symlinks
+            exe_path = Path(v["path"]).absolute()
             # Filter out executables not inside the runtime folder
             if exe_path.is_relative_to(self.runtime_folder):
                 installed_pys.append(UVPythonListing.from_dict(manager=self, entry=v))
