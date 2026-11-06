@@ -38,12 +38,25 @@ dynamic = ['version']
 
 [dependency-groups]
 dev = [
+    {include-group = "test"},
+    {include-group = "type-check"},
+    {include-group = "build"},
+    "textual-dev>=1.8.0",
+]
+
+build = [
+    "pip>=26.3",
+]
+
+test = [
     "pytest>=9.1",
     "pytest-cov>=7.1",
     "pytest-asyncio>=1.4",
-    "mypy>=2.4",
     "pytest-rerunfailures>=16.7",
-    "textual-dev>=1.8.0",
+]
+
+type-check = [
+    "mypy>=2.4",
 ]
 
 [tool.setuptools.packages.find]
@@ -85,3 +98,4 @@ ducktools-classbuilder = false
 ducktools-lazyimporter = false
 ducktools-pythonfinder = false
 reannotate = false
+pip = "2 days"
