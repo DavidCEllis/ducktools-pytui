@@ -75,9 +75,10 @@ def upgrade_requirements():
             "uv", "export",
             "--locked",
             "--no-dev",
-            "--fork-strategy", "fewest",
+            "--no-header",
             "-o", requirements_file,
         ],
+        check=True,
     )
 
 
