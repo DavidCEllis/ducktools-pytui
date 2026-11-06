@@ -31,6 +31,7 @@ def test_requirements_updated():
                 "--locked",
                 "--no-dev",
                 "--no-header",
+                "--no-emit-project",
                 "-o", requirements_file,
             ],
             check=True,
