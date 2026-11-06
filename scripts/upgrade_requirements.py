@@ -27,6 +27,8 @@ import subprocess
 from typing import NamedTuple
 from pathlib import Path
 
+from ducktools.pytui.runtime_installers.uv import UVManager
+
 base_dir = Path(__file__).parents[1]
 pyproject_file = str(base_dir  / "pyproject.toml")
 requirements_file = str(base_dir / "requirements.txt")
@@ -70,9 +72,13 @@ def check_version_constraints() -> None:
 
 
 def upgrade_requirements():
+    uv_path = UVManager().executable
+    if uv_path is None:
+        raise FileNotFoundError("UV is required on PATH in order to upgrade requirements")
+
     subprocess.run(
         [
-            "uv", "export",
+            uv_path, "export",
             "--locked",
             "--no-dev",
             "--no-header",

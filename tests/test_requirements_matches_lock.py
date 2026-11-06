@@ -17,7 +17,7 @@ def test_requirements_updated():
     # Check that if the lockfile has been updated
     # the requirements file matches the lockfile
     # Skip if UV unavailable
-    uv_path = UVManager.executable
+    uv_path = UVManager().executable
     if uv_path is None:
         pytest.skip(reason="UV is not available on Path")
 
@@ -27,7 +27,7 @@ def test_requirements_updated():
         requirements_file = Path(tmpdir) / "requirements.txt"
         subprocess.run(
             [
-                "uv", "export",
+                uv_path, "export",
                 "--locked",
                 "--no-dev",
                 "--no-header",
