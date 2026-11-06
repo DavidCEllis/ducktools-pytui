@@ -16,6 +16,7 @@ exclude-newer-span = "P1W"
 ducktools-classbuilder = false
 ducktools-lazyimporter = false
 ducktools-pythonfinder = false
+pip = { timestamp = "0001-01-01T00:00:00Z", span = "P2D" }
 reannotate = false
 
 [[package]]
@@ -408,13 +409,26 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+build = [
+    { name = "pip" },
+]
 dev = [
     { name = "mypy" },
+    { name = "pip" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "pytest-rerunfailures" },
     { name = "textual-dev" },
+]
+test = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "pytest-rerunfailures" },
+]
+type-check = [
+    { name = "mypy" },
 ]
 
 [package.metadata]
@@ -426,14 +440,23 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+build = [{ name = "pip", specifier = ">=26.3" }]
 dev = [
     { name = "mypy", specifier = ">=2.4" },
+    { name = "pip", specifier = ">=26.3" },
     { name = "pytest", specifier = ">=9.1" },
     { name = "pytest-asyncio", specifier = ">=1.4" },
     { name = "pytest-cov", specifier = ">=7.1" },
     { name = "pytest-rerunfailures", specifier = ">=16.7" },
     { name = "textual-dev", specifier = ">=1.8.0" },
 ]
+test = [
+    { name = "pytest", specifier = ">=9.1" },
+    { name = "pytest-asyncio", specifier = ">=1.4" },
+    { name = "pytest-cov", specifier = ">=7.1" },
+    { name = "pytest-rerunfailures", specifier = ">=16.7" },
+]
+type-check = [{ name = "mypy", specifier = ">=2.4" }]
 
 [[package]]
 name = "frozenlist"
@@ -1026,6 +1049,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/5a/82/42f767fc1c1143d6fd36efb827202a2d997a375e160a71eb2888a925aac1/pathspec-1.1.1.tar.gz", hash = "sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a", size = 135180, upload-time = "2026-04-27T01:46:08.907Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/d9/7fb5aa316bc299258e68c73ba3bddbc499654a07f151cba08f6153988714/pathspec-1.1.1-py3-none-any.whl", hash = "sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189", size = 57328, upload-time = "2026-04-27T01:46:07.06Z" },
+]
+
+[[package]]
+name = "pip"
+version = "26.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/53/c7/f8d9e2e0e7c1ed8a22a10eeb3b5bf7860bc07d8446c7a978a882c5c8214b/pip-26.3.tar.gz", hash = "sha256:6c36ae7da8695be67e3cd9f7d87919667ced53f57ce2ede75d89b5912ed2bc4c", size = 1934348, upload-time = "2026-11-02T20:34:27.738Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl", hash = "sha256:f3b60b20ffaadd4415ed7957212a38ac63fa4c5fa375bd0f4a797777940fad13", size = 1950951, upload-time = "2026-11-02T20:34:25.728Z" },
 ]
 
 [[package]]

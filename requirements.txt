@@ -1,4 +1,3 @@
--e .
 ducktools-classbuilder==0.15.3 \
     --hash=sha256:13d82dd6cb60d00ee6909c7ff4c6852a9e802ce7ba3d2f2542b3fc18cb3f2155 \
     --hash=sha256:3060796281771aab6ececed825c32a00876938b23ce4c3277d21d2de3aad7df1
