@@ -312,9 +312,16 @@ class VEnvTable(DataTable):
     def add_venv(self, venv: PythonVEnv, sort=False, global_venv=False):
         self._venv_catalogue[venv.folder] = venv
 
+        # Use the version from the install instead of that reported
+        # in the venv file
+        if parent := venv.get_parent_install():
+            version_str = parent.version_str
+        else:
+            version_str = venv.version_str
+
         if global_venv:
             self.add_row(
-                venv.version_str,
+                version_str,
                 True,
                 substitute_home(venv.folder),
                 substitute_home(venv.parent_executable),
@@ -323,7 +330,7 @@ class VEnvTable(DataTable):
         else:
             folder = os.path.relpath(venv.folder, start=CWD)
             self.add_row(
-                venv.version_str,
+                version_str,
                 False,
                 folder,
                 substitute_home(venv.parent_executable),
